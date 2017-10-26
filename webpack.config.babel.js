@@ -48,7 +48,9 @@ module.exports = {
         new ExtractTextPlugin({ filename: '[name].css', allChunks: false }),
         new webpack.optimize.UglifyJsPlugin({ comments: false }),
         new BrowserSyncPlugin({
-            proxy: `0.0.0.0:${process.env.PORT}/`,
+            host: 'localhost',
+            port: process.env.PORT,
+            server: { baseDir: ['public'] },
         }),
         new FaviconsWebpackPlugin('./favicon.png'),
     ],
