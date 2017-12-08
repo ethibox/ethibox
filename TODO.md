@@ -1,0 +1,4 @@
+- [ ] More informations about application (Infobulle)
+- [ ] Previsualisation image
+- [ ] Add Popular Applications 
+- [ ] Domain (optional)
