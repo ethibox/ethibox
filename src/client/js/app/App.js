@@ -1,10 +1,9 @@
 import React from 'react';
 import { Button, Container, Divider, Header, Icon, Card, Grid } from 'semantic-ui-react';
-import { connect } from 'react-redux';
 import Sidebar from '../sidebar/Sidebar';
-import Application from '../application/Application';
+import ApplicationList from '../application/ApplicationList';
 
-const App = (props) => {
+const App = () => {
     return (
         <Container>
             <Divider hidden />
@@ -29,8 +28,7 @@ const App = (props) => {
 
                     <Grid.Column computer={13}>
                         <Card.Group itemsPerRow={4}>
-                            { props.applications.filter(app => app.installed).map(app => <Application {...app} key={app.id} />) }
-                            { props.applications.filter(app => !app.installed).map(app => <Application {...app} key={app.id} />) }
+                            <ApplicationList />
                         </Card.Group>
                     </Grid.Column>
                 </Grid.Row>
@@ -39,18 +37,4 @@ const App = (props) => {
     );
 };
 
-const mapStateToProps = (state) => {
-    const { applications } = state.AppReducer;
-    const { category, search } = state.SidebarReducer;
-
-    if (category !== 'All') {
-        return { applications: applications.filter(app => app.category === category) };
-    }
-
-    const regexp = new RegExp(search, 'gi');
-    const applicationsFiltered = applications.filter(app => regexp.test(app.name) || regexp.test(app.domain));
-
-    return { applications: applicationsFiltered };
-};
-
-export default connect(mapStateToProps)(App);
+export default App;
