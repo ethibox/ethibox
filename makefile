@@ -11,11 +11,12 @@ install: check ## Install application
 	@ yarn --ignore-engines
 	@ ./node_modules/.bin/selenium-standalone install
 
-run: ## Run application
-	@ NODE_ENV=production PORT=${PORT} node public/index.js
+run: ## Run prod application
+	@ NODE_ENV=production node public/index.js
 
-dev: ## Run dev environment
-	@ PORT=${PORT} NODE_ENV=development ./node_modules/.bin/pm2 start --watch src/ --no-daemon src/server/index.js --interpreter ./node_modules/.bin/babel-node & make watch
+dev: ## Run dev application
+	@ rm -rf public && mkdir -p public
+	@ NODE_ENV=development ./node_modules/.bin/pm2 start --watch src/ --no-daemon src/server/index.js --interpreter ./node_modules/.bin/babel-node & make watch
 
 watch: ## Watch
 	@ mkdir -p public
@@ -26,14 +27,14 @@ build: ## Build with webpack
 	@ NODE_ENV=production ./node_modules/.bin/babel --minified --no-comments --compact true -d public/ src/server
 	@ NODE_ENV=production ./node_modules/.bin/webpack -p --progress --colors
 
-start-selenium:
+start-selenium: ## Start Selenium
 	@ ./node_modules/.bin/selenium-standalone start
 
 test: ## Run tests
 	@ NODE_ENV=test ./node_modules/.bin/mocha -t 99999999 --require babel-register --require babel-polyfill test/hook.js test/specs/*.spec.js
 
-lint:
+lint: ## Lint
 	@ ./node_modules/.bin/eslint src/
 
-lint-fix:
+lint-fix: ## Lint-fix
 	@ ./node_modules/.bin/eslint --fix src/
