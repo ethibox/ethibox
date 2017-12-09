@@ -1,0 +1,25 @@
+apiVersion: v1
+entries:
+  ghost:
+  - apiVersion: v1
+    appVersion: 1.18.2
+    created: 2017-12-09T00:47:01.188486005+01:00
+    description: A Helm chart for Kubernetes
+    digest: 4452bbb45d5087ad86fbee3bdac2b2e669a06e8469d4e8ae522acd375f19eb99
+    icon: https://framapic.org/B4x7MtG9cuHi/hRytuK7P1YHE.png
+    name: ghost
+    urls:
+    - ghost-0.1.0.tgz
+    version: 0.1.0
+  wordpress:
+  - apiVersion: v1
+    appVersion: 4.9.1
+    created: 2017-12-09T00:47:01.18881226+01:00
+    description: A Helm chart for Kubernetes
+    digest: e5b9684e34220d883855c00be0d41954c32d782ffda58468a0d309b77f70d920
+    icon: https://framapic.org/q4P5asK7T3rG/lwrvyHc3wRm0.png
+    name: wordpress
+    urls:
+    - wordpress-0.1.0.tgz
+    version: 0.1.0
+generated: 2017-12-09T00:47:01.188150495+01:00

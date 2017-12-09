@@ -1,0 +1,18 @@
+---
+replicaCount: 1
+image:
+  repository: wordpress
+  tag: 4.9.1
+service:
+  name: wordpress
+  type: NodePort
+  externalPort: 80
+  internalPort: 80
+ingress:
+  enabled: true
+  hosts:
+    - wordpress.local
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 300m

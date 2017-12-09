@@ -6,6 +6,7 @@ import api from './api';
 
 const app = express();
 const { PORT } = process.env;
+const publicPath = (process.env.NODE_ENV === 'production') ? './' : '../../public/';
 
 app.use(compression());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -13,19 +14,9 @@ app.use(bodyParser.json());
 
 app.use('/api', api);
 
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname)));
-
-    app.get('/', (req, res) => {
-        res.sendFile(path.join(__dirname, 'index.html'));
-    });
-} else {
-    app.use(express.static(path.join(__dirname, '../../public')));
-
-    app.get('/', (req, res) => {
-        res.sendFile(path.join(__dirname, '../../public', 'index.html'));
-    });
-}
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, publicPath, 'index.html'));
+});
 
 app.get('*', (req, res) => {
     res.status(404).send('Not found');
