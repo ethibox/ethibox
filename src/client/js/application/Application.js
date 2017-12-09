@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { Label, Card, Image, Button, Modal, Header, Icon, Progress, Dimmer, Loader, Input } from 'semantic-ui-react';
 import { installApplication, uninstallApplication, updateApplication } from '../application/ApplicationActions';
 
-const defaultLogo = 'https://react.semantic-ui.com/assets/images/wireframe/white-image.png';
+const defaultIcon = 'https://react.semantic-ui.com/assets/images/wireframe/white-image.png';
 const initialApplication = { state: null, installed: false, domainError: false, domain: '', openModal: false, progress: 0 };
 
 class Application extends React.Component {
@@ -48,12 +48,12 @@ class Application extends React.Component {
     }
 
     install = () => {
-        const { name, category, logo, domain } = this.state;
+        const { name, category, icon, domain } = this.state;
         this.setState({ state: 'installing' });
         setTimeout(() => this.setState({ progress: 70 }), 2000);
         setTimeout(() => this.setState({ progress: 100 }), 5000);
         setTimeout(() => this.setState({ state: 'running' }), 6000);
-        setTimeout(() => this.props.installApplication({ name, category, domain, logo, installed: true, state: 'running' }), 6200);
+        setTimeout(() => this.props.installApplication({ name, category, domain, icon, installed: true, state: 'running' }), 6200);
         setTimeout(() => this.setState({ ...initialApplication }), 6200);
     }
 
@@ -154,7 +154,7 @@ class Application extends React.Component {
     }
 
     render() {
-        const { logo, name, domain, state, hyperlien, progress } = this.state;
+        const { icon, name, domain, state, hyperlien, progress } = this.state;
 
         return (
             <Card>
@@ -166,7 +166,7 @@ class Application extends React.Component {
                     <Card.Header>{name}</Card.Header>
                     { state === 'upcomming' ? <Label as="a" color="orange" ribbon="right">Upcomming</Label> : null }
                     <Card.Description textAlign="center">
-                        <Image src={logo || defaultLogo} width="60" />
+                        <Image src={icon || defaultIcon} width="60" />
                         { (domain) ? <Card.Meta><a href={hyperlien} target="_blank"><Icon name="linkify" />{domain}</a></Card.Meta> : null }
                     </Card.Description>
                 </Card.Content>
