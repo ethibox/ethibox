@@ -4,12 +4,11 @@ language: node_js
 node_js:
   - 6
 install:
-  - npm i -g yarn
   - make install
 before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-  - nohup bash -c "./node_modules/.bin/selenium-standalone start 2>&1 &"
+  - nohup bash -c "make start-selenium 2>&1 &"
   - sleep 5
 script:
   - make build
