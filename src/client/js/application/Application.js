@@ -8,6 +8,10 @@ const defaultIcon = 'https://react.semantic-ui.com/assets/images/wireframe/white
 const ip = '192.168.1.58';
 
 class Application extends React.Component {
+    uninstall = (releaseName) => {
+        this.props.uninstallApplication(releaseName);
+    }
+
     render() {
         const { icon, releaseName, category, port } = this.props;
         const hyperlink = `http://${ip}:${port}`;
@@ -28,7 +32,7 @@ class Application extends React.Component {
                 </Card.Content>
                 <Card.Content extra>
                     <div className="ui two buttons">
-                        <Button color="red"><Icon name="stop" /> Stop</Button>
+                        <Button color="red" onClick={() => this.uninstall(releaseName)}><Icon name="delete" /> Uninstall</Button>
                     </div>
                 </Card.Content>
             </Card>

@@ -1,5 +1,4 @@
 export const updateApplication = app => ({ type: 'UPDATE_APPLICATION', app });
-export const uninstallApplication = id => ({ type: 'UNINSTALL_APPLICATION', id });
 export const listApplicationsSuccess = applications => ({ type: 'LIST_APPLICATIONS_SUCCESS', applications });
 
 export const listApplications = () => (dispatch) => {
@@ -17,3 +16,11 @@ export const installApplication = ({ name, releaseName }) => () => {
         body: JSON.stringify({ name, releaseName }),
     });
 };
+
+export const uninstallApplication = releaseName => () => {
+    fetch('/api/application/uninstall', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ releaseName }),
+    });
+}
