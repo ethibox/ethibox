@@ -21,6 +21,7 @@ class Chart extends React.Component {
         if (key === 'Enter') {
             if (this.isValidReleaseName(releaseName)) {
                 this.install(this.props.name, releaseName);
+                this.setState({ action: '' });
             } else {
                 this.setState({ error: true });
             }
