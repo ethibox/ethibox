@@ -1,10 +1,11 @@
 import express from 'express';
+import aa from 'express-async-await';
 import path from 'path';
 import compression from 'compression';
 import bodyParser from 'body-parser';
 import api from './api';
 
-const app = express();
+const app = aa(express());
 const { PORT } = process.env;
 const publicPath = (process.env.NODE_ENV === 'production') ? './' : '../../public/';
 
