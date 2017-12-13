@@ -1,6 +1,6 @@
 export default (state = { applications: [], isLoading: false }, action) => {
     switch (action.type) {
-        case 'LOAD_APPLICATIONS_SUCCESS': {
+        case 'LIST_APPLICATIONS_SUCCESS': {
             return { ...state, applications: action.applications };
         }
 
