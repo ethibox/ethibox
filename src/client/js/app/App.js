@@ -1,38 +1,24 @@
 import React from 'react';
-import { Button, Container, Divider, Header, Icon, Card, Grid } from 'semantic-ui-react';
-import Sidebar from '../sidebar/Sidebar';
+import { Container, Divider, Header, Icon, Card } from 'semantic-ui-react';
 import ApplicationList from '../application/ApplicationList';
+import ChartList from '../chart/ChartList';
 
 const App = () => {
     return (
         <Container>
             <Divider hidden />
 
-            <Header as="h1" floated="left">
+            <Header as="h1">
                 <Icon color="teal" name="cloud" />
-                <Header.Content>
-                    Ethibox
-                    <Header.Subheader>The new way to host websites</Header.Subheader>
-                </Header.Content>
+                <Header.Content>Ethibox</Header.Content>
             </Header>
-
-            <Button basic floated="right" icon="sign out" content="Se déconnecter" href="/logout" />
 
             <Divider hidden clearing />
 
-            <Grid columns={2}>
-                <Grid.Row>
-                    <Grid.Column computer={3}>
-                        <Sidebar />
-                    </Grid.Column>
-
-                    <Grid.Column computer={13}>
-                        <Card.Group itemsPerRow={4}>
-                            <ApplicationList />
-                        </Card.Group>
-                    </Grid.Column>
-                </Grid.Row>
-            </Grid>
+            <Card.Group itemsPerRow={4} stackable>
+                <ApplicationList />
+                <ChartList />
+            </Card.Group>
         </Container>
     );
 };
