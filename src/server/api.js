@@ -1,5 +1,5 @@
 import express from 'express';
-import { listApplications, installApplication, uninstallApplication, listCharts } from './k8sClient';
+import { listApplications, installApplication, uninstallApplication, listCharts, stateApplication } from './k8sClient';
 
 const api = express();
 
@@ -24,6 +24,12 @@ api.post('/application/uninstall', (req, res) => {
 api.get('/application/list', async (req, res) => {
     const apps = await listApplications();
     return res.json(apps);
+});
+
+api.get('/application/state/:releaseName', async (req, res) => {
+    const { releaseName } = req.params;
+    const state = await stateApplication(releaseName);
+    return res.json(state);
 });
 
 api.get('/chart/list', (req, res) => {
