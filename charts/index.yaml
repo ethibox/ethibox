@@ -3,23 +3,27 @@ entries:
   ghost:
   - apiVersion: v1
     appVersion: 1.18.2
-    created: 2017-12-09T16:44:31.894046665+01:00
+    created: 2017-12-13T17:30:15.524897749+01:00
     description: A Helm chart for Kubernetes
-    digest: 4452bbb45d5087ad86fbee3bdac2b2e669a06e8469d4e8ae522acd375f19eb99
+    digest: 8117531f31d4dbac42e48831c1dae009404fb4cfb58f31c1cf97525cb7c51776
     icon: https://framapic.org/B4x7MtG9cuHi/hRytuK7P1YHE.png
+    keywords:
+    - blog
     name: ghost
     urls:
-    - https://aa7775cc1e612b504155fd08819f4e4514f9ec86@raw.githubusercontent.com/ston3o/ethibox/master/charts/ghost-0.1.0.tgz
+    - ghost-0.1.0.tgz
     version: 0.1.0
   wordpress:
   - apiVersion: v1
     appVersion: 4.9.1
-    created: 2017-12-09T16:44:31.894350014+01:00
+    created: 2017-12-13T17:30:15.525197516+01:00
     description: A Helm chart for Kubernetes
-    digest: e5b9684e34220d883855c00be0d41954c32d782ffda58468a0d309b77f70d920
+    digest: e2136db1261b609bc45801aa15feccd126ff3f4e1c494402fd85baf9c87660db
     icon: https://framapic.org/q4P5asK7T3rG/lwrvyHc3wRm0.png
+    keywords:
+    - blog
     name: wordpress
     urls:
-    - https://aa7775cc1e612b504155fd08819f4e4514f9ec86@raw.githubusercontent.com/ston3o/ethibox/master/charts/wordpress-0.1.0.tgz
+    - wordpress-0.1.0.tgz
     version: 0.1.0
-generated: 2017-12-09T16:44:31.893741198+01:00
+generated: 2017-12-13T17:30:15.52455868+01:00
