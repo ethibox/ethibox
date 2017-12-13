@@ -6,16 +6,27 @@ export const listCharts = () => {
     return Object.values(chartIndex.entries).map(chart => ({ name: chart[0].name, icon: chart[0].icon, category: chart[0].keywords[0] }));
 };
 
-export const stateApplication = (releaseName) => {
-    // const isRunning = data.items.every(item => item.status.phase === 'Running');
-    return 'running';
-}
+export const stateApplication = async (releaseName) => {
+    const isRunning = await fetch(`http://127.0.0.1:8001/api/v1/namespaces/default/pods/?labelSelector=release=${releaseName}`)
+        .then(res => res.json())
+        .then(data => data.items.every(item => item.status.phase === 'Running'));
+
+    return isRunning ? 'running' : 'installing';
+};
+
+export const portApplication = async (name, releaseName) => {
+    const port = await fetch(`http://127.0.0.1:8001/api/v1/namespaces/default/services/?labelSelector=app=${name},release=${releaseName}`)
+        .then(res => res.json())
+        .then(data => data.items[0].spec.ports[0].nodePort);
+
+    return port;
+};
 
 export const listApplications = async () => {
     const charts = listCharts();
 
     const apps = await fetch('http://127.0.0.1:8001/apis/extensions/v1beta1/namespaces/default/ingresses')
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => data.items.map((item) => {
             const name = item.metadata.labels.app;
             const releaseName = item.metadata.labels.release;
@@ -24,12 +35,15 @@ export const listApplications = async () => {
             return {
                 name,
                 releaseName,
-                state: stateApplication(name),
                 icon,
                 category: 'blog',
-                port: 9348,
             };
         }));
+
+    await Promise.all(apps.map(async (app) => {
+        app.port = await portApplication(app.name, app.releaseName);
+        app.state = await stateApplication(app.releaseName);
+    }));
 
     return apps;
 };
