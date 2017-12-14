@@ -23,7 +23,6 @@ class Application extends React.Component {
         fetch(`/api/applications/${this.props.releaseName}`)
             .then(res => res.json())
             .then((application) => {
-                console.log(application);
                 if (application.state !== 'running') {
                     this.refreshApplication();
                 } else {
