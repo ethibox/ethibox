@@ -4,6 +4,14 @@ export default (state = { applications: [], isLoading: false }, action) => {
             return { ...state, applications: action.applications };
         }
 
+        case 'ADD_APPLICATION': {
+            return { ...state, applications: [...state.applications, action.application] };
+        }
+
+        case 'REMOVE_APPLICATION': {
+            return { ...state, applications: state.applications.filter(app => app.releaseName !== action.releaseName) };
+        }
+
         case 'INSTALL_APPLICATION': {
             const newId = state.applications.reduce((maxId, app) => Math.max(app.id, maxId), -1) + 1;
             const newApplication = { id: newId, ...action.application };

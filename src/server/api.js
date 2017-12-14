@@ -3,36 +3,30 @@ import { listApplications, installApplication, uninstallApplication, listCharts,
 
 const api = express();
 
-api.get('/', (req, res) => {
-    res.json({ response: 'Hello api!' });
-});
-
-api.post('/application/install', (req, res) => {
-    const { name, releaseName } = req.body;
-
-    installApplication(name, releaseName);
-    return res.json('installed');
-});
-
-api.post('/application/uninstall', (req, res) => {
-    const { releaseName } = req.body;
-
-    uninstallApplication(releaseName);
-    return res.json('uninstalled');
-});
-
-api.get('/application/list', async (req, res) => {
+api.get('/applications', async (req, res) => {
     const apps = await listApplications();
     return res.json(apps);
 });
 
-api.get('/application/state/:releaseName', async (req, res) => {
-    const { releaseName } = req.params;
-    const state = await stateApplication(releaseName);
-    return res.json(state);
+api.post('/applications', (req, res) => {
+    const { name, releaseName } = req.body;
+    installApplication(name, releaseName);
+    return res.json('installed');
 });
 
-api.get('/chart/list', (req, res) => {
+api.delete('/applications/:releaseName', (req, res) => {
+    const { releaseName } = req.params;
+    uninstallApplication(releaseName);
+    return res.json('uninstalled');
+});
+
+api.get('/applications/:releaseName', async (req, res) => {
+    const { releaseName } = req.params;
+    const state = await stateApplication(releaseName);
+    return res.json({ releaseName, state });
+});
+
+api.get('/charts', (req, res) => {
     const charts = listCharts();
     res.json(charts);
 });
