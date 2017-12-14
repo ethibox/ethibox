@@ -4,3 +4,5 @@ icon: https://framapic.org/q4P5asK7T3rG/lwrvyHc3wRm0.png
 name: wordpress
 version: 0.1.0
 appVersion: 4.9.1
+keywords:
+  - blog
