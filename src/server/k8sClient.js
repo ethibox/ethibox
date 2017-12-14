@@ -7,11 +7,29 @@ export const listCharts = () => {
 };
 
 export const stateApplication = async (releaseName) => {
-    const isRunning = await fetch(`http://127.0.0.1:8001/api/v1/namespaces/default/pods/?labelSelector=release=${releaseName}`)
+    const state = await fetch(`http://127.0.0.1:8001/api/v1/namespaces/default/pods/?labelSelector=release=${releaseName}`)
         .then(res => res.json())
-        .then(data => data.items.every(item => item.status.phase === 'Running'));
+        .then((data) => {
+            if (!data.items.length) {
+                return 'notexisting';
+            }
 
-    return isRunning ? 'running' : 'installing';
+            if (data.items.some(item => item.metadata.hasOwnProperty('deletionTimestamp'))) { // eslint-disable-line
+                return 'uninstalling';
+            }
+
+            if (data.items.every(item => item.status.containerStatuses[0].hasOwnProperty('ready') && item.status.containerStatuses[0].ready)) { // eslint-disable-line
+                return 'running';
+            }
+
+            if (data.items.some(item => item.status.containerStatuses[0].hasOwnProperty('ready'))) { // eslint-disable-line
+                return 'installing';
+            }
+
+            return 'problem';
+        });
+
+    return state;
 };
 
 export const portApplication = async (name, releaseName) => {
