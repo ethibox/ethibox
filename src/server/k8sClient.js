@@ -34,10 +34,13 @@ export const stateApplication = async (releaseName) => {
     return state;
 };
 
-export const portApplication = async (name, releaseName) => {
-    const port = await fetch(`http://127.0.0.1:8001/api/v1/namespaces/default/services/?labelSelector=app=${name},release=${releaseName}`)
+export const portApplication = async (releaseName) => {
+    const port = await fetch(`http://127.0.0.1:8001/api/v1/namespaces/default/services/?labelSelector=release=${releaseName}`)
         .then(res => res.json())
-        .then(data => data.items[0].spec.ports[0].nodePort);
+        .then((data) => {
+            const services = data.items;
+            return services[services.length - 1].spec.ports[0].nodePort;
+        });
 
     return port;
 };
@@ -58,7 +61,7 @@ export const listApplications = async () => {
         }));
 
     await Promise.all(apps.map(async (app) => {
-        app.port = await portApplication(app.name, app.releaseName);
+        app.port = await portApplication(app.releaseName);
         app.state = await stateApplication(app.releaseName);
     }));
 

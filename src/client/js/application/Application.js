@@ -37,6 +37,7 @@ class Application extends React.Component {
 
     uninstall = (releaseName) => {
         this.props.uninstallApplication(releaseName);
+        this.refreshApplication();
     }
 
     render() {

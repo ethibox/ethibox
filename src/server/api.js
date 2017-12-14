@@ -1,5 +1,5 @@
 import express from 'express';
-import { listApplications, installApplication, uninstallApplication, listCharts, stateApplication } from './k8sClient';
+import { listApplications, installApplication, uninstallApplication, listCharts, stateApplication, portApplication } from './k8sClient';
 
 const api = express();
 
@@ -23,7 +23,13 @@ api.delete('/applications/:releaseName', (req, res) => {
 api.get('/applications/:releaseName', async (req, res) => {
     const { releaseName } = req.params;
     const state = await stateApplication(releaseName);
-    return res.json({ releaseName, state });
+
+    if (state === 'notexisting') {
+        return res.json('notexisting');
+    }
+
+    const port = await portApplication(releaseName);
+    return res.json({ releaseName, state, port });
 });
 
 api.get('/charts', (req, res) => {
