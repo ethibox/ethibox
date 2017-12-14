@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
-import AppReducer from '../application/ApplicationReducer';
-import SidebarReducer from '../sidebar/SidebarReducer';
+import ApplicationReducer from '../application/ApplicationReducer';
+import ChartReducer from '../chart/ChartReducer';
 
-const reducers = combineReducers({ AppReducer, SidebarReducer });
+const reducers = combineReducers({ ApplicationReducer, ChartReducer });
 
 export default reducers;

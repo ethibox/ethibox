@@ -1,16 +1,39 @@
 import express from 'express';
-import yaml from 'yamljs';
+import { listApplications, installApplication, uninstallApplication, listCharts, stateApplication, portApplication } from './k8sClient';
 
 const api = express();
 
-api.get('/', (req, res) => {
-    res.json({ response: 'Hello api!' });
+api.get('/applications', async (req, res) => {
+    const apps = await listApplications();
+    return res.json(apps);
+});
+
+api.post('/applications', (req, res) => {
+    const { name, releaseName } = req.body;
+    installApplication(name, releaseName);
+    return res.json('installed');
+});
+
+api.delete('/applications/:releaseName', (req, res) => {
+    const { releaseName } = req.params;
+    uninstallApplication(releaseName);
+    return res.json('uninstalled');
+});
+
+api.get('/applications/:releaseName', async (req, res) => {
+    const { releaseName } = req.params;
+    const state = await stateApplication(releaseName);
+
+    if (state === 'notexisting') {
+        return res.json('notexisting');
+    }
+
+    const port = await portApplication(releaseName);
+    return res.json({ releaseName, state, port });
 });
 
 api.get('/charts', (req, res) => {
-    const chartIndex = yaml.load(`${__dirname}/../../charts/index.yaml`);
-    const charts = Object.values(chartIndex.entries).map(chart => ({ name: chart[0].name, icon: chart[0].icon }));
-
+    const charts = listCharts();
     res.json(charts);
 });
 

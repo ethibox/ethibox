@@ -1,27 +1,15 @@
 export default (state = { applications: [], isLoading: false }, action) => {
     switch (action.type) {
-        case 'LOAD_APPLICATIONS_SUCCESS': {
+        case 'LIST_APPLICATIONS_SUCCESS': {
             return { ...state, applications: action.applications };
         }
 
-        case 'INSTALL_APPLICATION': {
-            const newId = state.applications.reduce((maxId, app) => Math.max(app.id, maxId), -1) + 1;
-            const newApplication = { id: newId, ...action.application };
-            return { ...state, applications: [...state.applications, newApplication] };
+        case 'ADD_APPLICATION': {
+            return { ...state, applications: [...state.applications, action.application] };
         }
 
-        case 'UPDATE_APPLICATION': {
-            const applications = state.applications.map((app) => {
-                if (app.id === action.application.id) {
-                    return { ...app, ...action.application };
-                }
-                return app;
-            });
-            return { ...state, applications };
-        }
-
-        case 'UNINSTALL_APPLICATION': {
-            return { ...state, applications: state.applications.filter(app => app.id !== action.id) };
+        case 'REMOVE_APPLICATION': {
+            return { ...state, applications: state.applications.filter(app => app.releaseName !== action.releaseName) };
         }
 
         default: {

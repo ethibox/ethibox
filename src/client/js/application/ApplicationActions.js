@@ -1,13 +1,24 @@
-export const installApplication = application => ({ type: 'INSTALL_APPLICATION', application });
-export const updateApplication = application => ({ type: 'UPDATE_APPLICATION', application });
-export const uninstallApplication = id => ({ type: 'UNINSTALL_APPLICATION', id });
-export const loadApplicationsSuccess = applications => ({ type: 'LOAD_APPLICATIONS_SUCCESS', applications });
+export const addApplication = application => ({ type: 'ADD_APPLICATION', application });
+export const removeApplication = releaseName => ({ type: 'REMOVE_APPLICATION', releaseName });
+export const listApplicationsSuccess = applications => ({ type: 'LIST_APPLICATIONS_SUCCESS', applications });
 
-export const loadApplications = () => (dispatch) => {
-    fetch('/api/charts')
+export const listApplications = () => (dispatch) => {
+    fetch('/api/applications')
         .then(data => data.json())
-        .then((apps) => {
-            dispatch(loadApplicationsSuccess(apps));
-        })
-        .catch(console.log);
+        .then(applications => dispatch(listApplicationsSuccess(applications)));
+};
+
+export const installApplication = application => (dispatch) => {
+    dispatch(addApplication(application));
+
+    fetch('/api/applications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(application),
+    });
+};
+
+export const uninstallApplication = releaseName => (dispatch) => {
+    dispatch(removeApplication(releaseName));
+    fetch(`/api/applications/${releaseName}`, { method: 'DELETE' });
 };
