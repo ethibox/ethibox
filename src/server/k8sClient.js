@@ -6,6 +6,8 @@ export const listCharts = () => {
     return Object.values(chartIndex.entries).map(chart => ({ name: chart[0].name, icon: chart[0].icon, category: chart[0].keywords[0] }));
 };
 
+export const chart = name => listCharts().filter(c => c.name === name)[0];
+
 export const stateApplication = async (releaseName) => {
     const state = await fetch(`http://127.0.0.1:8001/api/v1/namespaces/default/pods/?labelSelector=release=${releaseName}`)
         .then(res => res.json())
@@ -41,20 +43,17 @@ export const portApplication = async (name, releaseName) => {
 };
 
 export const listApplications = async () => {
-    const charts = listCharts();
-
     const apps = await fetch('http://127.0.0.1:8001/apis/extensions/v1beta1/namespaces/default/ingresses')
         .then(res => res.json())
         .then(data => data.items.map((item) => {
             const name = item.metadata.labels.app;
             const releaseName = item.metadata.labels.release;
-            const { icon } = charts.filter(chart => chart.name === name)[0];
 
             return {
                 name,
                 releaseName,
-                icon,
-                category: 'blog',
+                icon: chart(name).icon,
+                category: chart(name).category,
             };
         }));
 

@@ -9,19 +9,20 @@ const defaultIcon = 'https://react.semantic-ui.com/assets/images/wireframe/white
 class Chart extends React.Component {
     state = { action: '', releaseName: '', error: false }
 
-    install(name, releaseName) {
-        this.props.installApplication({ name, releaseName });
+    install(releaseName) {
+        const { name, icon, category } = this.props;
+        this.props.installApplication({ name, icon, category, releaseName });
     }
 
-    isValidReleaseName = releaseName => releaseName.match(/[a-zA-Z-]+/);
+    isValidReleaseName = releaseName => releaseName.match(/^[a-z]+$/);
 
     enterReleaseName = (key) => {
         const { releaseName } = this.state;
 
         if (key === 'Enter') {
             if (this.isValidReleaseName(releaseName)) {
-                this.install(this.props.name, releaseName);
-                this.setState({ action: '' });
+                this.install(releaseName.trim());
+                this.setState({ action: '', releaseName: '' });
             } else {
                 this.setState({ error: true });
             }
