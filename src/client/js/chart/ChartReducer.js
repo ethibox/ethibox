@@ -4,10 +4,6 @@ export default (state = { charts: [] }, action) => {
             return { ...state, charts: action.charts };
         }
 
-        case 'SEARCH_CHART': {
-            return state;
-        }
-
         default: {
             return state;
         }
