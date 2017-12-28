@@ -1,0 +1,14 @@
+---
+replicaCount: 1
+image:
+  repository: metabase/metabase
+  tag: v0.27.2
+service:
+  name: metabase
+  type: NodePort
+  externalPort: 3000
+  internalPort: 3000
+ingress:
+  enabled: true
+  hosts:
+    - metabase.local

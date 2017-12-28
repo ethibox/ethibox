@@ -1,0 +1,18 @@
+---
+replicaCount: 1
+image:
+  repository: fuerst/etherpad-docker
+  tag: stable
+service:
+  name: etherpad
+  type: NodePort
+  externalPort: 9001
+  internalPort: 9001
+ingress:
+  enabled: true
+  hosts:
+    - etherpad.local
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 300m
