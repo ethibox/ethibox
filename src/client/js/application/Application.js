@@ -5,7 +5,9 @@ import { Card, Image, Button, Icon, Dimmer, Loader } from 'semantic-ui-react';
 import { uninstallApplication } from '../application/ApplicationActions';
 
 const defaultIcon = 'https://react.semantic-ui.com/assets/images/wireframe/white-image.png';
-const ip = '192.168.1.58';
+const ERROR_MEMORY = 'Insufficient memory';
+const RUNNING = 'running';
+const LOADING = 'loading';
 
 class Application extends React.Component {
     constructor(props) {
@@ -14,39 +16,32 @@ class Application extends React.Component {
     }
 
     componentWillMount() {
-        if (this.props.state !== 'running') {
+        if (this.props.state === LOADING) {
             this.refreshApplication();
         }
     }
 
-    getApplication = () => {
-        fetch(`/api/applications/${this.props.releaseName}`)
-            .then(res => res.json())
-            .then((application) => {
-                if (application.state !== 'running') {
-                    this.refreshApplication();
-                } else {
-                    this.setState(application);
-                }
-            });
-    }
-
     refreshApplication = () => {
-        setTimeout(() => this.getApplication(), 5000);
-    }
-
-    uninstall = (releaseName) => {
-        this.props.uninstallApplication(releaseName);
-        this.refreshApplication();
+        setTimeout(() => {
+            fetch(`/api/applications/${this.props.releaseName}`)
+                .then(res => res.json())
+                .then((application) => {
+                    if (application.state === LOADING) {
+                        this.refreshApplication();
+                    } else {
+                        this.setState(application);
+                    }
+                });
+        }, 5000);
     }
 
     render() {
         const { icon, releaseName, category, port, state } = this.state;
-        const hyperlink = `http://${ip}:${port}`;
+        const hyperlink = `http://192.168.99.100:${port}`;
 
         return (
             <Card>
-                <Dimmer active={state !== 'running'} inverted>
+                <Dimmer active={state === LOADING} inverted>
                     <Loader indeterminate>Loading...</Loader>
                 </Dimmer>
                 <Card.Content>
@@ -55,19 +50,24 @@ class Application extends React.Component {
                     <Card.Description textAlign="center">
                         <Image src={icon || defaultIcon} width="60" />
                         {
-                            state === 'running' ? (
-                                <Card.Meta>
-                                    <a href={hyperlink} target="_blank">
-                                        <Icon name="linkify" />{hyperlink}
-                                    </a>
-                                </Card.Meta>
-                            ) : null
+                            state === RUNNING &&
+                            <Card.Meta>
+                                <a href={hyperlink} target="_blank">
+                                    <Icon name="linkify" />{hyperlink}
+                                </a>
+                            </Card.Meta>
+                        }
+                        {
+                            state === ERROR_MEMORY &&
+                            <Card.Meta>
+                                <p style={{ color: 'red', fontWeight: 'bold' }}>Error: Insufficient memory</p>
+                            </Card.Meta>
                         }
                     </Card.Description>
                 </Card.Content>
                 <Card.Content extra>
                     <div className="ui two buttons">
-                        <Button color="red" onClick={() => this.uninstall(releaseName)}><Icon name="delete" /> Uninstall</Button>
+                        <Button color="red" onClick={() => this.props.uninstallApplication(releaseName)}><Icon name="delete" /> Uninstall</Button>
                     </div>
                 </Card.Content>
             </Card>

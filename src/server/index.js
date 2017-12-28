@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import express from 'express';
 import aa from 'express-async-await';
 import path from 'path';
@@ -6,7 +7,7 @@ import bodyParser from 'body-parser';
 import api from './api';
 
 const app = aa(express());
-const { PORT } = process.env;
+const PORT = process.env.PORT || 4444;
 const publicPath = (process.env.NODE_ENV === 'production') ? './' : '../../public/';
 
 app.use(compression());
@@ -15,6 +16,7 @@ app.use(bodyParser.json());
 
 app.use('/api', api);
 app.use('/static/', express.static(path.join(__dirname, publicPath)));
+app.use('/charts/', express.static(path.join(__dirname, publicPath, '../charts/packages/')));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, publicPath, 'index.html'));

@@ -10,7 +10,8 @@ class ApplicationList extends React.Component {
     }
 
     render() {
-        return this.props.applications.map(app => <Application {...app} key={app.releaseName} />);
+        const { applications } = this.props;
+        return applications.length ? applications.map(app => <Application {...app} key={app.releaseName} />) : null;
     }
 }
 
