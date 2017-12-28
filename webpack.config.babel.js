@@ -1,12 +1,12 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
 import webpack from 'webpack';
-import dotenv from 'dotenv';
 
-dotenv.config({ silent: true });
 const env = process.env.NODE_ENV || 'development';
+const port = process.env.PORT || 4444;
 
 const config = {
     entry: {
@@ -17,7 +17,7 @@ const config = {
     },
     output: {
         path: `${__dirname}/public`,
-        filename: 'bundle-[hash].js',
+        filename: (env === 'production') ? 'bundle-[hash].js' : 'bundle.js',
         publicPath: '/static/',
     },
     module: {
@@ -80,7 +80,10 @@ const config = {
 };
 
 if (env === 'development') {
-    config.plugins.push(new BrowserSyncPlugin({ proxy: `http://0.0.0.0:${process.env.PORT}` }));
+    config.plugins.push(
+        new BrowserSyncPlugin({ proxy: `http://0.0.0.0:${port}` }),
+        new BundleAnalyzerPlugin({ openAnalyzer: false, defaultSizes: 'gzip', analyzerMode: 'static' }),
+    );
 }
 
 export default config;
