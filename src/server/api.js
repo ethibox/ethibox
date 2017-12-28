@@ -1,40 +1,61 @@
 import express from 'express';
-import { listApplications, installApplication, uninstallApplication, listCharts, stateApplication, portApplication } from './k8sClient';
+import { checkConfig, listApplications, installApplication, uninstallApplication, listCharts, stateApplication, portApplication } from './k8sClient';
 
 const api = express();
 
 api.get('/applications', async (req, res) => {
-    const apps = await listApplications();
-    return res.json(apps);
+    try {
+        checkConfig();
+        const apps = await listApplications();
+        return res.json(apps);
+    } catch ({ message }) {
+        return res.status(500).send({ code: 1, message });
+    }
 });
 
-api.post('/applications', (req, res) => {
-    const { name, releaseName } = req.body;
-    installApplication(name, releaseName);
-    return res.json('installed');
+api.post('/applications', async (req, res) => {
+    try {
+        const { name, releaseName } = req.body;
+        await installApplication(name, releaseName);
+        return res.json('installed');
+    } catch (e) {
+        return res.status(500).send({ code: 2, message: 'Something failed!' });
+    }
 });
 
 api.delete('/applications/:releaseName', (req, res) => {
-    const { releaseName } = req.params;
-    uninstallApplication(releaseName);
-    return res.json('uninstalled');
+    try {
+        const { releaseName } = req.params;
+        uninstallApplication(releaseName);
+        return res.json('uninstalled');
+    } catch (e) {
+        return res.status(500).send({ code: 3, message: 'Something failed!' });
+    }
 });
 
 api.get('/applications/:releaseName', async (req, res) => {
-    const { releaseName } = req.params;
-    const state = await stateApplication(releaseName);
+    try {
+        const { releaseName } = req.params;
+        const state = await stateApplication(releaseName);
 
-    if (state === 'notexisting') {
-        return res.json('notexisting');
+        if (state === 'notexisting') {
+            return res.json('notexisting');
+        }
+
+        const port = await portApplication(releaseName);
+        return res.json({ releaseName, state, port });
+    } catch (e) {
+        return res.status(500).send({ code: 4, message: 'Something failed!' });
     }
-
-    const port = await portApplication(releaseName);
-    return res.json({ releaseName, state, port });
 });
 
 api.get('/charts', (req, res) => {
-    const charts = listCharts();
-    res.json(charts);
+    try {
+        const charts = listCharts();
+        return res.json(charts);
+    } catch (e) {
+        return res.status(500).send({ code: 5, message: 'Something failed!' });
+    }
 });
 
 export default api;
