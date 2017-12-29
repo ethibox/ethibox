@@ -85,6 +85,8 @@ make test
 
 ## Todo
 
+- [ ] Add image previsualisation and about application (tooltip)
+- [ ] Add more Applications
 - [ ] Improve release install/uninstall
 - [ ] Add ethibox kubernetes namespace
 - [ ] Add domain name system
