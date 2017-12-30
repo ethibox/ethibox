@@ -1,5 +1,5 @@
 <p align="center"><img width="15%" src="https://framapic.org/tUxf7mPC8HHU/zoDa3nLhs8HH.svg"></p>
-<p align="center">The Easiest Way to Deploy Websites</p>
+<p align="center">Let's decentralize the internet!</p>
 <p align="center">
   <a href=".github/CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.1.0-blue.svg?style=flat-square&colorA=0d7377&colorB=44c2c7"></a>
     &nbsp;
@@ -85,18 +85,13 @@ make test
 
 ## Todo
 
-- [ ] Add image previsualisation and about application (tooltip)
-- [ ] Add more Applications
-- [ ] Improve release install/uninstall
-- [ ] Add ethibox kubernetes namespace
-- [ ] Add domain name system
 - [ ] Add units tests
-- [ ] Add update system
-- [ ] Add PersistentVolume system
-- [ ] Add password manager
-- [ ] Add user sessions
-- [ ] Remove Swift
-- [ ] Replace Express
+- [ ] Add domain name system
+- [ ] Add let's encrypt feature
+- [ ] Add TOR feature
+- [ ] Add password manager feature
+- [ ] Add update system feature
+- [ ] Add Sign up / Sign in feature
 
 ## Contributing
 
