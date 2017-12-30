@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Card, Image, Button, Icon, Dimmer, Loader } from 'semantic-ui-react';
+import { Modal, Header, Card, Image, Button, Icon, Dimmer, Loader } from 'semantic-ui-react';
 import { uninstallApplication } from '../application/ApplicationActions';
 
 const defaultIcon = 'https://react.semantic-ui.com/assets/images/wireframe/white-image.png';
@@ -67,9 +67,19 @@ class Application extends React.Component {
                 </Card.Content>
                 <Card.Content extra>
                     <div className="ui two buttons">
-                        <Button color="red" onClick={() => this.props.uninstallApplication(releaseName)}><Icon name="delete" /> Uninstall</Button>
+                        <Button color="red" onClick={() => this.setState({ action: 'UNINSTALL' })}><Icon name="delete" /> Uninstall</Button>
                     </div>
                 </Card.Content>
+                <Modal size="large" open={this.state.action === 'UNINSTALL'} onClose={() => this.setState({ action: '' })} key="uninstall" basic>
+                    <Header icon="delete" content="Uninstall application" />
+                    <Modal.Content>
+                        <p>Are you sure you want to uninstall this application?</p>
+                    </Modal.Content>
+                    <Modal.Actions>
+                        <Button onClick={() => this.setState({ action: '' })} basic inverted>Cancel</Button>
+                        <Button color="red" onClick={() => this.props.uninstallApplication(releaseName)} inverted><Icon name="remove" />Uninstall</Button>
+                    </Modal.Actions>
+                </Modal>
             </Card>
         );
     }
