@@ -274,3 +274,123 @@ spec:
   selector:
     app: helm
     name: tiller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  creationTimestamp: null
+  name: kube-system-cluster-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: system:serviceaccount:kube-system:default
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: ethibox
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - ingresses
+      - services
+      - pods
+      - endpoints
+      - secrets
+    verbs:
+      - get
+      - update
+      - create
+      - list
+      - patch
+      - delete
+      - watch
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+      - services
+      - pods
+      - endpoints
+      - secrets
+    verbs:
+      - get
+      - update
+      - create
+      - list
+      - patch
+      - delete
+      - watch
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: ethibox
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ethibox
+subjects:
+  - kind: ServiceAccount
+    name: ethibox
+    namespace: kube-system
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: ethibox
+  namespace: kube-system
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: kube-system
+  creationTimestamp: null
+  name: ethibox
+spec:
+  ports:
+  - port: 4444
+    protocol: TCP
+    targetPort: 4444
+  selector:
+    run: ethibox
+  type: NodePort
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: kube-system
+  creationTimestamp: null
+  labels:
+    run: ethibox
+  name: ethibox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: ethibox
+  strategy: {}
+  template:
+    metadata:
+      namespace: kube-system
+      creationTimestamp: null
+      labels:
+        run: ethibox
+    spec:
+      serviceAccountName: ethibox
+      containers:
+      - image: index.docker.io/ston3o/ethibox
+        name: ethibox
+        ports:
+        - containerPort: 4444
+        resources: {}
+      imagePullSecrets:
+        - name: myregistrykey
+status: {}
