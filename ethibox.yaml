@@ -288,7 +288,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: ethibox
 rules:
-  - apiGroups: [""]
+  - apiGroups: ["", "extensions"]
     resources: ["ingresses", "services", "pods", "secrets"]
     verbs: ["get", "watch", "list"]
 ---
