@@ -289,43 +289,20 @@ subjects:
   kind: User
   name: system:serviceaccount:kube-system:default
 ---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: ethibox
+  namespace: kube-system
+---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: ethibox
 rules:
-  - apiGroups:
-      - ""
-    resources:
-      - ingresses
-      - services
-      - pods
-      - endpoints
-      - secrets
-    verbs:
-      - get
-      - update
-      - create
-      - list
-      - patch
-      - delete
-      - watch
-  - apiGroups:
-      - extensions
-    resources:
-      - ingresses
-      - services
-      - pods
-      - endpoints
-      - secrets
-    verbs:
-      - get
-      - update
-      - create
-      - list
-      - patch
-      - delete
-      - watch
+  - apiGroups: [""]
+    resources: ["ingresses", "services", "pods", "secrets"]
+    verbs: ["get", "watch", "list"]
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -339,12 +316,6 @@ subjects:
   - kind: ServiceAccount
     name: ethibox
     namespace: kube-system
----
-kind: ServiceAccount
-apiVersion: v1
-metadata:
-  name: ethibox
-  namespace: kube-system
 ---
 apiVersion: v1
 kind: Service
