@@ -66,7 +66,7 @@ make dev
 
 ## How it works
 
-<p align="center"><img src="https://framapic.org/ewfzU8WzgIr3/iaeIIIxMGLh3.png"></p>
+<p align="center"><img src=".github/how-it-works.png"></p>
 
 ## Deployment
 
