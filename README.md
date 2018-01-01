@@ -34,12 +34,6 @@
 
 ---
 
-<!-- ## TL;DR -->
-
-<!-- ```bash -->
-<!-- kubectl apply -f https://raw.githubusercontent.com/ston3o/ethibox/master/ethibox.yaml -->
-<!-- ``` -->
-
 ## Why ?
 
 - Because internet is centralized and lack of privacy
@@ -92,12 +86,14 @@ make test
 ## Todo
 
 - [ ] Add units tests
-- [ ] Add domain name system
-- [ ] Add let's encrypt feature
-- [ ] Add TOR feature
-- [ ] Add password manager feature
+- [ ] Add domain name system - Create/edit applications vhost from client
+- [ ] Add let's encrypt feature - Enable/Disable let's encrypt button for each applications
+- [ ] Add TOR feature - Enable/Disable tor button for each applications
+- [ ] Add password manager feature - Generate user and password account for each applications with account support
 - [ ] Add update system feature
 - [ ] Add Sign up / Sign in feature
+- [ ] Add WAF & IDS
+- [ ] Add backup system - Import/export applications
 - [ ] Update logo design
 
 ## Contributing
