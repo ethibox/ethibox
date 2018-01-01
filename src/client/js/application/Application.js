@@ -37,7 +37,7 @@ class Application extends React.Component {
 
     render() {
         const { icon, releaseName, category, port, state } = this.state;
-        const hyperlink = `http://192.168.99.100:${port}`;
+        const hyperlink = `http://${window.location.hostname}:${port}`;
 
         return (
             <Card>
