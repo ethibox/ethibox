@@ -98,6 +98,7 @@ make test
 - [ ] Add password manager feature
 - [ ] Add update system feature
 - [ ] Add Sign up / Sign in feature
+- [ ] Update logo design
 
 ## Contributing
 
