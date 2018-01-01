@@ -3,7 +3,7 @@ export const checkStatus = (response) => {
         return response;
     }
 
-    console.error(response);
+    console.error(response.statusText);
 
-    throw (new Error(response));
+    throw (new Error(response.statusText));
 };
