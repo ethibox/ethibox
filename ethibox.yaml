@@ -23,24 +23,12 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: traefik-ingress-controller
 rules:
-  - apiGroups:
-      - ""
-    resources:
-      - services
-      - endpoints
-      - secrets
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - extensions
-    resources:
-      - ingresses
-    verbs:
-      - get
-      - list
-      - watch
+  - apiGroups: [""]
+    resources: ["services", "endpoints", "secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["extensions"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch"]
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -125,30 +113,30 @@ spec:
         name: tiller
     spec:
       containers:
-      - env:
-        - name: TILLER_NAMESPACE
-          value: kube-system
-        - name: TILLER_HISTORY_MAX
-          value: "0"
-        image: gcr.io/kubernetes-helm/tiller:v2.7.2
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          httpGet:
-            path: /liveness
-            port: 44135
-          initialDelaySeconds: 1
-          timeoutSeconds: 1
-        name: tiller
-        ports:
-        - containerPort: 44134
+        - env:
+            - name: TILLER_NAMESPACE
+              value: kube-system
+            - name: TILLER_HISTORY_MAX
+              value: "0"
+          image: gcr.io/kubernetes-helm/tiller:v2.7.2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /liveness
+              port: 44135
+            initialDelaySeconds: 1
+            timeoutSeconds: 1
           name: tiller
-        readinessProbe:
-          httpGet:
-            path: /readiness
-            port: 44135
-          initialDelaySeconds: 1
-          timeoutSeconds: 1
-        resources: {}
+          ports:
+            - containerPort: 44134
+              name: tiller
+          readinessProbe:
+            httpGet:
+              path: /readiness
+              port: 44135
+            initialDelaySeconds: 1
+            timeoutSeconds: 1
+          resources: {}
       serviceAccountName: tiller
 status: {}
 ---
@@ -166,24 +154,24 @@ spec:
         app: swift
     spec:
       containers:
-      - args:
-        - run
-        - --v=3
-        - --connector=incluster
-        image: appscode/swift:0.5.1
-        imagePullPolicy: Always
-        name: swift
-        ports:
-        - containerPort: 9855
-          name: pt
-          protocol: TCP
-        - containerPort: 50055
-          name: tls
-          protocol: TCP
-        - containerPort: 56790
-          name: ops
-          protocol: TCP
-        volumeMounts:
+        - args:
+            - run
+            - --v=3
+            - --connector=incluster
+          image: appscode/swift:0.5.1
+          imagePullPolicy: Always
+          name: swift
+          ports:
+            - containerPort: 9855
+              name: pt
+              protocol: TCP
+            - containerPort: 50055
+              name: tls
+              protocol: TCP
+            - containerPort: 56790
+              name: ops
+              protocol: TCP
+          volumeMounts:
             - mountPath: /tmp
               name: chart-volume
       volumes:
@@ -199,15 +187,15 @@ metadata:
     app: swift
 spec:
   ports:
-  - name: pt
-    port: 9855
-    targetPort: pt
-  - name: tls
-    port: 50055
-    targetPort: tls
-  - name: ops
-    port: 56790
-    targetPort: ops
+    - name: pt
+      port: 9855
+      targetPort: pt
+    - name: tls
+      port: 50055
+      targetPort: tls
+    - name: ops
+      port: 56790
+      targetPort: ops
   selector:
     app: swift
 ---
@@ -230,30 +218,30 @@ spec:
         name: tiller
     spec:
       containers:
-      - env:
-        - name: TILLER_NAMESPACE
-          value: kube-system
-        - name: TILLER_HISTORY_MAX
-          value: "0"
-        image: gcr.io/kubernetes-helm/tiller:v2.7.2
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          httpGet:
-            path: /liveness
-            port: 44135
-          initialDelaySeconds: 1
-          timeoutSeconds: 1
-        name: tiller
-        ports:
-        - containerPort: 44134
+        - env:
+            - name: TILLER_NAMESPACE
+              value: kube-system
+            - name: TILLER_HISTORY_MAX
+              value: "0"
+          image: gcr.io/kubernetes-helm/tiller:v2.7.2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /liveness
+              port: 44135
+            initialDelaySeconds: 1
+            timeoutSeconds: 1
           name: tiller
-        readinessProbe:
-          httpGet:
-            path: /readiness
-            port: 44135
-          initialDelaySeconds: 1
-          timeoutSeconds: 1
-        resources: {}
+          ports:
+            - containerPort: 44134
+              name: tiller
+          readinessProbe:
+            httpGet:
+              path: /readiness
+              port: 44135
+            initialDelaySeconds: 1
+            timeoutSeconds: 1
+          resources: {}
       serviceAccountName: tiller
 status: {}
 ---
@@ -267,10 +255,102 @@ metadata:
   namespace: kube-system
 spec:
   ports:
-  - name: tiller
-    port: 44134
-    protocol: TCP
-    targetPort: tiller
+    - name: tiller
+      port: 44134
+      protocol: TCP
+      targetPort: tiller
   selector:
     app: helm
     name: tiller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  creationTimestamp: null
+  name: kube-system-cluster-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: User
+    name: system:serviceaccount:kube-system:default
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: ethibox
+  namespace: kube-system
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: ethibox
+rules:
+  - apiGroups: [""]
+    resources: ["ingresses", "services", "pods", "secrets"]
+    verbs: ["get", "watch", "list"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: ethibox
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ethibox
+subjects:
+  - kind: ServiceAccount
+    name: ethibox
+    namespace: kube-system
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: kube-system
+  creationTimestamp: null
+  name: ethibox
+spec:
+  ports:
+    - port: 4444
+      protocol: TCP
+      targetPort: 4444
+  selector:
+    run: ethibox
+  type: NodePort
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: kube-system
+  creationTimestamp: null
+  labels:
+    run: ethibox
+  name: ethibox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: ethibox
+  strategy: {}
+  template:
+    metadata:
+      namespace: kube-system
+      creationTimestamp: null
+      labels:
+        run: ethibox
+    spec:
+      serviceAccountName: ethibox
+      hostNetwork: true
+      containers:
+        - image: index.docker.io/ston3o/ethibox
+          name: ethibox
+          ports:
+            - containerPort: 4444
+          resources: {}
+      imagePullSecrets:
+        - name: myregistrykey
+status: {}
