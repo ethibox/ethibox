@@ -344,6 +344,7 @@ spec:
         run: ethibox
     spec:
       serviceAccountName: ethibox
+      hostNetwork: true
       containers:
         - image: index.docker.io/ston3o/ethibox
           name: ethibox
