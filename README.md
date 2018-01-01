@@ -40,6 +40,12 @@
 <!-- kubectl apply -f https://raw.githubusercontent.com/ston3o/ethibox/master/ethibox.yaml -->
 <!-- ``` -->
 
+## Why ?
+
+- Because internet is centralized and lack of privacy
+- Because it's not easy to self-hosted
+- Because free software ❤︎
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
