@@ -8,7 +8,7 @@ const chartsDirPath = (process.env.NODE_ENV === 'production') ? '../' : '../../'
 const agent = new https.Agent({ rejectUnauthorized: false });
 const KUBE_APISERVER_ENDPOINT = `https://${process.env.KUBERNETES_SERVICE_HOST}`;
 const SWIFT_ENDPOINT = `http://${process.env.SWIFT_SERVICE_HOST}:${process.env.SWIFT_SERVICE_PORT_PT}`;
-const CHART_REPOSITORY = 'https://aa7775cc1e612b504155fd08819f4e4514f9ec86@raw.githubusercontent.com/ston3o/ethibox/master/charts/packages';
+const CHART_REPOSITORY = `http://${process.env.ETHIBOX_SERVICE_HOST}:${process.env.ETHIBOX_SERVICE_PORT}/charts`;
 const NAMESPACE = 'default';
 
 export const checkConfig = () => {
