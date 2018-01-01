@@ -5,7 +5,7 @@ export const checkStatus = (response) => {
 
     console.error(response);
 
-    throw (new Error(response));
+    throw (new Error(response.statusText));
 };
 
 export const findVal = (object, key) => {
