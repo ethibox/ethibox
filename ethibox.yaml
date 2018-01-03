@@ -49,6 +49,15 @@ metadata:
   name: traefik-ingress-controller
   namespace: kube-system
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik-conf
+  namespace: kube-system
+data:
+  traefik.toml: |-
+    defaultEntryPoints = ["http","https"]
+---
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
@@ -73,9 +82,17 @@ spec:
       containers:
         - image: traefik
           name: traefik-ingress-lb
+          volumeMounts:
+            - mountPath: "/config"
+              name: "config"
           args:
-            - --web
             - --kubernetes
+            - --configfile=/config/traefik.toml
+            - --logLevel=INFO
+      volumes:
+        - name: config
+          configMap:
+            name: traefik-conf
 ---
 kind: Service
 apiVersion: v1
@@ -88,7 +105,10 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      name: web
+      name: http
+    - protocol: TCP
+      port: 443
+      name: https
     - protocol: TCP
       port: 8080
       name: admin
