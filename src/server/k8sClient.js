@@ -12,6 +12,10 @@ const CHART_REPOSITORY = process.env.CHART_REPOSITORY || `http://${process.env.E
 const NAMESPACE = 'default';
 
 export const checkConfig = () => {
+    if (!process.env.TOKEN) {
+        throw new Error('No kubernetes token');
+    }
+
     if (!process.env.SWIFT_SERVICE_HOST || !process.env.SWIFT_SERVICE_PORT_PT) {
         throw new Error('Swift configuration error');
     }
