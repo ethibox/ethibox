@@ -6,7 +6,7 @@
     "url": "git+https://github.com/ston3o/ethibox.git"
   },
   "scripts": {
-    "start": "TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) NODE_ENV=production node public/index.js"
+    "start": "TOKEN=$(cat $TELEPRESENCE_ROOT/var/run/secrets/kubernetes.io/serviceaccount/token) NODE_ENV=production node public/index.js"
   },
   "engines": {
     "node": "6.12.2",
