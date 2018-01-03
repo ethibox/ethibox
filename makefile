@@ -1,13 +1,12 @@
 .PHONY: install run build test
+.SILENT:
 
-TOKEN := $$(kubectl describe secret $$(kubectl get secrets | grep default | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t' | tr -d '[:space:]')
+TOKEN := $$(cat $$TELEPRESENCE_ROOT/var/run/secrets/kubernetes.io/serviceaccount/token)
 PORT := 4444
 
-check: ## Check dependencies
+install: check ## Install application
 	@ command -v node > /dev/null 2>&1 || (echo "node is not available please install" && exit 1)
 	@ command -v kubectl > /dev/null 2>&1 || (echo "kubectl is not available please install" && exit 1)
-
-install: check ## Install application
 	@ npm install
 	@ kubectl apply -f ethibox.yaml
 
@@ -15,9 +14,11 @@ uninstall:
 	\rm -rf public node_modules
 
 run: ## Run prod application
-	@ TOKEN=$$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) NODE_ENV=production node public/index.js
+	@ TOKEN=$(TOKEN) NODE_ENV=production node public/index.js
 
 dev: ## Run dev application
+	@ command -v telepresence > /dev/null 2>&1 || (echo "telepresence is not available please install" && exit 1)
+	@ test -n "$(TOKEN)" || (echo "Run dev application on kubernetes environement with Telepresence: make enter" && exit 1)
 	@ \rm -rf public && mkdir -p public
 	@ TOKEN=$(TOKEN) NODE_ENV=development ./node_modules/.bin/pm2 start --watch src/ --no-daemon src/server/index.js --interpreter ./node_modules/.bin/babel-node & make watch
 
@@ -37,8 +38,8 @@ start-selenium: ## Start Selenium
 enter:
 	@ command -v telepresence > /dev/null 2>&1 || (echo "telepresence is not available please install" && exit 1)
 	@ command -v kubectl > /dev/null 2>&1 || (echo "kubectl is not available please install" && exit 1)
-	@- kubectl --namespace kube-system delete deployment ethibox
-	@- kubectl --namespace kube-system delete service ethibox
+	@- kubectl --namespace kube-system delete deployment ethibox > /dev/null 2>&1
+	@- kubectl --namespace kube-system delete service ethibox > /dev/null 2>&1
 	@ telepresence --namespace kube-system --new-deployment ethibox --expose $(PORT) --run-shell
 
 test: ## Run tests
@@ -54,6 +55,3 @@ package-charts:
 	@ command -v helm > /dev/null 2>&1 || (echo "helm is not available please install" && exit 1)
 	helm package ./charts/charts/* -d ./charts/packages/
 	helm repo index ./charts/packages/
-
-show-token:
-	@ TOKEN=$$(cat /tmp/token) node index.js
