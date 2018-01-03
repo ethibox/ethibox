@@ -3,6 +3,7 @@ import { Container, Divider, Header, Card } from 'semantic-ui-react';
 import ApplicationList from '../application/ApplicationList';
 import ChartList from '../chart/ChartList';
 import Modal from '../modal/Modal';
+import Loader from '../loader/Loader';
 import logo from '../../images/logo.svg';
 
 const App = () => {
@@ -28,6 +29,7 @@ const App = () => {
                 <ChartList />
             </Card.Group>
             <Modal />
+            <Loader />
         </Container>
     );
 };
