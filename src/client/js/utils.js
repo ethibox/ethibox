@@ -1,9 +1,7 @@
-export const checkStatus = (response) => {
+export const checkStatus = response => new Promise((resolve, reject) => {
     if (response.status >= 200 && response.status < 300) {
-        return response;
+        return response.json().then(resolve);
     }
 
-    console.error(response.statusText);
-
-    throw (new Error(response.statusText));
-};
+    return response.json().then(reject);
+});
