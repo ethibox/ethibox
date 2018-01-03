@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
@@ -5,6 +6,7 @@ import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
 import webpack from 'webpack';
 import { exec } from 'shelljs';
+import { listCharts } from './src/server/k8sClient';
 
 const env = process.env.NODE_ENV || 'development';
 const port = process.env.PORT || 4444;
@@ -75,7 +77,11 @@ const config = {
             template: `${__dirname}/src/client/index.html`,
             hash: true,
         }),
-        new webpack.DefinePlugin({ 'process.env.NODE_ENV': JSON.stringify(env), 'process.env.HOSTNAME': JSON.stringify(hostname) }),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify(env),
+            'process.env.HOSTNAME': JSON.stringify(hostname),
+            'process.env.CHARTS': JSON.stringify(listCharts()),
+        }),
         new ExtractTextPlugin({ filename: '[name].css', allChunks: false }),
         new UglifyJsPlugin({ uglifyOptions: { output: { comments: false } } }),
     ],
