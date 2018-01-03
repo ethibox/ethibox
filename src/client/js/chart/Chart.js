@@ -39,7 +39,7 @@ class Chart extends React.Component {
                         error={error}
                         onBlur={() => this.setState({ action: '' })}
                         value={releaseName}
-                        onChange={(e, data) => this.setState({ releaseName: data.value })}
+                        onChange={(e, data) => this.setState({ releaseName: data.value, error: false })}
                         onKeyDown={e => this.enterReleaseName(e.key)}
                         placeholder="Enter name..."
                         autoFocus
