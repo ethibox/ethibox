@@ -44,10 +44,11 @@
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-### Prerequisites
+### Requirements
 
-* [minikube](https://github.com/kubernetes/minikube) - Run Kubernetes locally.
-* [telepresence](https://github.com/datawire/telepresence/) - Local development against a remote Kubernetes.
+* [Minikube](https://github.com/kubernetes/minikube) - Run Kubernetes locally.
+* [Telepresence](https://github.com/datawire/telepresence/) - Local development against a remote Kubernetes.
+* [Node.js](https://github.com/nodejs/node) - Node.js
 
 ### Installation
 
