@@ -5,7 +5,7 @@ import { Dimmer, Loader } from 'semantic-ui-react';
 const LoaderComponent = (props) => {
     return (
         <Dimmer active={props.isOpen}>
-            <Loader size="massive">Loading...</Loader>
+            <Loader size="massive">{props.loadingMessage || 'Loading...'}</Loader>
         </Dimmer>
     );
 };

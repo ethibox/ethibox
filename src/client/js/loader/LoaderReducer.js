@@ -1,11 +1,13 @@
-export default (state = { isOpen: false }, action) => {
+const initialState = { isOpen: false, loadingMessage: '' };
+
+export default (state = initialState, action) => {
     switch (action.type) {
         case 'OPEN_LOADER': {
-            return { ...state, isOpen: true };
+            return { ...state, isOpen: true, loadingMessage: action.loadingMessage };
         }
 
         case 'CLOSE_LOADER': {
-            return { ...state, isOpen: false };
+            return initialState;
         }
 
         default: {
