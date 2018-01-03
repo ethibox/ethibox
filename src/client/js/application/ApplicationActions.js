@@ -7,7 +7,7 @@ export const uninstallApplicationSuccess = releaseName => ({ type: 'UNINSTALL_AP
 export const listApplicationsSuccess = applications => ({ type: 'LIST_APPLICATIONS_SUCCESS', applications });
 
 export const listApplications = () => (dispatch) => {
-    dispatch(openLoader());
+    dispatch(openLoader('Loading applications...'));
 
     fetch('/api/applications')
         .then(checkStatus)
