@@ -39,7 +39,6 @@ export const stateApplication = async (releaseName) => {
         agent,
     })
         .then(checkStatus)
-        .then(res => res.json())
         .then((data) => {
             const pods = data.items;
             const message = findVal(pods, 'message');
@@ -76,7 +75,6 @@ export const portApplication = async (releaseName) => {
         agent,
     })
         .then(checkStatus)
-        .then(res => res.json())
         .then((data) => {
             const services = data.items;
             return services[services.length - 1].spec.ports[0].nodePort;
@@ -91,7 +89,6 @@ export const listApplications = async () => {
         agent,
     })
         .then(checkStatus)
-        .then(res => res.json())
         .then((data) => {
             if (typeof data.code !== 'undefined' && data.code === 404) {
                 return [];
@@ -133,8 +130,7 @@ export const installApplication = async (name, releaseName) => {
             values: { raw: JSON.stringify({ serviceType: 'NodePort' }) },
         }),
     })
-        .then(checkStatus)
-        .then(res => res.json());
+        .then(checkStatus);
 };
 
 export const uninstallApplication = (releaseName) => {
