@@ -27,7 +27,7 @@ export const checkConfig = () => {
 
 export const listCharts = () => {
     const chartIndex = yaml.load(path.join(__dirname, chartsDirPath, 'charts/packages/index.yaml'));
-    const charts = Object.values(chartIndex.entries).filter(chart => chart[0].name !== 'ethibox').map(chart => ({ name: chart[0].name, icon: chart[0].icon, category: chart[0].keywords[0] }));
+    const charts = Object.values(chartIndex.entries).map(chart => ({ name: chart[0].name, icon: chart[0].icon, category: chart[0].keywords[0] }));
     return charts;
 };
 
