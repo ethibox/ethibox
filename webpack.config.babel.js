@@ -6,11 +6,13 @@ import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
 import webpack from 'webpack';
 import { exec } from 'shelljs';
-import { listCharts } from './src/server/k8sClient';
+import yaml from 'yamljs';
 
 const env = process.env.NODE_ENV || 'development';
 const port = process.env.PORT || 4444;
 const hostname = exec('minikube ip', { silent: true }).stdout.trim();
+const chartIndex = yaml.load(`${__dirname}/charts/packages/index.yaml`);
+const listCharts = Object.values(chartIndex.entries).map(chart => ({ name: chart[0].name, icon: chart[0].icon, category: chart[0].keywords[0] }));
 
 const config = {
     entry: {
@@ -80,7 +82,7 @@ const config = {
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(env),
             'process.env.HOSTNAME': JSON.stringify(hostname),
-            'process.env.CHARTS': JSON.stringify(listCharts()),
+            'process.env.CHARTS': JSON.stringify(listCharts),
         }),
         new ExtractTextPlugin({ filename: '[name].css', allChunks: false }),
         new UglifyJsPlugin({ uglifyOptions: { output: { comments: false } } }),
