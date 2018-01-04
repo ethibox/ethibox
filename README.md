@@ -83,6 +83,7 @@ make test
 * [React](https://github.com/facebook/react) - A declarative, efficient, and flexible JavaScript library for building user interfaces.
 * [Redux](https://github.com/reactjs/redux) - Predictable state container for JavaScript apps.
 * [Express](https://github.com/expressjs/express) - Fast, unopinionated, minimalist web framework for node.
+* [Semantic UI](https://github.com/semantic-org/semantic-ui) - UI component framework based around useful principles from natural language.
 
 ## Todo
 
