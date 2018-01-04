@@ -37,7 +37,7 @@ class Application extends React.Component {
 
     render() {
         const { icon, releaseName, category, port, state } = this.state;
-        const hyperlink = `//${process.env.MINIKUBE_IP || window.location.hostname}:${port}`;
+        const hyperlink = `http://${process.env.MINIKUBE_IP || window.location.hostname}:${port}`;
 
         return (
             <Card>
