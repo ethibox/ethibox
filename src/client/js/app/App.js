@@ -5,6 +5,7 @@ import ChartList from '../chart/ChartList';
 import Modal from '../modal/Modal';
 import Loader from '../loader/Loader';
 import logo from '../../images/logo.svg';
+import fork from '../../images/fork-me.png';
 
 const App = () => {
     return (
@@ -18,7 +19,7 @@ const App = () => {
                     <Header.Subheader>Let&apos;s decentralize the internet!</Header.Subheader>
                 </Header.Content>
                 <a href="https://github.com/ston3o/ethibox" target="_blank" rel="noopener noreferrer">
-                    <img style={{ position: 'absolute', top: 0, right: 0, border: 0 }} src="https://frama.link/fork-me" alt="Fork me on GitHub" data-canonical-src="https://frama.link/wKZ3Ly2G" />
+                    <img style={{ position: 'absolute', top: 0, right: 0, border: 0 }} src={fork} alt="Fork me on GitHub" />
                 </a>
             </Header>
 
