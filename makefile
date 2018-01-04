@@ -4,7 +4,7 @@
 TOKEN := $$(cat $$TELEPRESENCE_ROOT/var/run/secrets/kubernetes.io/serviceaccount/token)
 PORT := 4444
 
-install: check ## Install application
+install: ## Install application
 	@ command -v node > /dev/null 2>&1 || (echo "node is not available please install" && exit 1)
 	@ command -v kubectl > /dev/null 2>&1 || (echo "kubectl is not available please install" && exit 1)
 	@ npm install
