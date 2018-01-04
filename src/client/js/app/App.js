@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Divider, Header, Card } from 'semantic-ui-react';
+import { Segment, Container, Divider, Header, Card } from 'semantic-ui-react';
 import ApplicationList from '../application/ApplicationList';
 import ChartList from '../chart/ChartList';
 import Modal from '../modal/Modal';
@@ -28,6 +28,11 @@ const App = () => {
                 <ApplicationList />
                 <ChartList />
             </Card.Group>
+
+            <Segment padded="very" vertical textAlign="center" style={{ border: 0 }}>
+                Made with <span style={{ color: 'red' }}>♥</span> by <a href="https://ston3o.me" rel="noopener noreferrer" target="_blank">ston3o</a>
+            </Segment>
+
             <Modal />
             <Loader />
         </Container>
