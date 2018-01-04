@@ -7,7 +7,3 @@ service:
   type: ClusterIP
   internalPort: 3306
   externalPort: 3306
-resources:
-  requests:
-    memory: 256Mi
-    cpu: 250m

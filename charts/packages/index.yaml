@@ -2,9 +2,9 @@ apiVersion: v1
 entries:
   etherpad:
   - apiVersion: v1
-    created: 2017-12-28T23:27:12.624693998+01:00
+    created: 2018-01-04T17:30:18.214248301+01:00
     description: A Helm chart for Kubernetes
-    digest: 4db86f6af20bf237a422ad7d9a364af54c58e9482cc633e4c5f9e6f88024fe17
+    digest: 722c800c0237af9687d08c9718fff338067344cf441acf9108fe1d997b99bbe8
     icon: https://framapic.org/B4pD2wkMwxob/yj5ucxt4XzRW.image
     keywords:
     - editor
@@ -15,7 +15,7 @@ entries:
   ghost:
   - apiVersion: v1
     appVersion: 1.18.2
-    created: 2017-12-28T23:27:12.624887423+01:00
+    created: 2018-01-04T17:30:18.214471452+01:00
     description: A Helm chart for Kubernetes
     digest: 8117531f31d4dbac42e48831c1dae009404fb4cfb58f31c1cf97525cb7c51776
     icon: https://framapic.org/B4x7MtG9cuHi/hRytuK7P1YHE.png
@@ -27,7 +27,7 @@ entries:
     version: 0.1.0
   metabase:
   - apiVersion: v1
-    created: 2017-12-28T23:27:12.625517147+01:00
+    created: 2018-01-04T17:30:18.214672674+01:00
     description: A Helm chart for Kubernetes
     digest: fa218a01387c2272a725fab62883ac63bf118a2d4cbcc7b7f639df89755717d0
     icon: https://framapic.org/aT339rWcPogD/UqW4QrKtQVHd.png
@@ -40,9 +40,9 @@ entries:
   wordpress:
   - apiVersion: v1
     appVersion: 4.9.1
-    created: 2017-12-28T23:27:12.625855032+01:00
+    created: 2018-01-04T17:30:18.21498473+01:00
     description: A Helm chart for Kubernetes
-    digest: e2136db1261b609bc45801aa15feccd126ff3f4e1c494402fd85baf9c87660db
+    digest: cdf20218ad42d10cbfcab43b20d1ce09c48a8c5047973bc48d95e59a4478e556
     icon: https://framapic.org/q4P5asK7T3rG/lwrvyHc3wRm0.png
     keywords:
     - blog
@@ -50,4 +50,4 @@ entries:
     urls:
     - wordpress-0.1.0.tgz
     version: 0.1.0
-generated: 2017-12-28T23:27:12.624353811+01:00
+generated: 2018-01-04T17:30:18.21392816+01:00
