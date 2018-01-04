@@ -12,7 +12,7 @@ const ModalComponent = (props) => {
             { hasErrored && <Header icon="warning sign" content={title || 'Error'} /> }
             { !hasErrored && <Header icon="checkmark" content={title || 'Success'} /> }
             <Modal.Content>
-                { hasErrored && <h3>{errorMessage || 'Unknow error'}, contact an administrator</h3> }
+                { hasErrored && <h3>{errorMessage || 'Unknow error, contact an administrator'}</h3> }
                 { !hasErrored && <h3>{successMessage || 'Operation completed'}</h3> }
             </Modal.Content>
             <Modal.Actions>
