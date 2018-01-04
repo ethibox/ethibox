@@ -18,19 +18,27 @@ export const listApplications = () => (dispatch) => {
         });
 };
 
-export const installApplication = application => (dispatch) => {
+export const installApplication = application => async (dispatch) => {
     dispatch(installApplicationSuccess(application));
 
-    fetch('/api/applications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(application),
-    })
-        .then(checkStatus)
-        .catch(({ message }) => {
-            dispatch(uninstallApplicationSuccess(application.releaseName));
-            dispatch(openModal({ hasErrored: true, errorMessage: message }));
-        });
+    const releases = await fetch('/api/applications').then(checkStatus);
+    const releaseNames = releases.map(release => release.releaseName);
+
+    if (!releaseNames.includes(application.releaseName)) {
+        fetch('/api/applications', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(application),
+        })
+            .then(checkStatus)
+            .catch(({ message }) => {
+                dispatch(uninstallApplicationSuccess(application.releaseName));
+                dispatch(openModal({ hasErrored: true, errorMessage: message }));
+            });
+    } else {
+        dispatch(uninstallApplicationSuccess(application.releaseName));
+        dispatch(openModal({ hasErrored: true, errorMessage: "Application's name already taken" }));
+    }
 };
 
 export const uninstallApplication = releaseName => (dispatch) => {
