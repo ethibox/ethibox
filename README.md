@@ -14,7 +14,7 @@
 
 <div align="center">
   <h4>
-    <a href="https://demo.ethibox.fr">Demo</a>
+    <a href="http://demo.ethibox.fr">Demo</a>
     <span> | </span>
     <a href="https://ethibox.fr">Website</a>
     <span> | </span>
