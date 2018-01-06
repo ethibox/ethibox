@@ -11,7 +11,7 @@ install: ## Install application
 	@ kubectl apply -f ethibox.yaml
 
 uninstall:
-	\rm -rf public node_modules
+	@ \rm -rf public node_modules
 
 run: ## Run prod application
 	@ TOKEN=$(TOKEN) NODE_ENV=production node public/index.js
@@ -53,8 +53,9 @@ lint-fix: ## Lint-fix
 
 package-charts:
 	@ command -v helm > /dev/null 2>&1 || (echo "helm is not available please install" && exit 1)
-	helm package ./charts/charts/* -d ./charts/packages/
-	helm repo index ./charts/packages/
+	@ rm ./charts/packages/*
+	@ helm package ./charts/charts/* -d ./charts/packages/
+	@ helm repo index ./charts/packages/
 
 deploy: build
 	@ docker build -t ston3o/ethibox .
