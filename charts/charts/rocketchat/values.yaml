@@ -1,0 +1,14 @@
+---
+replicaCount: 1
+image:
+  repository: rocket.chat
+  tag: 0.60.3
+service:
+  name: rocketchat
+  type: NodePort
+  externalPort: 3000
+  internalPort: 3000
+ingress:
+  enabled: true
+  hosts:
+    - rocketchat.local

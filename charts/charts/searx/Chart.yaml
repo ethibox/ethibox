@@ -1,0 +1,8 @@
+apiVersion: v1
+description: A Helm chart for Kubernetes
+icon: https://framapic.org/VeO7UlkcPXJE/0iS7VRr6oLV8.png
+name: searx
+version: 0.1.0
+appVersion: 0.13.1
+keywords:
+  - Search

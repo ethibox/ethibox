@@ -1,0 +1,14 @@
+---
+replicaCount: 1
+image:
+  repository: piwik
+  tag: 3.2.1
+service:
+  name: piwik
+  type: NodePort
+  externalPort: 80
+  internalPort: 80
+ingress:
+  enabled: true
+  hosts:
+    - piwik.local
