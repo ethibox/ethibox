@@ -1,0 +1,14 @@
+---
+replicaCount: 1
+image:
+  repository: mediawiki
+  tag: 1.27.4
+service:
+  name: mediawiki
+  type: NodePort
+  externalPort: 80
+  internalPort: 80
+ingress:
+  enabled: true
+  hosts:
+    - mediawiki.local
