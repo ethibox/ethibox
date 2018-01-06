@@ -1,0 +1,14 @@
+---
+replicaCount: 1
+image:
+  repository: wonderfall/freshrss
+  tag: latest
+service:
+  name: freshrss
+  type: NodePort
+  externalPort: 8888
+  internalPort: 8888
+ingress:
+  enabled: true
+  hosts:
+    - freshrss.local

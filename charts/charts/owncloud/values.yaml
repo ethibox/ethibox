@@ -1,0 +1,14 @@
+---
+replicaCount: 1
+image:
+  repository: owncloud
+  tag: 9.0
+service:
+  name: owncloud
+  type: NodePort
+  externalPort: 80
+  internalPort: 80
+ingress:
+  enabled: true
+  hosts:
+    - owncloud.local
