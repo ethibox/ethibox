@@ -80,6 +80,7 @@ const config = {
             hash: true,
         }),
         new webpack.DefinePlugin({
+            'process.env.NODE_PORT': JSON.stringify(port),
             'process.env.NODE_ENV': JSON.stringify(env),
             'process.env.MINIKUBE_IP': JSON.stringify(minikubeIp),
             'process.env.CHARTS': JSON.stringify(listCharts),

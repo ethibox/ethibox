@@ -132,5 +132,5 @@ export const installApplication = async (name, releaseName) => {
 };
 
 export const uninstallApplication = (releaseName) => {
-    fetch(`${SWIFT_ENDPOINT}/tiller/v2/releases/${releaseName}/json?purge=true`, { method: 'DELETE' });
+    fetch(`${SWIFT_ENDPOINT}/tiller/v2/releases/${releaseName}/json?purge=true`, { method: 'DELETE' }).then(checkStatus);
 };
