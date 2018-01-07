@@ -10,33 +10,15 @@ const LOADING = 'loading';
 const ERROR_MEMORY = 'Insufficient memory';
 
 class Application extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { ...props };
-    }
+    state = { action: '' };
 
-    componentWillMount() {
-        if (this.props.state === LOADING) {
-            this.refreshApplication();
-        }
-    }
-
-    refreshApplication = () => {
-        setTimeout(() => {
-            fetch(`/api/applications/${this.props.releaseName}`)
-                .then(res => res.json())
-                .then((application) => {
-                    if (application.state === LOADING) {
-                        this.refreshApplication();
-                    } else {
-                        this.setState(application);
-                    }
-                });
-        }, 5000);
+    uninstall = () => {
+        this.setState({ action: '' });
+        this.props.uninstallApplication(this.props.releaseName);
     }
 
     render() {
-        const { icon, releaseName, category, port, state } = this.state;
+        const { icon, releaseName, category, port, state } = this.props;
         const hyperlink = `http://${process.env.MINIKUBE_IP || window.location.hostname}:${port}`;
 
         return (
@@ -77,7 +59,7 @@ class Application extends React.Component {
                     </Modal.Content>
                     <Modal.Actions>
                         <Button onClick={() => this.setState({ action: '' })} basic inverted>Cancel</Button>
-                        <Button color="red" onClick={() => this.props.uninstallApplication(releaseName)} inverted><Icon name="remove" />Uninstall</Button>
+                        <Button color="red" onClick={() => this.uninstall()} inverted><Icon name="remove" />Uninstall</Button>
                     </Modal.Actions>
                 </Modal>
             </Card>
