@@ -42,8 +42,9 @@ export const installApplication = application => async (dispatch) => {
 };
 
 export const uninstallApplication = releaseName => (dispatch) => {
+    dispatch(uninstallApplicationSuccess(releaseName));
+
     fetch(`/api/applications/${releaseName}`, { method: 'DELETE' })
         .then(checkStatus)
-        .then(() => dispatch(uninstallApplicationSuccess(releaseName)))
         .catch(({ message }) => dispatch(openModal({ hasErrored: true, errorMessage: message })));
 };

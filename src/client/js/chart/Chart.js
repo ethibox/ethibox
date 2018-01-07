@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Card, Image, Button, Icon, Input } from 'semantic-ui-react';
 import { installApplication } from '../application/ApplicationActions';
+import { openModal } from '../modal/ModalActions';
 
 const defaultIcon = 'https://react.semantic-ui.com/assets/images/wireframe/white-image.png';
 
@@ -14,12 +15,19 @@ class Chart extends React.Component {
         this.props.installApplication({ name, icon, category, releaseName });
     }
 
-    isValidReleaseName = releaseName => releaseName.match(/^[a-z]+$/);
+    isValidReleaseName = releaseName => releaseName.trim().match(/^[a-z]+$/);
+    isAlreadyExist = releaseName => this.props.applications.map(release => release.releaseName).includes(releaseName);
 
     enterReleaseName = (key) => {
         const { releaseName } = this.state;
 
         if (key === 'Enter') {
+            if (this.isAlreadyExist(releaseName)) {
+                this.props.openModal({ hasErrored: true, errorMessage: "Application's name already taken" });
+                this.setState({ error: true });
+                return;
+            }
+
             if (this.isValidReleaseName(releaseName)) {
                 this.install(releaseName.trim());
                 this.setState({ action: '', releaseName: '' });
@@ -74,6 +82,6 @@ class Chart extends React.Component {
 }
 
 const mapStateToProps = state => ({ ...state.ApplicationReducer });
-const mapDispatchToProps = dispatch => bindActionCreators({ installApplication }, dispatch);
+const mapDispatchToProps = dispatch => bindActionCreators({ installApplication, openModal }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Chart);

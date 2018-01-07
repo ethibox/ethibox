@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === 'production') {
 document.addEventListener('keypress', ({ key }) => {
     const modal = store.getState().ModalReducer;
 
-    if (modal.isOpen && (key === 'Enter' || key === 'Escape')) {
+    if (modal.isOpen && (key === 'Escape')) {
         store.dispatch({ type: 'CLOSE_MODAL' });
     }
 });
