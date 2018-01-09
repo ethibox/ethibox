@@ -13,6 +13,12 @@ before_script:
 script:
   - make build
   - make test
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker build -t ston3o/ethibox .;
+    docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
+    docker push ston3o/ethibox;
+    fi
 cache: false
 branches:
   only:
