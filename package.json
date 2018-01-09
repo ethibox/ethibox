@@ -9,8 +9,8 @@
     "start": "TOKEN=$(cat $TELEPRESENCE_ROOT/var/run/secrets/kubernetes.io/serviceaccount/token) NODE_ENV=production node public/index.js"
   },
   "engines": {
-    "node": "6.12.2",
-    "npm": "3.10.10"
+    "node": "8.9.4",
+    "npm": "5.6.0"
   },
   "license": "GPL-3.0",
   "devDependencies": {
