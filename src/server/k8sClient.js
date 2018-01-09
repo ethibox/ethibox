@@ -32,7 +32,7 @@ export const listCharts = () => {
 export const chart = name => listCharts().filter(c => c.name === name)[0];
 
 export const stateApplication = async (releaseName) => {
-    const state = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/${NAMESPACE}/pods/?labelSelector=release=${releaseName}`, {
+    const stateApp = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/${NAMESPACE}/pods/?labelSelector=release=${releaseName}`, {
         headers: { Authorization: `Bearer ${process.env.TOKEN}` },
         agent,
     })
@@ -45,26 +45,17 @@ export const stateApplication = async (releaseName) => {
                 pod.status.containerStatuses.every(container => container.ready);
             });
 
-            if (!pods.length) {
-                return 'notexisting';
-            }
+            let state = 'error';
 
-            if (typeof message !== 'undefined' && message.match('Insufficient memory')) {
-                return 'Insufficient memory';
-            }
+            if (!pods.length) state = 'notexisting';
+            if (typeof message !== 'undefined' && message.match('Insufficient memory')) state = 'Insufficient memory';
+            if (containerStatuses.every(item => item)) state = 'running';
+            if (!containerStatuses.every(item => item)) state = 'loading';
 
-            if (containerStatuses.every(item => item)) {
-                return 'running';
-            }
-
-            if (!containerStatuses.every(item => item)) {
-                return 'loading';
-            }
-
-            return 'error';
+            return state;
         });
 
-    return state;
+    return stateApp;
 };
 
 export const portApplication = async (releaseName) => {
@@ -88,9 +79,7 @@ export const listApplications = async () => {
     })
         .then(checkStatus)
         .then((data) => {
-            if (typeof data.code !== 'undefined' && data.code === 404) {
-                return [];
-            }
+            if (typeof data.code !== 'undefined' && data.code === 404) return [];
 
             return data.items.map((item) => {
                 const name = item.metadata.labels.app;
@@ -105,9 +94,7 @@ export const listApplications = async () => {
             });
         });
 
-    if (!apps.length) {
-        return [];
-    }
+    if (!apps.length) return [];
 
     await Promise.all(apps.map(async (app) => {
         app.port = await portApplication(app.releaseName);
