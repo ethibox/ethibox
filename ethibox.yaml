@@ -371,6 +371,4 @@ spec:
           ports:
             - containerPort: 4444
           resources: {}
-      imagePullSecrets:
-        - name: myregistrykey
 status: {}
