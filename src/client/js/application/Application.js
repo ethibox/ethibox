@@ -17,35 +17,41 @@ class Application extends React.Component {
         this.props.uninstallApplication(this.props.releaseName);
     }
 
-    render() {
-        const { icon, releaseName, category, port, state } = this.props;
+    renderDescription = () => {
+        const { icon, port, state } = this.props;
         const hyperlink = `http://${process.env.MINIKUBE_IP || window.location.hostname}:${port}`;
 
         return (
+            <Card.Description textAlign="center">
+                <Image src={icon || defaultIcon} width="60" />
+                {
+                    state === RUNNING &&
+                    <Card.Meta>
+                        <a href={hyperlink} target="_blank">
+                            <Icon name="linkify" />{hyperlink}
+                        </a>
+                    </Card.Meta>
+                }
+                {
+                    state === ERROR_MEMORY &&
+                    <Card.Meta>
+                        <p style={{ color: 'red', fontWeight: 'bold' }}>Error: Insufficient memory</p>
+                    </Card.Meta>
+                }
+            </Card.Description>
+        );
+    }
+
+    render() {
+        return (
             <Card>
-                <Dimmer active={state === LOADING} inverted>
+                <Dimmer active={this.props.state === LOADING} inverted>
                     <Loader indeterminate>Loading...</Loader>
                 </Dimmer>
                 <Card.Content>
-                    <Card.Header>{releaseName}</Card.Header>
-                    <Card.Meta>{category}</Card.Meta>
-                    <Card.Description textAlign="center">
-                        <Image src={icon || defaultIcon} width="60" />
-                        {
-                            state === RUNNING &&
-                            <Card.Meta>
-                                <a href={hyperlink} target="_blank">
-                                    <Icon name="linkify" />{hyperlink}
-                                </a>
-                            </Card.Meta>
-                        }
-                        {
-                            state === ERROR_MEMORY &&
-                            <Card.Meta>
-                                <p style={{ color: 'red', fontWeight: 'bold' }}>Error: Insufficient memory</p>
-                            </Card.Meta>
-                        }
-                    </Card.Description>
+                    <Card.Header>{this.props.releaseName}</Card.Header>
+                    <Card.Meta>{this.props.category}</Card.Meta>
+                    { this.renderDescription() }
                 </Card.Content>
                 <Card.Content extra>
                     <div className="ui two buttons">
@@ -54,9 +60,7 @@ class Application extends React.Component {
                 </Card.Content>
                 <Modal size="large" open={this.state.action === 'UNINSTALL'} onClose={() => this.setState({ action: '' })} key="uninstall" basic>
                     <Header icon="delete" content="Uninstall application" />
-                    <Modal.Content>
-                        <p>Are you sure you want to uninstall this application?</p>
-                    </Modal.Content>
+                    <Modal.Content><p>Are you sure you want to uninstall this application?</p></Modal.Content>
                     <Modal.Actions>
                         <Button onClick={() => this.setState({ action: '' })} basic inverted>Cancel</Button>
                         <Button color="red" onClick={() => this.uninstall()} inverted><Icon name="remove" />Uninstall</Button>

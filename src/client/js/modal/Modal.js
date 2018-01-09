@@ -9,11 +9,9 @@ const ModalComponent = (props) => {
 
     return (
         <Modal open={isOpen} size="large" key="modal" basic>
-            { hasErrored && <Header icon="warning sign" content={title || 'Error'} /> }
-            { !hasErrored && <Header icon="checkmark" content={title || 'Success'} /> }
+            { hasErrored ? <Header icon="warning sign" content={title || 'Error'} /> : <Header icon="checkmark" content={title || 'Success'} /> }
             <Modal.Content>
-                { hasErrored && <h3>{errorMessage || 'Unknow error, contact an administrator'}</h3> }
-                { !hasErrored && <h3>{successMessage || 'Operation completed'}</h3> }
+                { hasErrored ? <h3>{errorMessage || 'Unknow error, contact an administrator'}</h3> : <h3>{successMessage || 'Operation completed'}</h3> }
             </Modal.Content>
             <Modal.Actions>
                 <Button color={hasErrored ? 'red' : 'green'} onClick={() => props.closeModal()} inverted>
