@@ -1,7 +1,7 @@
 <p align="center"><img width="15%" src="https://framapic.org/tUxf7mPC8HHU/zoDa3nLhs8HH.svg"></p>
 <p align="center">Let's decentralize the internet!</p>
 <p align="center">
-  <a href=".github/CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.1.0-blue.svg?style=flat-square&colorA=0d7377&colorB=44c2c7"></a>
+  <a href=".github/CHANGELOG.md"><img src="https://img.shields.io/github/tag/ston3o/ethibox.svg?label=version&style=flat-square&colorA=0d7377&colorB=44c2c7"></a>
     &nbsp;
   <a href="LICENSE.txt"><img src="https://img.shields.io/badge/license-GPL%20v3%2B-yellow.svg?style=flat-square&colorA=0d7377&colorB=44c2c7"></a>
     &nbsp;
