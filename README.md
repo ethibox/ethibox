@@ -123,6 +123,10 @@ Please read [CONTRIBUTING.md](.github/CONTRIBUTING.md) for details on our code o
 
 ## Donate
 
+Support me with a monthly donation and help me continue my activities:
+
+[![liberapay](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/ston3o/donate)
+
 Buy me a beer (BTC): 112aZxX9Jiya4TM6Le4foxTq9V8U6aVGbG
 
 ## License
