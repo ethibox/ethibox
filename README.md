@@ -121,7 +121,7 @@ make test
 
 Please read [CONTRIBUTING.md](.github/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
-## Donate
+## Help support ethibox
 
 Support me with a monthly donation and help me continue my activities:
 
