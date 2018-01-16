@@ -1,0 +1,16 @@
+---
+engines:
+  duplication:
+    enabled: false
+  eslint:
+    enabled: true
+    channel: "eslint-4"
+  fixme:
+    enabled: true
+ratings:
+  paths:
+    - "**.js"
+exclude_paths:
+  - node_modules/
+  - test/
+  - .github/
