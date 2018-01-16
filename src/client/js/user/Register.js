@@ -2,11 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import isEmail from 'validator/lib/isEmail';
-import { Header, Container, Segment, Message, Grid, Button, Form } from 'semantic-ui-react';
+import { Container, Segment, Message, Grid, Button, Form } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { register } from './UserActions';
 import Loader from '../loader/Loader';
-import logo from '../../images/logo.svg';
+import Header from '../app/Header';
 
 class Register extends React.Component {
     state = { email: '', password: '', errors: [] };
@@ -53,13 +53,8 @@ class Register extends React.Component {
             <Container style={{ height: '100%' }}>
                 <Grid verticalAlign="middle" style={{ height: '100%' }} centered stackable>
                     <Grid.Column style={{ maxWidth: 450 }}>
-                        <Header as="h1">
-                            <img src={logo} alt="logo" />
-                            <Header.Content>
-                                Ethibox
-                                <Header.Subheader>Let&apos;s decentralize the internet!</Header.Subheader>
-                            </Header.Content>
-                        </Header>
+                        <Header />
+                        { this.renderForm() }
                         <Message style={{ textAlign: 'center' }}><p>Already have an account? <Link to="/login">Sign in</Link></p></Message>
                     </Grid.Column>
                 </Grid>
