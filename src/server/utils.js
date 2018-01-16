@@ -1,3 +1,7 @@
+import jwt from 'jsonwebtoken';
+
+export const secret = process.env.SECRET || 'mysecret';
+
 export const checkStatus = response => new Promise((resolve, reject) => {
     if (response.status >= 200 && response.status < 300) {
         return response.json().then(resolve);
@@ -21,4 +25,13 @@ export const findVal = (object, key) => {
         }
     });
     return value;
+};
+
+export const isAuthenticate = (token) => {
+    try {
+        jwt.verify(token, secret);
+        return true;
+    } catch ({ message }) {
+        return false;
+    }
 };

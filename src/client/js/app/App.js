@@ -1,5 +1,5 @@
 import React from 'react';
-import { Segment, Container, Divider, Header, Card } from 'semantic-ui-react';
+import { Segment, Container, Divider, Header, Card, Button } from 'semantic-ui-react';
 import ApplicationList from '../application/ApplicationList';
 import ChartList from '../chart/ChartList';
 import Modal from '../modal/Modal';
@@ -12,7 +12,7 @@ const App = () => {
         <Container>
             <Divider hidden />
 
-            <Header as="h1">
+            <Header as="h1" floated="left">
                 <img src={logo} alt="logo" />
                 <Header.Content>
                     Ethibox
@@ -22,6 +22,8 @@ const App = () => {
                     <img style={{ position: 'absolute', top: 0, right: 0, border: 0 }} src={fork} alt="Fork me on GitHub" />
                 </a>
             </Header>
+
+            <Button basic floated="right" icon="sign out" content="Se déconnecter" onClick={() => { localStorage.clear(); window.location.replace('/'); }} />
 
             <Divider hidden clearing />
 

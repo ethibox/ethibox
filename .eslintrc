@@ -16,7 +16,8 @@
   },
   "globals": {
       "assert",
-      "browser"
+      "browser",
+      "socket",
   },
   "env": {
       "browser": true,
