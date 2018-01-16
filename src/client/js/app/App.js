@@ -1,30 +1,17 @@
 import React from 'react';
-import { Segment, Container, Divider, Header, Card, Button } from 'semantic-ui-react';
+import { Segment, Container, Divider, Card, Button } from 'semantic-ui-react';
 import ApplicationList from '../application/ApplicationList';
 import ChartList from '../chart/ChartList';
 import Modal from '../modal/Modal';
 import Loader from '../loader/Loader';
-import logo from '../../images/logo.svg';
-import fork from '../../images/fork-me.png';
+import Header from './Header';
 
 const App = () => {
     return (
         <Container>
             <Divider hidden />
-
-            <Header as="h1" floated="left">
-                <img src={logo} alt="logo" />
-                <Header.Content>
-                    Ethibox
-                    <Header.Subheader>Let&apos;s decentralize the internet!</Header.Subheader>
-                </Header.Content>
-                <a href="https://github.com/ston3o/ethibox" target="_blank" rel="noopener noreferrer">
-                    <img style={{ position: 'absolute', top: 0, right: 0, border: 0 }} src={fork} alt="Fork me on GitHub" />
-                </a>
-            </Header>
-
+            <Header floated="left" />
             <Button basic floated="right" icon="sign out" content="Se déconnecter" onClick={() => { localStorage.clear(); window.location.replace('/'); }} />
-
             <Divider hidden clearing />
 
             <Card.Group itemsPerRow={4} stackable>

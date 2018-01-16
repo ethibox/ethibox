@@ -31,10 +31,24 @@ class Register extends React.Component {
         }
     }
 
-    render() {
+    renderForm = () => {
         const { email, password, errors } = this.state;
         const { registerError } = this.props;
 
+        return (
+            <Form size="large">
+                <Segment stacked>
+                    <Form.Input icon="mail outline" iconPosition="left" type="text" placeholder="E-mail address" name="email" value={email} onChange={this.handleChange} />
+                    <Form.Input icon="lock" iconPosition="left" type="password" placeholder="Password" name="password" value={password} onChange={this.handleChange} />
+                    <Message header="Error" list={errors} visible={!!errors.length} error />
+                    <Message header="Error" content={registerError} visible={!!registerError} error />
+                    <Button type="submit" color="teal" onClick={this.handleSubmit} fluid>Create an account</Button>
+                </Segment>
+            </Form>
+        );
+    }
+
+    render() {
         return (
             <Container style={{ height: '100%' }}>
                 <Grid verticalAlign="middle" style={{ height: '100%' }} centered stackable>
@@ -46,15 +60,6 @@ class Register extends React.Component {
                                 <Header.Subheader>Let&apos;s decentralize the internet!</Header.Subheader>
                             </Header.Content>
                         </Header>
-                        <Form size="large">
-                            <Segment stacked>
-                                <Form.Input icon="mail outline" iconPosition="left" type="text" placeholder="E-mail address" name="email" value={email} onChange={this.handleChange} />
-                                <Form.Input icon="lock" iconPosition="left" type="password" placeholder="Password" name="password" value={password} onChange={this.handleChange} />
-                                <Message header="Error" list={errors} visible={!!errors.length} error />
-                                <Message header="Error" content={registerError} visible={!!registerError} error />
-                                <Button type="submit" color="teal" onClick={this.handleSubmit} fluid>Register</Button>
-                            </Segment>
-                        </Form>
                         <Message style={{ textAlign: 'center' }}><p>Already have an account? <Link to="/login">Sign in</Link></p></Message>
                     </Grid.Column>
                 </Grid>
