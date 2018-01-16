@@ -20,7 +20,7 @@ const App = () => {
             </Card.Group>
 
             <Segment padded="very" vertical textAlign="center" style={{ border: 0 }}>
-                Made with <span style={{ color: 'red' }}>♥</span> by <a href="https://ston3o.me" rel="noopener noreferrer" target="_blank">ston3o</a>
+                Made with <span style={{ color: 'red' }}>♥</span> by <a href="https://ston3o.me" rel="noopener noreferrer" target="_blank">ston3o</a> for the Open-Source Community.
             </Segment>
 
             <Modal />
