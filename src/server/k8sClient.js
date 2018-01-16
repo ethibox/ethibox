@@ -87,13 +87,7 @@ export const listApplications = async () => {
                 const releaseName = item.metadata.labels.release;
                 const emailSha1 = item.metadata.labels.email;
 
-                return {
-                    name,
-                    releaseName,
-                    icon: chart(name).icon,
-                    category: chart(name).category,
-                    email: emailSha1,
-                };
+                return { name, releaseName, icon: chart(name).icon, category: chart(name).category, email: emailSha1 };
             });
         });
 
