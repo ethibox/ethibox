@@ -9,25 +9,32 @@ export const listApplicationsSuccess = applications => ({ type: 'LIST_APPLICATIO
 export const listApplications = () => (dispatch) => {
     dispatch(openLoader('Loading applications...'));
 
-    fetch('/api/applications')
-        .then(checkStatus)
-        .then(applications => dispatch(listApplicationsSuccess(applications)) && dispatch(closeLoader()))
-        .catch(({ message }) => {
-            dispatch(closeLoader());
-            dispatch(openModal({ hasErrored: true, errorMessage: message }));
-        });
+    socket.on('listApplications', (apps) => {
+        dispatch(closeLoader());
+        if (localStorage.getItem('lastActionDate') < Date.now() - 5000) {
+            dispatch(listApplicationsSuccess(apps));
+        }
+    });
 };
 
 export const installApplication = application => async (dispatch) => {
     dispatch(installApplicationSuccess(application));
 
-    const releases = await fetch('/api/applications').then(checkStatus);
+    const releases = await fetch('/api/applications', {
+        headers: { 'Content-Type': 'application/json', 'x-access-token': localStorage.getItem('token') },
+    })
+        .then(checkStatus)
+        .catch(({ message }) => {
+            dispatch(uninstallApplicationSuccess(application.releaseName));
+            dispatch(openModal({ hasErrored: true, errorMessage: message }));
+        });
+
     const releaseNames = releases.map(release => release.releaseName);
 
     if (!releaseNames.includes(application.releaseName)) {
         fetch('/api/applications', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'x-access-token': localStorage.getItem('token') },
             body: JSON.stringify(application),
         })
             .then(checkStatus)
@@ -44,7 +51,10 @@ export const installApplication = application => async (dispatch) => {
 export const uninstallApplication = releaseName => (dispatch) => {
     dispatch(uninstallApplicationSuccess(releaseName));
 
-    fetch(`/api/applications/${releaseName}`, { method: 'DELETE' })
+    fetch(`/api/applications/${releaseName}`, {
+        method: 'DELETE',
+        headers: { 'x-access-token': localStorage.getItem('token') },
+    })
         .then(checkStatus)
         .catch(({ message }) => dispatch(openModal({ hasErrored: true, errorMessage: message })));
 };

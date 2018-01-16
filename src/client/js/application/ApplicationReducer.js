@@ -1,4 +1,4 @@
-export default (state = { applications: [], lastActionDate: Date.now() - 5000 }, action) => {
+export default (state = { applications: [] }, action) => {
     switch (action.type) {
         case 'LIST_APPLICATIONS_SUCCESS': {
             return { ...state, applications: action.applications };
@@ -7,15 +7,13 @@ export default (state = { applications: [], lastActionDate: Date.now() - 5000 },
         case 'INSTALL_APPLICATION_SUCCESS': {
             const newApplication = action.application;
             newApplication.state = 'loading';
-            return { ...state, applications: [...state.applications, newApplication], lastActionDate: Date.now() };
+            localStorage.setItem('lastActionDate', Date.now());
+            return { ...state, applications: [...state.applications, newApplication] };
         }
 
         case 'UNINSTALL_APPLICATION_SUCCESS': {
-            return {
-                ...state,
-                applications: state.applications.map(app => (app.releaseName === action.releaseName ? { ...app, state: 'loading' } : app)),
-                lastActionDate: Date.now(),
-            };
+            localStorage.setItem('lastActionDate', Date.now());
+            return { ...state, applications: state.applications.map(app => (app.releaseName === action.releaseName ? { ...app, state: 'loading' } : app)) };
         }
 
         default: {
