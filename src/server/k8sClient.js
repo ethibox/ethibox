@@ -2,6 +2,7 @@ import yaml from 'yamljs';
 import fetch from 'node-fetch';
 import path from 'path';
 import https from 'https';
+import sha1 from 'node-sha1';
 import { checkStatus, findVal } from './utils';
 
 const agent = new https.Agent({ rejectUnauthorized: false });
@@ -84,13 +85,9 @@ export const listApplications = async () => {
             return data.items.map((item) => {
                 const name = item.metadata.labels.app;
                 const releaseName = item.metadata.labels.release;
+                const emailSha1 = item.metadata.labels.email;
 
-                return {
-                    name,
-                    releaseName,
-                    icon: chart(name).icon,
-                    category: chart(name).category,
-                };
+                return { name, releaseName, icon: chart(name).icon, category: chart(name).category, email: emailSha1 };
             });
         });
 
@@ -104,7 +101,7 @@ export const listApplications = async () => {
     return apps;
 };
 
-export const installApplication = async (name, releaseName) => {
+export const installApplication = async (name, email, releaseName) => {
     const chartUrl = `${CHART_REPOSITORY}/${name}-0.1.0.tgz`;
 
     await fetch(`${SWIFT_ENDPOINT}/tiller/v2/releases/${releaseName}/json`, {
@@ -112,7 +109,7 @@ export const installApplication = async (name, releaseName) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             chart_url: chartUrl,
-            values: { raw: JSON.stringify({ serviceType: 'NodePort' }) },
+            values: { raw: JSON.stringify({ serviceType: 'NodePort', email: sha1(email) }) },
         }),
     })
         .then(checkStatus);

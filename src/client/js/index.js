@@ -5,8 +5,12 @@ import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import io from 'socket.io-client';
 import reducers from './app/reducers';
 import App from './app/App';
+import Register from './user/Register';
+import Login from './user/Login';
 
 let store;
 if (process.env.NODE_ENV === 'production') {
@@ -23,9 +27,24 @@ document.addEventListener('keypress', ({ key }) => {
     }
 });
 
+const token = localStorage.getItem('token');
+const endpoint = (process.env.NODE_ENV === 'production') ? `//${window.location.host}` : `//${window.location.hostname}:${process.env.NODE_PORT}`;
+
+if (token) {
+    global.socket = io(endpoint, { query: `token=${token}` });
+} else {
+    global.socket = io(endpoint);
+}
+
 ReactDOM.render(
     <Provider store={store}>
-        <App />
+        <Router>
+            <div style={{ height: '100%' }}>
+                <Route exact path="/" render={() => (token ? (<App />) : (<Login />))} />
+                <Route path="/register" component={Register} />
+                <Route path="/login" component={Login} />
+            </div>
+        </Router>
     </Provider>,
     document.getElementById('root'),
 );
