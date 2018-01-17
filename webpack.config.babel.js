@@ -4,6 +4,7 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
+import GitRevisionPlugin from 'git-revision-webpack-plugin';
 import webpack from 'webpack';
 import { exec } from 'shelljs';
 import yaml from 'yamljs';
@@ -13,6 +14,7 @@ const port = process.env.PORT || 4444;
 const minikubeIp = (env === 'development') ? exec('minikube ip', { silent: true }).stdout.trim() : '';
 const chartIndex = yaml.load(`${__dirname}/charts/packages/index.yaml`);
 const listCharts = Object.values(chartIndex.entries).map(chart => ({ name: chart[0].name, icon: chart[0].icon, category: chart[0].keywords[0] }));
+const gitRevisionPlugin = new GitRevisionPlugin({ lightweightTags: true });
 
 const config = {
     entry: {
@@ -84,6 +86,7 @@ const config = {
             'process.env.NODE_ENV': JSON.stringify(env),
             'process.env.MINIKUBE_IP': JSON.stringify(minikubeIp),
             'process.env.CHARTS': JSON.stringify(listCharts),
+            'process.env.VERSION': JSON.stringify(gitRevisionPlugin.version()),
         }),
         new ExtractTextPlugin({ filename: '[name].css', allChunks: false }),
         new UglifyJsPlugin({ uglifyOptions: { output: { comments: false } } }),

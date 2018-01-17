@@ -19,8 +19,8 @@ const App = () => {
                 <ChartList />
             </Card.Group>
 
-            <Segment padded="very" vertical textAlign="center" style={{ border: 0 }}>
-                Made with <span style={{ color: 'red' }}>♥</span> by <a href="https://ston3o.me" rel="noopener noreferrer" target="_blank">ston3o</a> for the Open-Source Community.
+            <Segment padded="very" textAlign="center" style={{ border: 0 }} vertical>
+                <p>Made with <span style={{ color: 'red' }}>♥</span> by <a href="https://ston3o.me" rel="noopener noreferrer" target="_blank">ston3o</a> for the Open-Source Community - <a href="https://github.com/ston3o/ethibox/releases" rel="noopener noreferrer" target="_blank">Version { process.env.VERSION }</a></p>
             </Segment>
 
             <Modal />
