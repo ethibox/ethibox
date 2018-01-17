@@ -2,6 +2,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import jwtDecode from 'jwt-decode';
 import isEmail from 'validator/lib/isEmail';
+import bcrypt from 'bcrypt';
 import { checkConfig, listApplications, installApplication, uninstallApplication, listCharts, stateApplication, portApplication } from './k8sClient';
 import { User } from './models';
 import { isAuthenticate, secret } from './utils';
@@ -18,7 +19,8 @@ api.post('/register', async (req, res) => {
     }
 
     if (!await User.count({ where: { email } })) {
-        User.sync().then(() => User.create({ ip, email, password }));
+        const hashPassword = bcrypt.hashSync(password, 10);
+        User.sync().then(() => User.create({ ip, email, password: hashPassword }));
         const payload = { email };
         const token = jwt.sign(payload, secret, { expiresIn: tokenExpiration });
 
@@ -31,7 +33,8 @@ api.post('/register', async (req, res) => {
 api.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
-    if (await User.count({ where: { email, password } })) {
+    const user = await User.findOne({ where: { email }, raw: true });
+    if (user && bcrypt.compareSync(password, user.password)) {
         const payload = { email };
         const token = jwt.sign(payload, secret, { expiresIn: tokenExpiration });
 
