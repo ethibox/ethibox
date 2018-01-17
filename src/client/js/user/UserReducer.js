@@ -3,7 +3,7 @@ export default (state = {}, action) => {
         case 'LOGIN_SUCCESS': {
             localStorage.setItem('token', action.token);
             window.location.replace('/');
-            return { ...state };
+            return { ...state, loginError: '' };
         }
 
         case 'LOGIN_FAILURE': {
@@ -13,7 +13,7 @@ export default (state = {}, action) => {
         case 'REGISTER_SUCCESS': {
             localStorage.setItem('token', action.token);
             window.location.replace('/');
-            return { ...state };
+            return { ...state, registerError: '' };
         }
 
         case 'REGISTER_FAILURE': {
