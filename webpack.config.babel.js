@@ -2,6 +2,7 @@ import 'babel-polyfill';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
 import GitRevisionPlugin from 'git-revision-webpack-plugin';
@@ -90,6 +91,7 @@ const config = {
         }),
         new ExtractTextPlugin({ filename: '[name].css', allChunks: false }),
         new UglifyJsPlugin({ uglifyOptions: { output: { comments: false } } }),
+        new CopyWebpackPlugin([{ from: './static/' }]),
     ],
 };
 
