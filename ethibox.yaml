@@ -178,7 +178,7 @@ spec:
             - run
             - --v=3
             - --connector=incluster
-          image: appscode/swift:0.5.1
+          image: appscode/swift:0.5.2
           imagePullPolicy: Always
           name: swift
           ports:
@@ -366,7 +366,8 @@ spec:
       serviceAccountName: ethibox
       hostNetwork: true
       containers:
-        - image: index.docker.io/ston3o/ethibox
+        - image: ston3o/ethibox
+          imagePullPolicy: Always
           name: ethibox
           ports:
             - containerPort: 4444
