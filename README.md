@@ -9,7 +9,7 @@
     &nbsp;
   <a href="https://codeclimate.com/github/ston3o/ethibox"><img src="https://img.shields.io/codeclimate/maintainability/ston3o/ethibox.svg?style=flat-square&colorA=0d7377&colorB=44c2c7"></a>
     &nbsp;
-  <a href="https://fr.liberapay.com/"><img src="https://img.shields.io/badge/donate-liberapay-blue.svg?style=flat-square&colorA=0d7377&colorB=44c2c7"></a>
+  <a href="https://liberapay.com/ston3o/donate"><img src="https://img.shields.io/badge/donate-liberapay-blue.svg?style=flat-square&colorA=0d7377&colorB=44c2c7"></a>
 </p>
 
 <div align="center">
