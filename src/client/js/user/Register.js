@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { register } from './UserActions';
 import Loader from '../loader/Loader';
 import Header from '../app/Header';
+import Footer from '../app/Footer';
 
 class Register extends React.Component {
     state = { email: '', password: '', errors: [] };
@@ -56,6 +57,7 @@ class Register extends React.Component {
                         <Header />
                         { this.renderForm() }
                         <Message style={{ textAlign: 'center' }}><p>Already have an account? <Link to="/login">Sign in</Link></p></Message>
+                        <Footer />
                     </Grid.Column>
                 </Grid>
                 <Loader />
