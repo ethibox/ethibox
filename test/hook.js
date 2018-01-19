@@ -13,7 +13,7 @@ const options = {
 
 before(() => {
     const server = express();
-    server.use('/', express.static(path.join(__dirname, '../public')));
+    server.use('/', express.static(path.join(__dirname, '../public/static')));
     listeningServer = server.listen(options.port);
 
     const client = webdriverio.remote({
