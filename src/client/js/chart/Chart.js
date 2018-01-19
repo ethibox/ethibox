@@ -15,7 +15,7 @@ class Chart extends React.Component {
         this.props.installApplication({ name, icon, category, releaseName });
     }
 
-    isValidReleaseName = releaseName => releaseName.trim().match(/^[a-z]+$/);
+    isValidReleaseName = releaseName => releaseName.trim().match(/^[a-z]([-a-z0-9]*[a-z0-9])?$/);
     isAlreadyExist = releaseName => this.props.applications.map(release => release.releaseName).includes(releaseName);
 
     enterReleaseName = (key) => {
