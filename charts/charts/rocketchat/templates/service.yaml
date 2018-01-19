@@ -7,6 +7,8 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    email: {{ .Values.email }}
+    category: {{ index .Chart.Keywords 0 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
