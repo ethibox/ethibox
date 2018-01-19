@@ -59,7 +59,6 @@ api.get('/applications', async (req, res) => {
     if (!req.jwt_auth) return res.status(401).send({ success: false, message: 'Not authorized' });
 
     try {
-        checkConfig();
         const apps = await listApplications();
         return res.json(apps);
     } catch ({ message }) {
@@ -74,7 +73,6 @@ api.post('/applications', async (req, res) => {
     const { email } = jwtDecode(token);
 
     try {
-        checkConfig();
         const { name, releaseName } = req.body;
         await installApplication(name, email, releaseName);
         return res.json({ success: true, message: 'Application installed' });
@@ -87,7 +85,6 @@ api.delete('/applications/:releaseName', (req, res) => {
     if (!req.jwt_auth) return res.status(401).send({ success: false, message: 'Not authorized' });
 
     try {
-        checkConfig();
         const { releaseName } = req.params;
         uninstallApplication(releaseName);
         return res.json({ success: true, message: 'Application uninstalled' });
