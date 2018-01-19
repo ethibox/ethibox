@@ -13,6 +13,9 @@ export default (state = { applications: [] }, action) => {
 
         case 'UNINSTALL_APPLICATION_SUCCESS': {
             localStorage.setItem('lastActionDate', Date.now());
+            if (action.force) {
+                return { ...state, applications: state.applications.filter(app => app.releaseName !== action.releaseName) };
+            }
             return { ...state, applications: state.applications.map(app => (app.releaseName === action.releaseName ? { ...app, state: 'loading' } : app)) };
         }
 

@@ -3,11 +3,11 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Modal, Header, Card, Image, Button, Icon, Dimmer, Loader } from 'semantic-ui-react';
 import { uninstallApplication } from '../application/ApplicationActions';
-import { defaultIcon } from '../../images/default-icon.png';
+import defaultIcon from '../../images/default-icon.png';
 
 const RUNNING = 'running';
 const LOADING = 'loading';
-const ERROR_MEMORY = 'Insufficient memory';
+const ERROR = 'error';
 
 class Application extends React.Component {
     state = { action: '' };
@@ -33,9 +33,9 @@ class Application extends React.Component {
                     </Card.Meta>
                 }
                 {
-                    state === ERROR_MEMORY &&
+                    state === ERROR &&
                     <Card.Meta>
-                        <p style={{ color: 'red', fontWeight: 'bold' }}>Error: Insufficient memory</p>
+                        <p style={{ color: 'red', fontWeight: 'bold' }}>Error</p>
                     </Card.Meta>
                 }
             </Card.Description>
