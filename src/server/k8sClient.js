@@ -30,73 +30,49 @@ export const listCharts = () => {
     return Object.values(chartIndex.entries).map(chart => ({ name: chart[0].name, icon: chart[0].icon, category: chart[0].keywords[0] }));
 };
 
-export const chart = name => listCharts().filter(c => c.name === name)[0];
-
 export const stateApplication = async (releaseName) => {
-    const stateApp = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/${NAMESPACE}/pods/?labelSelector=release=${releaseName}`, {
+    const app = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/${NAMESPACE}/pods/?labelSelector=release=${releaseName}`, {
         headers: { Authorization: `Bearer ${process.env.TOKEN}` },
         agent,
     })
         .then(checkStatus)
-        .then((data) => {
-            const pods = data.items;
-            const message = findVal(pods, 'message');
-            const containerStatuses = pods.map((pod) => {
-                return pod.status.hasOwnProperty('containerStatuses') && // eslint-disable-line
-                pod.status.containerStatuses.every(container => container.ready);
-            });
+        .then(({ items }) => ({
+            pods: items.length,
+            message: findVal(items, 'message'),
+            containersRunning: !!items.map(pod => pod.status.containerStatuses.every(container => container.ready)),
+        }));
 
-            let state = 'error';
+    let state = 'loading';
 
-            if (!pods.length) state = 'notexisting';
-            if (typeof message !== 'undefined' && message.match('Insufficient memory')) state = 'Insufficient memory';
-            if (containerStatuses.every(item => item)) state = 'running';
-            if (!containerStatuses.every(item => item)) state = 'loading';
+    if (app.containersRunning) state = 'running';
+    if (app.message && app.message.match('unready')) state = 'loading';
+    if (app.message && app.message.match('DiskPressure')) state = 'error';
+    if (app.message && app.message.match('Insufficient memory')) state = 'error';
 
-            return state;
-        });
-
-    return stateApp;
-};
-
-export const portApplication = async (releaseName) => {
-    const port = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/${NAMESPACE}/services/?labelSelector=release=${releaseName}`, {
-        headers: { Authorization: `Bearer ${process.env.TOKEN}` },
-        agent,
-    })
-        .then(checkStatus)
-        .then((data) => {
-            const services = data.items;
-            return services[services.length - 1].spec.ports[0].nodePort;
-        });
-
-    return port;
+    return state;
 };
 
 export const listApplications = async () => {
-    const apps = await fetch(`${KUBE_APISERVER_ENDPOINT}/apis/extensions/v1beta1/namespaces/${NAMESPACE}/ingresses`, {
+    const apps = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/${NAMESPACE}/services/?labelSelector=heritage=Tiller`, {
         headers: { Authorization: `Bearer ${process.env.TOKEN}` },
         agent,
     })
         .then(checkStatus)
         .then((data) => {
-            if (typeof data.code !== 'undefined' && data.code === 404) return [];
-
-            return data.items.map((item) => {
-                const name = item.metadata.labels.app;
-                const releaseName = item.metadata.labels.release;
-                const emailSha1 = item.metadata.labels.email;
-
-                return { name, releaseName, icon: chart(name).icon, category: chart(name).category, email: emailSha1 };
-            });
+            return data.items.map(item => ({
+                name: item.metadata.labels.app,
+                releaseName: item.metadata.labels.release,
+                category: item.metadata.labels.category,
+                email: item.metadata.labels.email,
+                port: item.spec.ports[0].nodePort,
+            }));
         });
 
-    if (!apps.length) return [];
-
-    await Promise.all(apps.map(async (app) => {
-        app.port = await portApplication(app.releaseName);
-        app.state = await stateApplication(app.releaseName);
-    }));
+    if (apps.length) {
+        await Promise.all(apps.map(async (app) => {
+            app.state = await stateApplication(app.releaseName);
+        }));
+    }
 
     return apps;
 };
