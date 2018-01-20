@@ -26,7 +26,7 @@ export const stateApplications = async () => {
             if (!items.length) return [];
 
             return items.map(item => ({
-                releaseName: item.metadata.labels.release,
+                releaseName: item.metadata.labels.release.slice(0, -6),
                 containersRunning: item.status.hasOwnProperty('containerStatuses') && item.status.containerStatuses.every(container => container.ready), // eslint-disable-line
                 message: findVal(item, 'message'),
                 reason: findVal(item, 'reason'),
@@ -48,25 +48,28 @@ export const stateApplications = async () => {
 };
 
 export const listApplications = async () => {
-    const stateApps = await stateApplications();
-
     const apps = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/${NAMESPACE}/services/?labelSelector=heritage=Tiller`, {
         headers: { Authorization: `Bearer ${process.env.TOKEN}` },
         agent,
     })
         .then(checkStatus)
         .then((data) => {
+            if (!data.items.length) return [];
             return data.items.map(item => ({
                 name: item.metadata.labels.app,
                 releaseName: item.metadata.labels.release.slice(0, -6),
                 category: item.metadata.labels.category,
                 email: item.metadata.labels.email,
                 port: item.spec.ports[0].nodePort,
-                state: stateApps[stateApps.findIndex(app => app.releaseName === item.metadata.labels.release)].state,
             }));
         });
 
-    return apps;
+    const stateApps = await stateApplications();
+    return apps.map((app) => {
+        const index = stateApps.findIndex(item => item.releaseName === app.releaseName);
+        const { state } = stateApps[index];
+        return { ...app, state: state || 'loading' };
+    });
 };
 
 export const installApplication = async (name, email, releaseName) => {
