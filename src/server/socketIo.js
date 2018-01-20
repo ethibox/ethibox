@@ -4,7 +4,7 @@ import socketIo from 'socket.io';
 import { listApplications } from './k8sClient';
 import { isAuthenticate } from './utils';
 
-const interval = 5000;
+const interval = 10000;
 
 export default (server) => {
     const io = socketIo(server);

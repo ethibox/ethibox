@@ -15,13 +15,12 @@ app.use(compression());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.use('/', express.static(path.join(__dirname, publicPath, '/static')));
 app.use('/api', api);
-app.use('/static/', express.static(path.join(__dirname, publicPath)));
 app.use('/charts/', express.static(path.join(__dirname, publicPath, '../charts/packages/')));
+app.use('/icons/', express.static(path.join(__dirname, publicPath, '../charts/charts/')));
 
-app.get(['/', '/register', '/login'], (req, res) => res.sendFile(path.join(__dirname, publicPath, 'index.html')));
-app.get('/robots.txt', (req, res) => res.sendFile(path.join(__dirname, publicPath, 'robots.txt')));
-app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, publicPath, 'favicon.ico')));
+app.get(['/register', '/login'], (req, res) => res.sendFile(path.join(__dirname, publicPath, '/static/index.html')));
 app.get('*', (req, res) => res.status(404).send('Not found'));
 
 const server = http.createServer(app);

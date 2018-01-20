@@ -1,9 +1,9 @@
-import { checkStatus } from '../utils';
+import { checkStatus, isConnect } from '../utils';
 import { openModal } from '../modal/ModalActions';
 import { openLoader, closeLoader } from '../loader/LoaderActions';
 
 export const installApplicationSuccess = application => ({ type: 'INSTALL_APPLICATION_SUCCESS', application });
-export const uninstallApplicationSuccess = releaseName => ({ type: 'UNINSTALL_APPLICATION_SUCCESS', releaseName });
+export const uninstallApplicationSuccess = (releaseName, force) => ({ type: 'UNINSTALL_APPLICATION_SUCCESS', releaseName, force });
 export const listApplicationsSuccess = applications => ({ type: 'LIST_APPLICATIONS_SUCCESS', applications });
 
 export const listApplications = () => (dispatch) => {
@@ -14,38 +14,25 @@ export const listApplications = () => (dispatch) => {
         if (localStorage.getItem('lastActionDate') < Date.now() - 5000) {
             dispatch(listApplicationsSuccess(apps));
         }
+
+        if (!isConnect()) window.location.replace('/');
     });
 };
 
 export const installApplication = application => async (dispatch) => {
+    const { releaseName } = application;
     dispatch(installApplicationSuccess(application));
 
-    const releases = await fetch('/api/applications', {
+    fetch('/api/applications', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-access-token': localStorage.getItem('token') },
+        body: JSON.stringify(application),
     })
         .then(checkStatus)
         .catch(({ message }) => {
-            dispatch(uninstallApplicationSuccess(application.releaseName));
+            dispatch(uninstallApplicationSuccess(releaseName));
             dispatch(openModal({ hasErrored: true, errorMessage: message }));
         });
-
-    const releaseNames = releases.map(release => release.releaseName);
-
-    if (!releaseNames.includes(application.releaseName)) {
-        fetch('/api/applications', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-access-token': localStorage.getItem('token') },
-            body: JSON.stringify(application),
-        })
-            .then(checkStatus)
-            .catch(({ message }) => {
-                dispatch(uninstallApplicationSuccess(application.releaseName));
-                dispatch(openModal({ hasErrored: true, errorMessage: message }));
-            });
-    } else {
-        dispatch(uninstallApplicationSuccess(application.releaseName));
-        dispatch(openModal({ hasErrored: true, errorMessage: "Application's name already taken" }));
-    }
 };
 
 export const uninstallApplication = releaseName => (dispatch) => {

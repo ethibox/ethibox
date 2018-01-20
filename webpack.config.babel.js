@@ -25,9 +25,9 @@ const config = {
         ],
     },
     output: {
-        path: `${__dirname}/public`,
+        path: `${__dirname}/public/static/`,
         filename: (env === 'production') ? 'bundle-[hash].js' : 'bundle.js',
-        publicPath: '/static/',
+        publicPath: '/',
     },
     module: {
         rules: [
