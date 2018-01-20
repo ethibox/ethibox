@@ -3,12 +3,12 @@ import jwt from 'jsonwebtoken';
 import jwtDecode from 'jwt-decode';
 import isEmail from 'validator/lib/isEmail';
 import bcrypt from 'bcrypt';
-import { checkConfig, listApplications, installApplication, uninstallApplication, listCharts, stateApplication, portApplication } from './k8sClient';
+import { listApplications, installApplication, uninstallApplication, listCharts } from './k8sClient';
 import { User } from './models';
 import { isAuthenticate, secret } from './utils';
 
 const api = express();
-const tokenExpiration = '24h';
+const tokenExpiration = '7d';
 
 api.post('/register', async (req, res) => {
     const { email, password } = req.body;
@@ -59,7 +59,6 @@ api.get('/applications', async (req, res) => {
     if (!req.jwt_auth) return res.status(401).send({ success: false, message: 'Not authorized' });
 
     try {
-        checkConfig();
         const apps = await listApplications();
         return res.json(apps);
     } catch ({ message }) {
@@ -74,7 +73,6 @@ api.post('/applications', async (req, res) => {
     const { email } = jwtDecode(token);
 
     try {
-        checkConfig();
         const { name, releaseName } = req.body;
         await installApplication(name, email, releaseName);
         return res.json({ success: true, message: 'Application installed' });
@@ -87,29 +85,12 @@ api.delete('/applications/:releaseName', (req, res) => {
     if (!req.jwt_auth) return res.status(401).send({ success: false, message: 'Not authorized' });
 
     try {
-        checkConfig();
+        const token = req.body.token || req.query.token || req.headers['x-access-token'];
         const { releaseName } = req.params;
-        uninstallApplication(releaseName);
+        const { email } = jwtDecode(token);
+
+        uninstallApplication(releaseName, email);
         return res.json({ success: true, message: 'Application uninstalled' });
-    } catch ({ message }) {
-        return res.status(500).send({ success: false, message });
-    }
-});
-
-api.get('/applications/:releaseName', async (req, res) => {
-    if (!req.jwt_auth) return res.status(401).send({ success: false, message: 'Not authorized' });
-
-    try {
-        checkConfig();
-        const { releaseName } = req.params;
-        const state = await stateApplication(releaseName);
-
-        if (state === 'notexisting') {
-            return res.status(404).send({ success: false, message: 'Application not exist' });
-        }
-
-        const port = await portApplication(releaseName);
-        return res.json({ releaseName, state, port });
     } catch ({ message }) {
         return res.status(500).send({ success: false, message });
     }

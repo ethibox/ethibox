@@ -11,6 +11,7 @@ import reducers from './app/reducers';
 import App from './app/App';
 import Register from './user/Register';
 import Login from './user/Login';
+import { isConnect } from './utils';
 
 let store;
 if (process.env.NODE_ENV === 'production') {
@@ -27,11 +28,10 @@ document.addEventListener('keypress', ({ key }) => {
     }
 });
 
-const token = localStorage.getItem('token');
 const endpoint = (process.env.NODE_ENV === 'production') ? `//${window.location.host}` : `//${window.location.hostname}:${process.env.NODE_PORT}`;
 
-if (token) {
-    global.socket = io(endpoint, { query: `token=${token}` });
+if (isConnect()) {
+    global.socket = io(endpoint, { query: `token=${localStorage.getItem('token')}` });
 } else {
     global.socket = io(endpoint);
 }
@@ -40,7 +40,7 @@ ReactDOM.render(
     <Provider store={store}>
         <Router>
             <div style={{ height: '100%' }}>
-                <Route exact path="/" render={() => (token ? (<App />) : (<Login />))} />
+                <Route exact path="/" render={() => (isConnect() ? (<App />) : (<Login />))} />
                 <Route path="/register" component={Register} />
                 <Route path="/login" component={Login} />
             </div>

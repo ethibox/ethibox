@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import path from 'path';
 import https from 'https';
 import sha1 from 'node-sha1';
-import { checkStatus, findVal } from './utils';
+import { checkStatus, findVal, genUniqReleaseName } from './utils';
 
 const agent = new https.Agent({ rejectUnauthorized: false });
 const KUBE_APISERVER_ENDPOINT = `https://${process.env.KUBERNETES_SERVICE_HOST}`;
@@ -11,100 +11,72 @@ const SWIFT_ENDPOINT = `http://${process.env.SWIFT_SERVICE_HOST}:${process.env.S
 const CHART_REPOSITORY = process.env.CHART_REPOSITORY || `http://${process.env.ETHIBOX_SERVICE_HOST}:${process.env.ETHIBOX_SERVICE_PORT}/charts`;
 const NAMESPACE = 'default';
 
-export const checkConfig = () => {
-    if (!process.env.TOKEN) {
-        throw new Error('No kubernetes token');
-    }
-
-    if (!process.env.SWIFT_SERVICE_HOST || !process.env.SWIFT_SERVICE_PORT_PT) {
-        throw new Error('Swift configuration error');
-    }
-
-    if (!process.env.KUBERNETES_SERVICE_HOST) {
-        throw new Error('Kubernetes configuration error');
-    }
-};
-
 export const listCharts = () => {
     const chartIndex = yaml.load(path.join(__dirname, (process.env.NODE_ENV === 'production') ? '../' : '../../', 'charts/packages/index.yaml'));
-    return Object.values(chartIndex.entries).map(chart => ({ name: chart[0].name, icon: chart[0].icon, category: chart[0].keywords[0] }));
+    return Object.values(chartIndex.entries).map(([chart]) => ({ ...chart, category: chart.keywords[0] }));
 };
 
-export const chart = name => listCharts().filter(c => c.name === name)[0];
-
-export const stateApplication = async (releaseName) => {
-    const stateApp = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/${NAMESPACE}/pods/?labelSelector=release=${releaseName}`, {
+export const stateApplications = async () => {
+    const apps = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/${NAMESPACE}/pods/`, {
         headers: { Authorization: `Bearer ${process.env.TOKEN}` },
         agent,
     })
         .then(checkStatus)
-        .then((data) => {
-            const pods = data.items;
-            const message = findVal(pods, 'message');
-            const containerStatuses = pods.map((pod) => {
-                return pod.status.hasOwnProperty('containerStatuses') && // eslint-disable-line
-                pod.status.containerStatuses.every(container => container.ready);
-            });
+        .then(({ items }) => {
+            if (!items.length) return [];
 
-            let state = 'error';
-
-            if (!pods.length) state = 'notexisting';
-            if (typeof message !== 'undefined' && message.match('Insufficient memory')) state = 'Insufficient memory';
-            if (containerStatuses.every(item => item)) state = 'running';
-            if (!containerStatuses.every(item => item)) state = 'loading';
-
-            return state;
+            return items.map(item => ({
+                releaseName: item.metadata.labels.release.slice(0, -6),
+                containersRunning: item.status.hasOwnProperty('containerStatuses') && item.status.containerStatuses.every(container => container.ready), // eslint-disable-line
+                message: findVal(item, 'message'),
+                reason: findVal(item, 'reason'),
+                ready: findVal(item, 'ready'),
+            }));
         });
 
-    return stateApp;
-};
-
-export const portApplication = async (releaseName) => {
-    const port = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/${NAMESPACE}/services/?labelSelector=release=${releaseName}`, {
-        headers: { Authorization: `Bearer ${process.env.TOKEN}` },
-        agent,
-    })
-        .then(checkStatus)
-        .then((data) => {
-            const services = data.items;
-            return services[services.length - 1].spec.ports[0].nodePort;
-        });
-
-    return port;
+    return apps.map((app) => {
+        let state = 'loading';
+        if (app.containersRunning) state = 'running';
+        if (app.message && app.message.match('unready')) state = 'loading';
+        if (app.message && app.message.match('DiskPressure')) state = 'error';
+        if (app.message && app.message.match('Insufficient memory')) state = 'error';
+        if (app.reason && app.reason === 'CrashLoopBackOff') state = 'error';
+        if (app.reason && app.reason === 'Error') state = 'error';
+        if (app.ready) state = 'running';
+        return { releaseName: app.releaseName, state };
+    });
 };
 
 export const listApplications = async () => {
-    const apps = await fetch(`${KUBE_APISERVER_ENDPOINT}/apis/extensions/v1beta1/namespaces/${NAMESPACE}/ingresses`, {
+    const apps = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/${NAMESPACE}/services/?labelSelector=heritage=Tiller`, {
         headers: { Authorization: `Bearer ${process.env.TOKEN}` },
         agent,
     })
         .then(checkStatus)
         .then((data) => {
-            if (typeof data.code !== 'undefined' && data.code === 404) return [];
-
-            return data.items.map((item) => {
-                const name = item.metadata.labels.app;
-                const releaseName = item.metadata.labels.release;
-                const emailSha1 = item.metadata.labels.email;
-
-                return { name, releaseName, icon: chart(name).icon, category: chart(name).category, email: emailSha1 };
-            });
+            if (!data.items.length) return [];
+            return data.items.map(item => ({
+                name: item.metadata.labels.app,
+                releaseName: item.metadata.labels.release.slice(0, -6),
+                category: item.metadata.labels.category,
+                email: item.metadata.labels.email,
+                port: item.spec.ports[0].nodePort,
+            }));
         });
 
-    if (!apps.length) return [];
-
-    await Promise.all(apps.map(async (app) => {
-        app.port = await portApplication(app.releaseName);
-        app.state = await stateApplication(app.releaseName);
-    }));
-
-    return apps;
+    const stateApps = await stateApplications();
+    return apps.map((app) => {
+        const index = stateApps.findIndex(item => item.releaseName === app.releaseName);
+        const { state } = stateApps[index];
+        return { ...app, state: state || 'loading' };
+    });
 };
 
 export const installApplication = async (name, email, releaseName) => {
     const chartUrl = `${CHART_REPOSITORY}/${name}-0.1.0.tgz`;
+    const uniqueReleaseName = genUniqReleaseName(releaseName, email);
 
-    await fetch(`${SWIFT_ENDPOINT}/tiller/v2/releases/${releaseName}/json`, {
+    await fetch(`${SWIFT_ENDPOINT}/tiller/v2/releases/${uniqueReleaseName}/json`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -115,6 +87,7 @@ export const installApplication = async (name, email, releaseName) => {
         .then(checkStatus);
 };
 
-export const uninstallApplication = (releaseName) => {
-    fetch(`${SWIFT_ENDPOINT}/tiller/v2/releases/${releaseName}/json?purge=true`, { method: 'DELETE' }).then(checkStatus);
+export const uninstallApplication = (releaseName, email) => {
+    fetch(`${SWIFT_ENDPOINT}/tiller/v2/releases/${genUniqReleaseName(releaseName, email)}/json?purge=true`, { method: 'DELETE' })
+        .then(checkStatus);
 };

@@ -2,9 +2,9 @@ apiVersion: v1
 entries:
   etherpad:
   - apiVersion: v1
-    created: 2018-01-17T13:19:16.385660952+01:00
+    created: 2018-01-18T23:41:32.263863679+01:00
     description: A Helm chart for Kubernetes
-    digest: 80b2542a4be8d199127f5b091f3510469dad06f072dbe95dc149b1a603a2e54b
+    digest: acebb68dd07eb022f1a02d7ef904f1f852c5af8861223150e9991e3d98381ab3
     icon: https://framapic.org/B4pD2wkMwxob/yj5ucxt4XzRW.image
     keywords:
     - Editor
@@ -15,9 +15,9 @@ entries:
   freshrss:
   - apiVersion: v1
     appVersion: 1.7.0
-    created: 2018-01-17T13:19:16.385871504+01:00
+    created: 2018-01-18T23:41:32.264068327+01:00
     description: A Helm chart for Kubernetes
-    digest: 050a0022d30371e0e2940d30612e6f0bff2595cba9cf8c1200bacc9b985fad02
+    digest: b3afbc1f0a63f3d5d54070ede24e2740e4bc22fc8272d3bda79b87f7cfe91cf2
     icon: https://lut.im/zJh8t6DzcW/MkZe5l8AMW2tNUsU.png
     keywords:
     - RSS
@@ -28,9 +28,9 @@ entries:
   ghost:
   - apiVersion: v1
     appVersion: 1.18.2
-    created: 2018-01-17T13:19:16.386072442+01:00
+    created: 2018-01-18T23:41:32.264262041+01:00
     description: A Helm chart for Kubernetes
-    digest: 0bb48032170bfb66193549025045a4ff8247468376eba11d0855b570c1cba799
+    digest: e49731af02315cc6f21512d90ce100c856c3933c2054dc1c19ab7288fd9cfcd1
     icon: https://framapic.org/B4x7MtG9cuHi/hRytuK7P1YHE.png
     keywords:
     - Blog
@@ -41,9 +41,9 @@ entries:
   mediawiki:
   - apiVersion: v1
     appVersion: 1.27.4
-    created: 2018-01-17T13:19:16.386288725+01:00
+    created: 2018-01-18T23:41:32.264446289+01:00
     description: A Helm chart for Kubernetes
-    digest: bd2f0967482d9de19b85c091fd4189d6f9b036ca284c1bcbce4d82935e3641f8
+    digest: 1b3baccfdcc90b56502e5b2b6745109718c639d667ec0d64e14977b09b36b278
     icon: https://framapic.org/Y8v7vD9ueL0G/bZU879yWimmw.image
     keywords:
     - Wiki
@@ -54,9 +54,9 @@ entries:
   owncloud:
   - apiVersion: v1
     appVersion: "9"
-    created: 2018-01-17T13:19:16.386484889+01:00
+    created: 2018-01-18T23:41:32.26472545+01:00
     description: A Helm chart for Kubernetes
-    digest: 7dc096d14a244e540b3764d10cb7af9d828fed91e00675498596c95402b1d1f6
+    digest: 6b764d2a010030840179380d860d27df7eed7d0e5c4a1d88436621b7e30a4568
     icon: https://framapic.org/QdfgE4rRnsxX/h0xNKhj0BxpW.png
     keywords:
     - Storage
@@ -67,9 +67,9 @@ entries:
   piwik:
   - apiVersion: v1
     appVersion: 3.2.1
-    created: 2018-01-17T13:19:16.386792303+01:00
+    created: 2018-01-18T23:41:32.265053111+01:00
     description: A Helm chart for Kubernetes
-    digest: 1e66aa2c502ad673a5edf5e3f9d88832ef87c13461e072da22576603a89d9a7d
+    digest: 0709f561c6889b45b9bd1310c03fc5f12363701bb9845520e52e12f2048cf378
     icon: https://framapic.org/xxOf4D1WT2Fq/SaGejrhkhLkS.image
     keywords:
     - Analytics
@@ -80,9 +80,9 @@ entries:
   rocketchat:
   - apiVersion: v1
     appVersion: 0.60.3
-    created: 2018-01-17T13:19:16.387094258+01:00
+    created: 2018-01-18T23:41:32.265322579+01:00
     description: A Helm chart for Kubernetes
-    digest: 8045287362834f26c42fd5e77e8e1601f2c2d9d866e24a4126d0bd6eff83d1c2
+    digest: 1528f66c34796de215e1efb7cb935510bce9542c152b7fee6ba080138a9ac8a4
     icon: https://framapic.org/DdPKNc1y7wTK/dfxmnUyBsWkj.png
     keywords:
     - Chat
@@ -93,9 +93,9 @@ entries:
   searx:
   - apiVersion: v1
     appVersion: 0.13.1
-    created: 2018-01-17T13:19:16.387290698+01:00
+    created: 2018-01-18T23:41:32.26552506+01:00
     description: A Helm chart for Kubernetes
-    digest: 88314f1654be969d57c39a029f89e4012278cc5592f7c7cd9dda8059b82efec9
+    digest: 54130c85d8ff636ec635425c04fcc244da8f923251be33b30d452ed767ff1ef7
     icon: https://framapic.org/VeO7UlkcPXJE/0iS7VRr6oLV8.png
     keywords:
     - Search
@@ -106,12 +106,12 @@ entries:
   wekan:
   - apiVersion: v1
     appVersion: v0.63
-    created: 2018-01-17T13:19:16.387608044+01:00
+    created: 2018-01-18T23:41:32.265783959+01:00
     description: A Helm chart for Kubernetes
-    digest: 43fc009785168d43b0a93d63b45896054d39d1cbcf25c34aaac2a7632de52d4a
+    digest: 440039b02da64c8cad48c9ba7705a86b725c58489d047e0b01ce3903af2b20d5
     icon: https://framapic.org/K0myLKsOZv1P/wijRbnUVxKaN.png
     keywords:
-    - Project Management
+    - Project-Management
     name: wekan
     urls:
     - wekan-0.1.0.tgz
@@ -119,9 +119,9 @@ entries:
   wordpress:
   - apiVersion: v1
     appVersion: 4.9.1
-    created: 2018-01-17T13:19:16.387913046+01:00
+    created: 2018-01-18T23:41:32.266083877+01:00
     description: A Helm chart for Kubernetes
-    digest: 7288b8d48e68c64144f8f5ebc429785f2a3c6a77d687e83d6588e688bbe69a46
+    digest: 1736acada92c08482813f66b49e51ba49ac8ee359c3627083dad940be10ba793
     icon: https://framapic.org/q4P5asK7T3rG/lwrvyHc3wRm0.png
     keywords:
     - Blog
@@ -129,4 +129,4 @@ entries:
     urls:
     - wordpress-0.1.0.tgz
     version: 0.1.0
-generated: 2018-01-17T13:19:16.385346167+01:00
+generated: 2018-01-18T23:41:32.263537523+01:00
