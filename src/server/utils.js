@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import sha1 from 'node-sha1';
 
 export const secret = process.env.SECRET || 'mysecret';
 
@@ -35,3 +36,5 @@ export const isAuthenticate = (token) => {
         return false;
     }
 };
+
+export const genUniqReleaseName = (releaseName, email) => `${releaseName}-${sha1(email).slice(0, 5)}`;
