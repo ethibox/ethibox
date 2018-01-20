@@ -8,7 +8,7 @@ import { User } from './models';
 import { isAuthenticate, secret } from './utils';
 
 const api = express();
-const tokenExpiration = '24h';
+const tokenExpiration = '7d';
 
 api.post('/register', async (req, res) => {
     const { email, password } = req.body;
