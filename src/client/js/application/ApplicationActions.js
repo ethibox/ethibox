@@ -1,4 +1,4 @@
-import { checkStatus } from '../utils';
+import { checkStatus, isConnect } from '../utils';
 import { openModal } from '../modal/ModalActions';
 import { openLoader, closeLoader } from '../loader/LoaderActions';
 
@@ -14,6 +14,8 @@ export const listApplications = () => (dispatch) => {
         if (localStorage.getItem('lastActionDate') < Date.now() - 5000) {
             dispatch(listApplicationsSuccess(apps));
         }
+
+        if (!isConnect()) window.location.replace('/');
     });
 };
 
