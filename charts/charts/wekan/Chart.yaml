@@ -1,7 +1,7 @@
 ---
 apiVersion: v1
 description: A Helm chart for Kubernetes
-icon: https://framapic.org/K0myLKsOZv1P/wijRbnUVxKaN.png
+icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/wekan/icon.png
 name: wekan
 version: 0.1.0
 appVersion: v0.63
