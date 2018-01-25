@@ -25,7 +25,7 @@ const App = () => {
                 <ChartList />
             </Card.Group>
 
-            <Footer version />
+            <Footer />
 
             <Modal />
             <Loader />
