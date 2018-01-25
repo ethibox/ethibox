@@ -88,6 +88,7 @@ const config = {
             'process.env.MINIKUBE_IP': JSON.stringify(minikubeIp),
             'process.env.CHARTS': JSON.stringify(listCharts),
             'process.env.VERSION': JSON.stringify(gitRevisionPlugin.version()),
+            'process.env.DEMO': JSON.stringify(process.env.DEMO),
         }),
         new ExtractTextPlugin({ filename: '[name].css', allChunks: false }),
         new UglifyJsPlugin({ uglifyOptions: { output: { comments: false } } }),
