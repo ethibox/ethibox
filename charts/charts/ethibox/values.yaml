@@ -1,0 +1,16 @@
+---
+replicaCount: 1
+image:
+  repository: ston3o/ethibox
+  tag: 0.5.0
+service:
+  type: NodePort
+  port: 4444
+ingress:
+  enabled: true
+  hosts:
+    - ethibox.local
+traefik:
+  serviceType: NodePort
+persistence:
+  enabled: true
