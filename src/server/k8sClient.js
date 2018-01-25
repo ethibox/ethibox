@@ -13,7 +13,7 @@ const NAMESPACE = 'default';
 
 export const listCharts = () => {
     const chartIndex = yaml.load(path.join(__dirname, (process.env.NODE_ENV === 'production') ? '../' : '../../', 'charts/packages/index.yaml'));
-    return Object.values(chartIndex.entries).map(([chart]) => ({ ...chart, category: chart.keywords[0] }));
+    return Object.values(chartIndex.entries).filter(([chart]) => chart.name !== 'ethibox').map(([chart]) => ({ ...chart, category: chart.keywords[0] }));
 };
 
 export const stateApplications = async () => {
