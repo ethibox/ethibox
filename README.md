@@ -40,6 +40,12 @@
 - Because it's not easy to self-hosted
 - Because free software ❤︎
 
+## TL;DR
+
+```bash
+helm install --namespace kube-system --name ethibox http://demo.ethibox.fr/charts/ethibox-0.1.0.tgz
+```
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
@@ -85,7 +91,7 @@ User ─────────▶│ traefik │─────▶│ Ghost   
 ## Deployment
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/ston3o/ethibox/master/ethibox.yaml
+helm install --namespace kube-system --name ethibox http://demo.ethibox.fr/charts/ethibox-0.1.0.tgz
 ```
 
 ## Running the tests
