@@ -53,7 +53,6 @@ lint-fix: ## Lint-fix
 
 package-charts:
 	@ command -v helm > /dev/null 2>&1 || (echo "helm is not available please install" && exit 1)
-	@ rm ./charts/packages/*
 	@ helm package ./charts/charts/* -d ./charts/packages/
 	@ helm repo index ./charts/packages/
 
