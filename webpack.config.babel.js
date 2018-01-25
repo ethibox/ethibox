@@ -14,7 +14,7 @@ const env = process.env.NODE_ENV || 'development';
 const port = process.env.PORT || 4444;
 const minikubeIp = (env === 'development') ? exec('minikube ip', { silent: true }).stdout.trim() : '';
 const chartIndex = yaml.load(`${__dirname}/charts/packages/index.yaml`);
-const listCharts = Object.values(chartIndex.entries).map(chart => ({ name: chart[0].name, icon: chart[0].icon, category: chart[0].keywords[0] }));
+const listCharts = Object.values(chartIndex.entries).filter(([chart]) => chart.name !== 'ethibox').map(([chart]) => ({ ...chart, category: chart.keywords[0] }));
 const gitRevisionPlugin = new GitRevisionPlugin({ lightweightTags: true });
 
 const config = {

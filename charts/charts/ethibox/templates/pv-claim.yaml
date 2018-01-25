@@ -1,0 +1,13 @@
+{{- if .Values.persistence.enabled }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: ethibox-pv-claim
+spec:
+  storageClassName: ethibox
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+{{ end }}

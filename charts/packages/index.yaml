@@ -12,6 +12,17 @@ entries:
     urls:
     - etherpad-0.1.0.tgz
     version: 0.1.0
+  ethibox:
+  - apiVersion: v1
+    appVersion: 0.5.0
+    created: 2018-01-25T11:21:46.968714638+01:00
+    description: A Helm chart for Kubernetes
+    digest: 45be68fccc5336e4485ea1dd7dc3df4bd7befa4753bf3e1122f1332eb41c687a
+    icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/ethibox/icon.png
+    name: ethibox
+    urls:
+    - ethibox-0.1.0.tgz
+    version: 0.1.0
   freshrss:
   - apiVersion: v1
     appVersion: 1.7.0
@@ -129,4 +140,4 @@ entries:
     urls:
     - wordpress-0.1.0.tgz
     version: 0.1.0
-generated: 2018-01-25T10:05:32.261082102+01:00
+generated: 2018-01-25T11:21:46.966619185+01:00

@@ -7,13 +7,13 @@ import { checkStatus, findVal, genUniqReleaseName } from './utils';
 
 const agent = new https.Agent({ rejectUnauthorized: false });
 const KUBE_APISERVER_ENDPOINT = `https://${process.env.KUBERNETES_SERVICE_HOST}`;
-const SWIFT_ENDPOINT = `http://${process.env.SWIFT_SERVICE_HOST}:${process.env.SWIFT_SERVICE_PORT_PT}`;
+const SWIFT_ENDPOINT = `http://${process.env.SWIFT_ETHIBOX_SERVICE_HOST}:${process.env.SWIFT_ETHIBOX_SERVICE_PORT_PT}`;
 const CHART_REPOSITORY = process.env.CHART_REPOSITORY || `http://${process.env.ETHIBOX_SERVICE_HOST}:${process.env.ETHIBOX_SERVICE_PORT}/charts`;
 const NAMESPACE = 'default';
 
 export const listCharts = () => {
     const chartIndex = yaml.load(path.join(__dirname, (process.env.NODE_ENV === 'production') ? '../' : '../../', 'charts/packages/index.yaml'));
-    return Object.values(chartIndex.entries).map(([chart]) => ({ ...chart, category: chart.keywords[0] }));
+    return Object.values(chartIndex.entries).filter(([chart]) => chart.name !== 'ethibox').map(([chart]) => ({ ...chart, category: chart.keywords[0] }));
 };
 
 export const stateApplications = async () => {
