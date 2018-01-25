@@ -1,7 +1,7 @@
 ---
 apiVersion: v1
 description: A Helm chart for Kubernetes
-icon: https://framapic.org/B4pD2wkMwxob/yj5ucxt4XzRW.image
+icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/etherpad/icon.png
 name: etherpad
 version: 0.1.0
 keywords:
