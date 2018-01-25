@@ -6,11 +6,13 @@ import Modal from '../modal/Modal';
 import Loader from '../loader/Loader';
 import Header from './Header';
 import Footer from './Footer';
+import Fork from './Fork';
 
 const App = () => {
     return (
         <Container>
             <Divider hidden />
+            <Fork />
             <Header floated="left" />
             <Button basic floated="right" icon="sign out" content="Se déconnecter" onClick={() => { localStorage.clear(); window.location.replace('/'); }} />
             <Divider hidden clearing />
