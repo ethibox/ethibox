@@ -5,7 +5,7 @@ export default () => {
     return (
         <Message info>
             <Message.Header>Information</Message.Header>
-            <p>This is a <b>demo</b>, applications will be removed frequently.</p>
+            <p>This is a <b>demo</b> instance, applications will be removed frequently.</p>
         </Message>
     );
 };

@@ -16,20 +16,14 @@
   <h4>
     <a href="http://demo.ethibox.fr">Demo</a>
     <span> | </span>
-    <a href="https://ethibox.fr">Website</a>
-    <span> | </span>
     <a href=".github/CONTRIBUTING.md">Contributing</a>
     <span> | </span>
     <a href="https://www.reddit.com/r/ethibox/">Reddit</a>
-    <span> | </span>
-    <a href="https://webchat.freenode.net/?channels=ethibox">Chat</a>
   </h4>
 </div>
 
 <div align="center">
-  <sub>Built with <span style="color:red">❤︎</span> by
-  <a href="https://ston3o.me">ston3o</a> and
-  <a href="https://github.com/ston3o/ethibox/graphs/contributors">contributors</a>
+  <sub>Made with <span style="color:red">❤︎</span> by <a href="https://ston3o.me">ston3o</a> for the Open-Source Community
 </div>
 
 ---
@@ -112,16 +106,12 @@ make test
 
 ## Todo
 
-- [ ] Add units tests
-- [ ] Add domain name system - Create/edit applications vhost from client
-- [ ] Add let's encrypt feature - Enable/Disable let's encrypt button for each applications
-- [ ] Add TOR feature - Enable/Disable tor button for each applications
-- [ ] Add password manager feature - Generate user and password account for each applications with account support
-- [ ] Add update system feature
-- [ ] Add Sign up / Sign in feature
-- [ ] Add WAF & IDS
-- [ ] Add backup system - Import/export applications
-- [ ] Update logo design
+[![](https://api.gh-polls.com/poll/01C4QPC0NMHB3XQZV1K56XH1EF/DNS%20support%20-%20Add%20vhosts%20from%20client)](https://api.gh-polls.com/poll/01C4QPC0NMHB3XQZV1K56XH1EF/DNS%20support%20-%20Add%20vhosts%20from%20client/vote)
+[![](https://api.gh-polls.com/poll/01C4QPC0NMHB3XQZV1K56XH1EF/Let%27s%20encrypt%20support%20-%20Enable%20or%20disable%20for%20each%20application)](https://api.gh-polls.com/poll/01C4QPC0NMHB3XQZV1K56XH1EF/Let%27s%20encrypt%20support%20-%20Enable%20or%20disable%20for%20each%20application/vote)
+[![](https://api.gh-polls.com/poll/01C4QPC0NMHB3XQZV1K56XH1EF/TOR%20support%20-%20Enable%20or%20disable%20for%20each%20application)](https://api.gh-polls.com/poll/01C4QPC0NMHB3XQZV1K56XH1EF/TOR%20support%20-%20Enable%20or%20disable%20for%20each%20application/vote)
+[![](https://api.gh-polls.com/poll/01C4QPC0NMHB3XQZV1K56XH1EF/VPN%20support%20with%20public%20static%20IP)](https://api.gh-polls.com/poll/01C4QPC0NMHB3XQZV1K56XH1EF/VPN%20support%20with%20public%20static%20IP/vote)
+[![](https://api.gh-polls.com/poll/01C4QPC0NMHB3XQZV1K56XH1EF/Multi-node%20cluster%20support%20with%20auto%20horizontal%20scale)](https://api.gh-polls.com/poll/01C4QPC0NMHB3XQZV1K56XH1EF/Multi-node%20cluster%20support%20with%20auto%20horizontal%20scale/vote)
+[![](https://api.gh-polls.com/poll/01C4QPC0NMHB3XQZV1K56XH1EF/Add%20auto%20backup%20system)](https://api.gh-polls.com/poll/01C4QPC0NMHB3XQZV1K56XH1EF/Add%20auto%20backup%20system/vote)
 
 ## Contributing
 
