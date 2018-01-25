@@ -12,8 +12,7 @@ export default (server) => {
 
     setInterval(async () => {
         const apps = await listApplications();
-        authenticateUsers.forEach(({ socketID, email }) => {
-            const emailSha1 = sha1(email);
+        authenticateUsers.forEach(({ socketID, emailSha1 }) => {
             const userApps = apps.filter(a => a.email === emailSha1);
             io.sockets.to(socketID).emit('listApplications', userApps);
         });
@@ -29,7 +28,7 @@ export default (server) => {
             const userApps = apps.filter(a => a.email === emailSha1);
             socket.emit('listApplications', userApps);
 
-            authenticateUsers.push({ socketID: socket.id, email });
+            authenticateUsers.push({ socketID: socket.id, email, emailSha1 });
 
             socket.on('disconnect', () => {
                 const disconnectUserindex = authenticateUsers.findIndex(user => user.socketID === socket.id);
