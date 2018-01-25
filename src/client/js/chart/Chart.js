@@ -5,14 +5,12 @@ import { Card, Image, Button, Icon, Input } from 'semantic-ui-react';
 import { installApplication } from '../application/ApplicationActions';
 import { openModal } from '../modal/ModalActions';
 
-const defaultIcon = 'https://react.semantic-ui.com/assets/images/wireframe/white-image.png';
-
 class Chart extends React.Component {
     state = { action: '', releaseName: '', error: false }
 
     install(releaseName) {
-        const { name, icon, category } = this.props;
-        this.props.installApplication({ name, icon, category, releaseName });
+        const { name, category } = this.props;
+        this.props.installApplication({ name, category, releaseName });
     }
 
     isValidReleaseName = releaseName => releaseName.trim().match(/^[a-z]([-a-z0-9]*[a-z0-9])?$/);
@@ -64,7 +62,7 @@ class Chart extends React.Component {
     }
 
     render() {
-        const { name, icon, category } = this.props;
+        const { name, category } = this.props;
 
         return (
             <Card>
@@ -72,7 +70,7 @@ class Chart extends React.Component {
                     <Card.Header>{name}</Card.Header>
                     <Card.Meta>{category}</Card.Meta>
                     <Card.Description textAlign="center">
-                        <Image src={icon || defaultIcon} width="60" />
+                        <Image src={`/icons/${name}/icon.png`} width="60" />
                     </Card.Description>
                 </Card.Content>
                 <Card.Content extra>{ this.renderButtons() }</Card.Content>
