@@ -109,9 +109,6 @@ spec:
     - protocol: TCP
       port: 443
       name: https
-    - protocol: TCP
-      port: 8080
-      name: admin
   type: NodePort
 ---
 apiVersion: extensions/v1beta1
