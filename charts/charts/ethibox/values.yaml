@@ -11,6 +11,7 @@ ingress:
   hosts:
     - ethibox.local
 traefik:
+  imageTag: 1.5.0
   serviceType: NodePort
 persistence:
   enabled: true
