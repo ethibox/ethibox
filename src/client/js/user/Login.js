@@ -8,6 +8,7 @@ import { login } from './UserActions';
 import Loader from '../loader/Loader';
 import Header from '../app/Header';
 import Footer from '../app/Footer';
+import Fork from '../app/Fork';
 
 class Login extends React.Component {
     state = { email: '', password: '', errors: [] };
@@ -52,6 +53,7 @@ class Login extends React.Component {
     render() {
         return (
             <Container style={{ height: '100%' }}>
+                <Fork />
                 <Grid verticalAlign="middle" style={{ height: '100%' }} centered stackable>
                     <Grid.Column style={{ maxWidth: 450 }}>
                         <Header />
