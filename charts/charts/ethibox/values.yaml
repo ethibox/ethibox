@@ -2,7 +2,7 @@
 replicaCount: 1
 image:
   repository: ston3o/ethibox
-  tag: 0.6.1
+  tag: 0.6.2
 service:
   type: NodePort
   port: 4444
@@ -15,4 +15,3 @@ traefik:
   serviceType: NodePort
 persistence:
   enabled: true
-demo: false
