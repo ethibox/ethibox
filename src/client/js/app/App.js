@@ -18,7 +18,7 @@ const App = () => {
             <Button basic floated="right" icon="sign out" content="Se déconnecter" onClick={() => { localStorage.clear(); window.location.replace('/'); }} />
             <Divider hidden clearing />
 
-            { process.env.DEMO && <MessageDemo /> }
+            { process.env.ENABLE_DEMO && <MessageDemo /> }
 
             <Card.Group itemsPerRow={4} stackable>
                 <ApplicationList />
