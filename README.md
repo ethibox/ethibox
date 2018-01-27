@@ -1,5 +1,4 @@
-<p align="center"><img width="15%" src="https://framapic.org/tUxf7mPC8HHU/zoDa3nLhs8HH.svg"></p>
-<p align="center">Let's decentralize the internet!</p>
+<img src="https://blog.ston3o.me/content/images/2018/01/ethibox-1.jpg">
 <p align="center">
   <a href=".github/CHANGELOG.md"><img src="https://img.shields.io/github/tag/ston3o/ethibox.svg?label=version&style=flat-square&colorA=0d7377&colorB=44c2c7"></a>
     &nbsp;
