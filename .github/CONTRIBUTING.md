@@ -24,5 +24,7 @@ TODO
 Sometimes we find a project we like but just don't have time to contribute. That's okay, there are other ways to show support:
 
 - Star the project
-- Tell your friends
-- Write a blog article on it
+- Tell your friends about ethibox
+- Write a blog article on ethibox
+- Launch your ethibox instance
+- Use or deploy websites from ethibox instances
