@@ -29,7 +29,7 @@
 
 ## Why ?
 
-- Because internet is centralized and lack of privacy
+- Because internet is centralized and lacks of privacy
 - Because it's not easy to self-hosted
 - Because free software ❤︎
 
