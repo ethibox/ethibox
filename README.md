@@ -1,4 +1,4 @@
-<img src="https://blog.ston3o.me/content/images/2018/01/ethibox-1.jpg">
+<img src=".github/background.jpg">
 <p align="center">
   <a href=".github/CHANGELOG.md"><img src="https://img.shields.io/github/tag/ston3o/ethibox.svg?label=version&style=flat-square&colorA=0d7377&colorB=44c2c7"></a>
     &nbsp;
