@@ -17,6 +17,8 @@
     <span> | </span>
     <a href=".github/CONTRIBUTING.md">Contributing</a>
     <span> | </span>
+    <a href="https://blog.ston3o.me/decentralisons-internet-avec-ethibox/">Blog Article</a>
+    <span> | </span>
     <a href="https://www.reddit.com/r/ethibox/">Reddit</a>
   </h4>
 </div>
