@@ -7,7 +7,7 @@ export default (props) => {
         <Header as="h1" floated={props.floated}>
             <img src={logo} alt="logo" />
             <Header.Content>
-                Ethibox
+                Ethibox { props.demo && <small className="demo">demo</small> }
                 <Header.Subheader>Let&apos;s decentralize internet!</Header.Subheader>
             </Header.Content>
         </Header>
