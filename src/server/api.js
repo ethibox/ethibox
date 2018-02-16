@@ -21,7 +21,7 @@ api.post('/register', async (req, res) => {
     if (!await User.count({ where: { email } })) {
         const hashPassword = bcrypt.hashSync(password, 10);
         User.sync().then(() => User.create({ ip, email, password: hashPassword }));
-        const payload = { email };
+        const payload = { email, demo: process.env.ENABLE_DEMO };
         const token = jwt.sign(payload, secret, { expiresIn: tokenExpiration });
 
         return res.json({ success: true, message: 'Register succeeded', token });
@@ -35,7 +35,7 @@ api.post('/login', async (req, res) => {
 
     const user = await User.findOne({ where: { email }, raw: true });
     if (user && bcrypt.compareSync(password, user.password)) {
-        const payload = { email };
+        const payload = { email, demo: process.env.ENABLE_DEMO };
         const token = jwt.sign(payload, secret, { expiresIn: tokenExpiration });
 
         return res.json({ success: true, message: 'Login succeeded', token });
