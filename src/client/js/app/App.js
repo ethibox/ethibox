@@ -1,33 +1,21 @@
 import React from 'react';
-import { Container, Divider, Card, Button } from 'semantic-ui-react';
-import ApplicationList from '../application/ApplicationList';
-import ChartList from '../chart/ChartList';
-import Modal from '../modal/Modal';
-import Loader from '../loader/Loader';
-import Header from './Header';
-import Footer from './Footer';
-import Fork from './Fork';
+import { Switch, BrowserRouter as Router, Route } from 'react-router-dom';
+import { isConnect } from '../utils';
+import Register from '../user/Register';
+import Login from '../user/Login';
+import DashboardLayout from './DashboardLayout';
+import Home from './Home';
 
-const App = () => {
+export default () => {
     return (
-        <Container>
-            <Divider hidden />
-            <Fork />
-            <Header floated="left" />
-            <Button basic floated="right" icon="sign out" content="Se déconnecter" onClick={() => { localStorage.clear(); window.location.replace('/'); }} />
-            <Divider hidden clearing />
-
-            <Card.Group itemsPerRow={4} stackable>
-                <ApplicationList />
-                <ChartList />
-            </Card.Group>
-
-            <Footer />
-
-            <Modal />
-            <Loader />
-        </Container>
+        <Router>
+            <Switch>
+                <Route path="/" render={() => (isConnect() ? (<DashboardLayout><Home /></DashboardLayout>) : (<Login />))} exact />
+                <Route path="/payment" render={() => (isConnect() ? (<DashboardLayout><Payment /></DashboardLayout>) : (<Login />))} exact />
+                <Route path="/register" component={Register} />
+                <Route path="/login" component={Login} />
+                <Route path="/404" component={() => <div>Not found</div>} />
+            </Switch>
+        </Router>
     );
-};
-
-export default App;
+}

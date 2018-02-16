@@ -5,12 +5,9 @@ import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
 import io from 'socket.io-client';
 import reducers from './app/reducers';
 import App from './app/App';
-import Register from './user/Register';
-import Login from './user/Login';
 import { isConnect } from './utils';
 
 let store;
@@ -38,13 +35,7 @@ if (isConnect()) {
 
 ReactDOM.render(
     <Provider store={store}>
-        <Router>
-            <div style={{ height: '100%' }}>
-                <Route exact path="/" render={() => (isConnect() ? (<App />) : (<Login />))} />
-                <Route path="/register" component={Register} />
-                <Route path="/login" component={Login} />
-            </div>
-        </Router>
+        <App />
     </Provider>,
     document.getElementById('root'),
 );

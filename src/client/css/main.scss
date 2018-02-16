@@ -1,1 +1,73 @@
 @import '~semantic-ui-css/semantic.min.css';
+
+// DEMO
+
+small.demo {
+    line-height: 1px;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    position: absolute;
+    padding: 6px 3px;
+    border-radius: 2px;
+    border: 1px solid red;
+    color: red;
+    margin-left: 2px;
+}
+
+// FORK
+
+.fork {
+    display: none;
+}
+
+// STICKY FOOTER
+
+.ui.container.main {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+.second {
+    flex: 1;
+}
+
+// SIDEBAR
+
+.ui.inverted.menu.sidebar {
+    background: linear-gradient(to bottom, #0D7478, #12CEC3);
+}
+
+// LINKS
+
+a {
+    color: teal;
+}
+
+a:hover {
+    color: #006060;
+}
+
+// DESKTOP
+
+@media only screen and (min-width: 768px) {
+    .pusher > .container {
+        padding-top: 20px;
+        padding-right: 20px;
+        padding-left: 200px;
+    }
+
+    .ui.left.overlay.sidebar {
+        transform: translateZ(0);
+        visibility: visible;
+    }
+
+    .ui.thin.left.sidebar {
+        width: 180px;
+    }
+
+    .fork {
+        display: block;
+    }
+}

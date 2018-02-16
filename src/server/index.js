@@ -20,8 +20,7 @@ app.use('/api', api);
 app.use('/charts/', express.static(path.join(__dirname, publicPath, '../charts/packages/')));
 app.use('/icons/', express.static(path.join(__dirname, publicPath, '../charts/charts/')));
 
-app.get(['/register', '/login'], (req, res) => res.sendFile(path.join(__dirname, publicPath, '/static/index.html')));
-app.get('*', (req, res) => res.status(404).send('Not found'));
+app.get('*', (req, res) => res.sendFile(path.join(__dirname, publicPath, '/static/index.html')));
 
 const server = http.createServer(app);
 socketIo(server);
