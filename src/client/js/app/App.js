@@ -11,11 +11,10 @@ export default () => {
         <Router>
             <Switch>
                 <Route path="/" render={() => (isConnect() ? (<DashboardLayout><Home /></DashboardLayout>) : (<Login />))} exact />
-                <Route path="/payment" render={() => (isConnect() ? (<DashboardLayout><Payment /></DashboardLayout>) : (<Login />))} exact />
                 <Route path="/register" component={Register} />
                 <Route path="/login" component={Login} />
                 <Route path="/404" component={() => <div>Not found</div>} />
             </Switch>
         </Router>
     );
-}
+};
