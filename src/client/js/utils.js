@@ -8,6 +8,8 @@ export const checkStatus = response => new Promise((resolve, reject) => {
     return response.json().then(reject);
 });
 
+export const dataToken = localStorage.getItem('token') ? jwtDecode(localStorage.getItem('token')) : {};
+
 export const isConnect = () => {
     const token = localStorage.getItem('token');
     if (!token) return false;

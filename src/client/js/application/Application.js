@@ -27,7 +27,7 @@ class Application extends React.Component {
                     state === RUNNING &&
                     <Card.Meta>
                         <a href={hyperlink} target="_blank">
-                            <Icon name="linkify" />{hyperlink}
+                            <Icon name="external" /> {hyperlink}
                         </a>
                     </Card.Meta>
                 }
