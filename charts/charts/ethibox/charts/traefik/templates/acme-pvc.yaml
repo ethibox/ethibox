@@ -1,0 +1,24 @@
+{{- if and .Values.acme.enabled .Values.acme.persistence.enabled (not .Values.acme.persistence.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ template "traefik.fullname" . }}-acme
+  labels:
+    app: {{ template "traefik.name" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  accessModes:
+    - {{ .Values.acme.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.acme.persistence.size | quote }}
+{{- if .Values.acme.persistence.storageClass }}
+{{- if (eq "-" .Values.acme.persistence.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.acme.persistence.storageClass }}"
+{{- end }}
+{{- end }}
+{{- end }}
