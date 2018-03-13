@@ -23,7 +23,7 @@ traefik:
     staging: false
     logging: true
     persistence:
-      enabled: false
+      enabled: true
   rbac:
     enabled: true
 persistence:
