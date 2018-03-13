@@ -17,14 +17,14 @@ traefik:
     enabled: false
     enforced: false
   acme:
-    enabled: true
+    enabled: false
     email: contact@example.com
     challengeType: http-01
-    staging: false
+    staging: true
     logging: true
     persistence:
       enabled: true
   rbac:
-    enabled: true
+    enabled: false
 persistence:
   enabled: true
