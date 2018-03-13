@@ -1,0 +1,16 @@
+{{- if .Values.acme.persistence.enabled }}
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: ssl-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: ssl
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/opt/ssl/"
+{{ end }}
