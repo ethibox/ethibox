@@ -13,7 +13,18 @@ ingress:
 traefik:
   imageTag: 1.5.3
   serviceType: NodePort
+  ssl:
+    enabled: false
+    enforced: false
+  acme:
+    enabled: false
+    email: contact@example.com
+    challengeType: http-01
+    staging: true
+    logging: true
+    persistence:
+      enabled: true
   rbac:
-    enabled: true
+    enabled: false
 persistence:
   enabled: true
