@@ -3,14 +3,14 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Input, Dropdown, Modal, Header, Card, Image, Button, Icon, Dimmer, Loader } from 'semantic-ui-react';
 import isFQDN from 'validator/lib/isFQDN';
-import { uninstallApplication } from '../application/ApplicationActions';
+import { uninstallApplication, editDomainName } from '../application/ApplicationActions';
 
 const RUNNING = 'running';
 const LOADING = 'loading';
 const ERROR = 'error';
 
 class Application extends React.Component {
-    state = { action: '', domainName: '', error: false };
+    state = { action: '', domainName: this.props.domain || '', error: false };
 
     uninstall = () => {
         this.setState({ action: '' });
@@ -18,20 +18,27 @@ class Application extends React.Component {
     }
 
     enterDomainName = (key) => {
-        const { domainName } = this.state;
+        const domainName = this.state.domainName.trim();
 
         if (key === 'Enter') {
             if (isFQDN(domainName)) {
-                // this.editDomainName(domainName.trim());
+                this.props.editDomainName({ domainName, name: this.props.name, releaseName: this.props.releaseName });
+                this.setState({ action: '', error: false, domainName });
             } else {
                 this.setState({ error: true });
             }
         }
     }
 
+    removeDomainName = () => {
+        this.props.editDomainName({ domainName: '', name: this.props.name, releaseName: this.props.releaseName });
+        this.setState({ domainName: '' });
+    }
+
     renderDescription = () => {
         const { name, port, state } = this.props;
-        const hyperlink = `http://${process.env.MINIKUBE_IP || window.location.hostname}:${port}`;
+        const { domainName } = this.state;
+        const hyperlink = domainName ? `http://${domainName}` : `http://${process.env.MINIKUBE_IP || window.location.hostname}:${port}`;
 
         return (
             <Card.Description textAlign="center">
@@ -60,6 +67,10 @@ class Application extends React.Component {
             { key: 'edit', icon: 'edit', text: 'Edit domain name', value: 'edit', onClick: () => this.setState({ action: 'editDomainName' }) },
         ];
 
+        if (domainName) {
+            options.push({ key: 'delete', icon: 'delete', text: 'Remove domain name', value: 'delete', onClick: () => this.removeDomainName() });
+        }
+
         if (action === 'editDomainName') {
             return (
                 <Input
@@ -78,7 +89,7 @@ class Application extends React.Component {
 
         return (
             <Button.Group color="red" widths={2}>
-                <Button style={{ width: '90%' }} onClick={() => this.setState({ action: 'UNINSTALL' })} fluid>Uninstall</Button>
+                <Button style={{ width: '90%' }} onClick={() => this.setState({ action: 'UNINSTALL' })} fluid><Icon name="delete" /> Uninstall</Button>
                 <Dropdown options={options} style={{ width: 29 }} floating button className="icon" />
             </Button.Group>
         );
@@ -110,6 +121,6 @@ class Application extends React.Component {
 }
 
 const mapStateToProps = state => ({ ...state.ApplicationReducer });
-const mapDispatchToProps = dispatch => bindActionCreators({ uninstallApplication }, dispatch);
+const mapDispatchToProps = dispatch => bindActionCreators({ uninstallApplication, editDomainName }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Application);

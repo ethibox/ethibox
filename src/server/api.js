@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import jwtDecode from 'jwt-decode';
 import isEmail from 'validator/lib/isEmail';
 import bcrypt from 'bcrypt';
-import { listApplications, installApplication, uninstallApplication, listCharts } from './k8sClient';
+import { listApplications, installApplication, uninstallApplication, listCharts, editApplication } from './k8sClient';
 import { User } from './models';
 import { isAuthenticate, secret } from './utils';
 
@@ -91,6 +91,23 @@ api.delete('/applications/:releaseName', (req, res) => {
 
         uninstallApplication(releaseName, email);
         return res.json({ success: true, message: 'Application uninstalled' });
+    } catch ({ message }) {
+        return res.status(500).send({ success: false, message });
+    }
+});
+
+api.put('/applications/:releaseName', async (req, res) => {
+    if (!req.jwt_auth) return res.status(401).send({ success: false, message: 'Not authorized' });
+
+    const token = req.body.token || req.query.token || req.headers['x-access-token'];
+    const { email } = jwtDecode(token);
+
+    try {
+        const { releaseName } = req.params;
+        const { domainName, name } = req.body;
+
+        await editApplication(name, email, releaseName, domainName);
+        return res.json({ success: true, message: 'Application edited' });
     } catch ({ message }) {
         return res.status(500).send({ success: false, message });
     }
