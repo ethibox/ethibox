@@ -1,3 +1,4 @@
+import dns from 'dns';
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import jwtDecode from 'jwt-decode';
@@ -99,12 +100,28 @@ api.delete('/applications/:releaseName', (req, res) => {
 api.put('/applications/:releaseName', async (req, res) => {
     if (!req.jwt_auth) return res.status(401).send({ success: false, message: 'Not authorized' });
 
+    const { releaseName } = req.params;
+    const { domainName, name } = req.body;
+
     const token = req.body.token || req.query.token || req.headers['x-access-token'];
     const { email } = jwtDecode(token);
 
     try {
-        const { releaseName } = req.params;
-        const { domainName, name } = req.body;
+        if (domainName) {
+            const serverIp = req.connection.remoteAddress.replace('::ffff:', '');
+            const domainNameIp = await new Promise((resolve, reject) => {
+                dns.lookup(domainName, (error, address) => {
+                    if (error) {
+                        return reject(new Error('DNS error, domain does not exist'));
+                    }
+                    return resolve(address);
+                });
+            });
+
+            if (serverIp !== domainNameIp) {
+                return res.status(500).send({ success: false, message: `DNS error, create a correct A record for your domain: ${domainName}. IN A ${serverIp}.` });
+            }
+        }
 
         await editApplication(name, email, releaseName, domainName);
         return res.json({ success: true, message: 'Application edited' });
