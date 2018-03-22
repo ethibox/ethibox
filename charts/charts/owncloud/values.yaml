@@ -9,6 +9,6 @@ service:
   externalPort: 80
   internalPort: 80
 ingress:
-  enabled: true
+  enabled: false
   hosts:
     - owncloud.local
