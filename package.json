@@ -53,6 +53,7 @@
     "shelljs": "^0.8.1",
     "style-loader": "^0.20.1",
     "url-loader": "^0.6.2",
+    "validator": "^9.4.1",
     "webdriverio": "^4.10.2",
     "webpack": "^3.11.0",
     "webpack-bundle-analyzer": "^2.10.0",

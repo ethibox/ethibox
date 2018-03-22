@@ -45,3 +45,15 @@ export const uninstallApplication = releaseName => (dispatch) => {
         .then(checkStatus)
         .catch(({ message }) => dispatch(openModal({ hasErrored: true, errorMessage: message })));
 };
+
+export const editDomainName = application => (dispatch) => {
+    const { releaseName } = application;
+
+    fetch(`/api/applications/${releaseName}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'x-access-token': localStorage.getItem('token') },
+        body: JSON.stringify(application),
+    })
+        .then(checkStatus)
+        .catch(({ message }) => dispatch(openModal({ hasErrored: true, errorMessage: message })));
+};

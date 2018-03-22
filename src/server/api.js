@@ -1,9 +1,10 @@
+import dns from 'dns';
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import jwtDecode from 'jwt-decode';
 import isEmail from 'validator/lib/isEmail';
 import bcrypt from 'bcrypt';
-import { listApplications, installApplication, uninstallApplication, listCharts } from './k8sClient';
+import { listApplications, installApplication, uninstallApplication, listCharts, editApplication } from './k8sClient';
 import { User } from './models';
 import { isAuthenticate, secret } from './utils';
 
@@ -91,6 +92,39 @@ api.delete('/applications/:releaseName', (req, res) => {
 
         uninstallApplication(releaseName, email);
         return res.json({ success: true, message: 'Application uninstalled' });
+    } catch ({ message }) {
+        return res.status(500).send({ success: false, message });
+    }
+});
+
+api.put('/applications/:releaseName', async (req, res) => {
+    if (!req.jwt_auth) return res.status(401).send({ success: false, message: 'Not authorized' });
+
+    const { releaseName } = req.params;
+    const { domainName, name } = req.body;
+
+    const token = req.body.token || req.query.token || req.headers['x-access-token'];
+    const { email } = jwtDecode(token);
+
+    try {
+        if (domainName) {
+            const serverIp = req.connection.remoteAddress.replace('::ffff:', '');
+            const domainNameIp = await new Promise((resolve, reject) => {
+                dns.lookup(domainName, (error, address) => {
+                    if (error) {
+                        return reject(new Error('DNS error, domain does not exist'));
+                    }
+                    return resolve(address);
+                });
+            });
+
+            if (serverIp !== domainNameIp) {
+                return res.status(500).send({ success: false, message: `DNS error, create a correct A record for your domain: ${domainName}. IN A ${serverIp}.` });
+            }
+        }
+
+        await editApplication(name, email, releaseName, domainName);
+        return res.json({ success: true, message: 'Application edited' });
     } catch ({ message }) {
         return res.status(500).send({ success: false, message });
     }

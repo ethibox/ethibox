@@ -61,6 +61,7 @@ export const listApplications = async () => {
                 category: item.metadata.labels.category,
                 email: item.metadata.labels.email,
                 port: item.spec.ports[0].nodePort,
+                domain: item.metadata.labels.domain,
             }));
         });
 
@@ -89,5 +90,20 @@ export const installApplication = async (name, email, releaseName) => {
 
 export const uninstallApplication = (releaseName, email) => {
     fetch(`${SWIFT_ENDPOINT}/tiller/v2/releases/${genUniqReleaseName(releaseName, email)}/json?purge=true`, { method: 'DELETE' })
+        .then(checkStatus);
+};
+
+export const editApplication = async (name, email, releaseName, domainName) => {
+    const chartUrl = `${CHART_REPOSITORY}/${name}-0.1.0.tgz`;
+    const uniqueReleaseName = genUniqReleaseName(releaseName, email);
+
+    await fetch(`${SWIFT_ENDPOINT}/tiller/v2/releases/${uniqueReleaseName}/json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            chart_url: chartUrl,
+            values: { raw: JSON.stringify({ serviceType: 'NodePort', email: sha1(email), ingress: { enabled: !!domainName, hosts: [domainName] } }) },
+        }),
+    })
         .then(checkStatus);
 };
