@@ -40,24 +40,24 @@ class Chart extends React.Component {
 
         if (action === 'editReleaseName') {
             return (
-                <div className="ui large transparent input">
-                    <Input
-                        error={error}
-                        onBlur={() => this.setState({ action: '' })}
-                        value={releaseName}
-                        onChange={(e, data) => this.setState({ releaseName: data.value, error: false })}
-                        onKeyDown={e => this.enterReleaseName(e.key)}
-                        placeholder="Enter name..."
-                        autoFocus
-                    />
-                </div>
+                <Input
+                    error={error}
+                    onBlur={() => this.setState({ action: '' })}
+                    value={releaseName}
+                    onChange={(e, data) => this.setState({ releaseName: data.value, error: false })}
+                    onKeyDown={e => this.enterReleaseName(e.key)}
+                    placeholder="Enter application's name..."
+                    transparent
+                    autoFocus
+                    fluid
+                />
             );
         }
 
         return (
-            <div className="ui two buttons">
+            <Button.Group color="teal" widths={2}>
                 <Button color="teal" onClick={() => this.setState({ action: 'editReleaseName' })}><Icon name="add" /> Install</Button>
-            </div>
+            </Button.Group>
         );
     }
 
