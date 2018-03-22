@@ -9,6 +9,6 @@ service:
   externalPort: 8888
   internalPort: 8888
 ingress:
-  enabled: true
+  enabled: false
   hosts:
     - searx.local
