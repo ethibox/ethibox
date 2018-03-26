@@ -6,7 +6,7 @@ import isEmail from 'validator/lib/isEmail';
 import bcrypt from 'bcrypt';
 import { listApplications, installApplication, uninstallApplication, listCharts, editApplication } from './k8sClient';
 import { User } from './models';
-import { isAuthenticate, secret } from './utils';
+import { isAuthenticate, secret, externalIp } from './utils';
 
 const api = express();
 const tokenExpiration = '7d';
@@ -108,7 +108,7 @@ api.put('/applications/:releaseName', async (req, res) => {
 
     try {
         if (domainName) {
-            const serverIp = req.connection.remoteAddress.replace('::ffff:', '');
+            const serverIp = await externalIp();
             const domainNameIp = await new Promise((resolve, reject) => {
                 dns.lookup(domainName, (error, address) => {
                     if (error) {
