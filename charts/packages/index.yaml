@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   etherpad:
   - apiVersion: v1
-    created: 2018-03-22T16:47:16.507448191+01:00
+    created: 2018-03-26T13:13:48.386450935+02:00
     description: A Helm chart for Kubernetes
     digest: b8ad96d32844b54ea1b8e3410f161ca375298e39627925c7d655d9ccc0c12f80
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/etherpad/icon.png
@@ -14,10 +14,10 @@ entries:
     version: 0.1.0
   ethibox:
   - apiVersion: v1
-    appVersion: 0.6.2
-    created: 2018-03-22T16:47:16.50962653+01:00
+    appVersion: 0.7.2
+    created: 2018-03-26T13:13:48.388249626+02:00
     description: A Helm chart for Kubernetes
-    digest: c4f034c212f11d4e75b1b850fda67296e532459e85100bd4eeefeffd331d257f
+    digest: 55ead41ee59bf653dbad18e2d521ca39d545061969a1ae57d39f4f561a42cffe
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/ethibox/icon.png
     name: ethibox
     urls:
@@ -26,7 +26,7 @@ entries:
   freshrss:
   - apiVersion: v1
     appVersion: 1.7.0
-    created: 2018-03-22T16:47:16.510138294+01:00
+    created: 2018-03-26T13:13:48.388836083+02:00
     description: A Helm chart for Kubernetes
     digest: ab0a06cc95661bec0917b8312407f0b3d77862d7a7f392b0e869f098d136e89a
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/freshrss/icon.png
@@ -39,7 +39,7 @@ entries:
   ghost:
   - apiVersion: v1
     appVersion: 1.18.2
-    created: 2018-03-22T16:47:16.510490214+01:00
+    created: 2018-03-26T13:13:48.38914334+02:00
     description: A Helm chart for Kubernetes
     digest: 44bfb48d4621e0acdba4819d3a1009f8d7da02e2606d77bcbd3e5d5279fb4412
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/ghost/icon.png
@@ -52,7 +52,7 @@ entries:
   mediawiki:
   - apiVersion: v1
     appVersion: 1.27.4
-    created: 2018-03-22T16:47:16.51225972+01:00
+    created: 2018-03-26T13:13:48.390756534+02:00
     description: A Helm chart for Kubernetes
     digest: 81b80e4ca1de7e926de967b0706d8366c2fe18741a64f7790a78b8b0a67cb622
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/mediawiki/icon.png
@@ -65,7 +65,7 @@ entries:
   owncloud:
   - apiVersion: v1
     appVersion: "9"
-    created: 2018-03-22T16:47:16.512715616+01:00
+    created: 2018-03-26T13:13:48.391388351+02:00
     description: A Helm chart for Kubernetes
     digest: 9c1a978c7679e83c8fbb4e1393e3632c6569a39568a55b4fe199563fe35732cc
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/owncloud/icon.png
@@ -78,7 +78,7 @@ entries:
   piwik:
   - apiVersion: v1
     appVersion: 3.2.1
-    created: 2018-03-22T16:47:16.513376461+01:00
+    created: 2018-03-26T13:13:48.392154211+02:00
     description: A Helm chart for Kubernetes
     digest: e4f4a996708cf1db43f4ecf3f4ebf8a91a7f763b970525a4b48f03cfadf43de3
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/piwik/icon.png
@@ -91,7 +91,7 @@ entries:
   rocketchat:
   - apiVersion: v1
     appVersion: 0.60.3
-    created: 2018-03-22T16:47:16.513896896+01:00
+    created: 2018-03-26T13:13:48.392739662+02:00
     description: A Helm chart for Kubernetes
     digest: c70cd14d1063e0fae6a5ca4d5a28e98053d63dc84e12cb27e04f6e963a61bf10
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/rocketchat/icon.png
@@ -104,7 +104,7 @@ entries:
   searx:
   - apiVersion: v1
     appVersion: 0.13.1
-    created: 2018-03-22T16:47:16.517044405+01:00
+    created: 2018-03-26T13:13:48.397523655+02:00
     description: A Helm chart for Kubernetes
     digest: f8a92d8e3c54737ad8bb9d54befaf88346307b03c705f54d64e46349753d7607
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/searx/icon.png
@@ -117,7 +117,7 @@ entries:
   wekan:
   - apiVersion: v1
     appVersion: v0.63
-    created: 2018-03-22T16:47:16.517415031+01:00
+    created: 2018-03-26T13:13:48.397916205+02:00
     description: A Helm chart for Kubernetes
     digest: d631b02cb37ba85edfa14435a77738d5b2aaa90910e58d84d313b57c8fd27005
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/wekan/icon.png
@@ -130,7 +130,7 @@ entries:
   wordpress:
   - apiVersion: v1
     appVersion: 4.9.1
-    created: 2018-03-22T16:47:16.51899089+01:00
+    created: 2018-03-26T13:13:48.398577558+02:00
     description: A Helm chart for Kubernetes
     digest: 9a37f39d981069795e6bece76e5831103b283e17be7905efeb61ecc571c0fcdd
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/wordpress/icon.png
@@ -140,4 +140,4 @@ entries:
     urls:
     - wordpress-0.1.0.tgz
     version: 0.1.0
-generated: 2018-03-22T16:47:16.506983274+01:00
+generated: 2018-03-26T13:13:48.385947739+02:00
