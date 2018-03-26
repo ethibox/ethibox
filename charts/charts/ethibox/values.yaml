@@ -2,7 +2,7 @@
 replicaCount: 1
 image:
   repository: ston3o/ethibox
-  tag: 0.7.2
+  tag: 0.7.3
 service:
   type: NodePort
   port: 4444
