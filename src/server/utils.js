@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import sha1 from 'node-sha1';
+import fetch from 'node-fetch';
 
 export const secret = process.env.SECRET || 'mysecret';
 
@@ -38,3 +39,8 @@ export const isAuthenticate = (token) => {
 };
 
 export const genUniqReleaseName = (releaseName, email) => `${releaseName}-${sha1(email).slice(0, 5)}`;
+
+export const externalIp = async () => {
+    const ip = await fetch('http://ipinfo.io/ip', { headers: { 'User-Agent': 'curl/7.37.1' } });
+    return (await ip.text()).trim();
+};
