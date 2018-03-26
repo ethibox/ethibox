@@ -57,7 +57,6 @@
     "redux-thunk": "^2.2.0",
     "sass-loader": "^6.0.6",
     "selenium-standalone": "^6.12.0",
-    "semantic-ui-css": "^2.2.14",
     "semantic-ui-react": "^0.78.2",
     "shelljs": "^0.8.1",
     "style-loader": "^0.20.1",
@@ -80,6 +79,7 @@
     "node-fetch": "^2.0.0",
     "node-sha1": "^1.0.1",
     "sequelize": "^4.33.4",
+    "semantic-ui-css": "^2.2.14",
     "socket.io": "^2.0.4",
     "sqlite3": "^3.1.13",
     "yamljs": "^0.3.0"
