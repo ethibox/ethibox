@@ -79,7 +79,7 @@
     "node-fetch": "^2.0.0",
     "node-sha1": "^1.0.1",
     "sequelize": "^4.33.4",
-    "semantic-ui-css": "^2.2.14",
+    "semantic-ui-css": "2.2.14",
     "socket.io": "^2.0.4",
     "sqlite3": "^3.1.13",
     "yamljs": "^0.3.0"
