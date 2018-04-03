@@ -31,7 +31,7 @@ const config = {
     },
     module: {
         rules: [
-            { test: /\.html$/, use: 'html-loader' },
+            { test: /\.html$/, use: 'html-loader?minimize=false' },
             { test: /\.json$/, use: 'json-loader' },
             { test: /\.(njk|nunjucks)$/, use: 'nunjucks-loader' },
             { test: /\.jsx?$/, use: 'babel-loader', exclude: /node_modules/ },
