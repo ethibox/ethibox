@@ -9,7 +9,9 @@ metadata:
     heritage: {{ .Release.Service }}
     email: {{ .Values.email }}
     category: {{ index .Chart.Keywords 0 }}
+    {{ if .Values.ingress.hosts }}
     domain: {{ index .Values.ingress.hosts 0 }}
+    {{ end }}
 spec:
   type: {{ .Values.service.type }}
   ports:

@@ -2,9 +2,9 @@ apiVersion: v1
 entries:
   etherpad:
   - apiVersion: v1
-    created: 2018-03-26T18:15:20.046879042+02:00
+    created: 2018-04-03T20:56:38.774349252+02:00
     description: A Helm chart for Kubernetes
-    digest: b8ad96d32844b54ea1b8e3410f161ca375298e39627925c7d655d9ccc0c12f80
+    digest: 88f23afa072fab4ce8df4b714d80ac6489470a36b4a98411adfee8def36dd8b3
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/etherpad/icon.png
     keywords:
     - Editor
@@ -15,9 +15,9 @@ entries:
   ethibox:
   - apiVersion: v1
     appVersion: 0.7.3
-    created: 2018-03-26T18:15:20.048673136+02:00
+    created: 2018-04-03T20:56:38.775869775+02:00
     description: A Helm chart for Kubernetes
-    digest: c02937122787cb18b9d811b64b4f301b94e5022ddf8289fe2e1e1b3f734503fb
+    digest: ea4d292325292e026851af62da2c1ff5c3a2c8e5d1b2d3e63ef1911ce04efe2b
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/ethibox/icon.png
     name: ethibox
     urls:
@@ -26,9 +26,9 @@ entries:
   freshrss:
   - apiVersion: v1
     appVersion: 1.7.0
-    created: 2018-03-26T18:15:20.049197598+02:00
+    created: 2018-04-03T20:56:38.776350183+02:00
     description: A Helm chart for Kubernetes
-    digest: ab0a06cc95661bec0917b8312407f0b3d77862d7a7f392b0e869f098d136e89a
+    digest: 10116a32ab5b49a169b64442db638ae1207cf746052342488622b0eb65677f98
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/freshrss/icon.png
     keywords:
     - RSS
@@ -39,9 +39,9 @@ entries:
   ghost:
   - apiVersion: v1
     appVersion: 1.18.2
-    created: 2018-03-26T18:15:20.049455352+02:00
+    created: 2018-04-03T20:56:38.776626718+02:00
     description: A Helm chart for Kubernetes
-    digest: 44bfb48d4621e0acdba4819d3a1009f8d7da02e2606d77bcbd3e5d5279fb4412
+    digest: 4290461102aea187a4091490c8e2c84e3fb817035f4b7c544cbbf4180a5a0fbb
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/ghost/icon.png
     keywords:
     - Blog
@@ -49,12 +49,25 @@ entries:
     urls:
     - ghost-0.1.0.tgz
     version: 0.1.0
+  matomo:
+  - apiVersion: v1
+    appVersion: 3.3.0
+    created: 2018-04-03T20:56:38.777198576+02:00
+    description: A Helm chart for Kubernetes
+    digest: 23fcf31e18f1c97d9c977f132699a9e61d26f17eaeab79b5d18ae23f30f4d800
+    icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/matomo/icon.png
+    keywords:
+    - Analytics
+    name: matomo
+    urls:
+    - matomo-0.1.0.tgz
+    version: 0.1.0
   mediawiki:
   - apiVersion: v1
     appVersion: 1.27.4
-    created: 2018-03-26T18:15:20.050951417+02:00
+    created: 2018-04-03T20:56:38.778515588+02:00
     description: A Helm chart for Kubernetes
-    digest: 81b80e4ca1de7e926de967b0706d8366c2fe18741a64f7790a78b8b0a67cb622
+    digest: 8a9dbcd55bfc31f79cce7a798976fc95953ac23fab9b2dab7da0187593a5a918
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/mediawiki/icon.png
     keywords:
     - Wiki
@@ -65,9 +78,9 @@ entries:
   owncloud:
   - apiVersion: v1
     appVersion: "9"
-    created: 2018-03-26T18:15:20.051443269+02:00
+    created: 2018-04-03T20:56:38.778925777+02:00
     description: A Helm chart for Kubernetes
-    digest: 9c1a978c7679e83c8fbb4e1393e3632c6569a39568a55b4fe199563fe35732cc
+    digest: 985d4a5f4fa0979b177671a53ef3ec9d597464c8d63ae7f2456affbfd531ab5a
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/owncloud/icon.png
     keywords:
     - Storage
@@ -75,25 +88,12 @@ entries:
     urls:
     - owncloud-0.1.0.tgz
     version: 0.1.0
-  piwik:
-  - apiVersion: v1
-    appVersion: 3.2.1
-    created: 2018-03-26T18:15:20.05213584+02:00
-    description: A Helm chart for Kubernetes
-    digest: e4f4a996708cf1db43f4ecf3f4ebf8a91a7f763b970525a4b48f03cfadf43de3
-    icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/piwik/icon.png
-    keywords:
-    - Analytics
-    name: piwik
-    urls:
-    - piwik-0.1.0.tgz
-    version: 0.1.0
   rocketchat:
   - apiVersion: v1
     appVersion: 0.60.3
-    created: 2018-03-26T18:15:20.052764049+02:00
+    created: 2018-04-03T20:56:38.779442582+02:00
     description: A Helm chart for Kubernetes
-    digest: c70cd14d1063e0fae6a5ca4d5a28e98053d63dc84e12cb27e04f6e963a61bf10
+    digest: 0e3e9b55af138b17b0f57bd0399f4927eedabe94ba277453e2d2d3e523debf87
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/rocketchat/icon.png
     keywords:
     - Chat
@@ -104,9 +104,9 @@ entries:
   searx:
   - apiVersion: v1
     appVersion: 0.13.1
-    created: 2018-03-26T18:15:20.05644737+02:00
+    created: 2018-04-03T20:56:38.782549365+02:00
     description: A Helm chart for Kubernetes
-    digest: f8a92d8e3c54737ad8bb9d54befaf88346307b03c705f54d64e46349753d7607
+    digest: 19fc5c448ddd4f0ca0a3b587c770ce7e2f6554e417852ae7ad10b512b824a604
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/searx/icon.png
     keywords:
     - Search
@@ -117,9 +117,9 @@ entries:
   wekan:
   - apiVersion: v1
     appVersion: v0.63
-    created: 2018-03-26T18:15:20.056929289+02:00
+    created: 2018-04-03T20:56:38.782903957+02:00
     description: A Helm chart for Kubernetes
-    digest: d631b02cb37ba85edfa14435a77738d5b2aaa90910e58d84d313b57c8fd27005
+    digest: 3158aa12bae5eba9c33fb506147a629371e5c07003cfb5e2825a7fff130515ef
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/wekan/icon.png
     keywords:
     - Project-Management
@@ -130,9 +130,9 @@ entries:
   wordpress:
   - apiVersion: v1
     appVersion: 4.9.1
-    created: 2018-03-26T18:15:20.057766843+02:00
+    created: 2018-04-03T20:56:38.783510409+02:00
     description: A Helm chart for Kubernetes
-    digest: 9a37f39d981069795e6bece76e5831103b283e17be7905efeb61ecc571c0fcdd
+    digest: 8221081ea5fff227eff7f189407b74db71d2f22ea00916389a414263ef92c689
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/wordpress/icon.png
     keywords:
     - Blog
@@ -140,4 +140,4 @@ entries:
     urls:
     - wordpress-0.1.0.tgz
     version: 0.1.0
-generated: 2018-03-26T18:15:20.046321943+02:00
+generated: 2018-04-03T20:56:38.773833573+02:00

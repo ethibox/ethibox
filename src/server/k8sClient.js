@@ -25,11 +25,11 @@ export const stateApplications = async () => {
         .then(({ items }) => {
             if (!items.length) return [];
 
-            return items.map(item => ({
+            return items.filter(item => !['mysql', 'mariadb', 'mongodb'].includes(item.metadata.labels.app)).map(item => ({
                 releaseName: item.metadata.labels.release.slice(0, -6),
                 containersRunning: item.status.hasOwnProperty('containerStatuses') && item.status.containerStatuses.every(container => container.ready), // eslint-disable-line
                 message: findVal(item, 'message'),
-                reason: findVal(item, 'reason'),
+                reason: findVal(item.status.containerStatuses, 'reason'),
                 ready: findVal(item, 'ready'),
             }));
         });
@@ -37,11 +37,11 @@ export const stateApplications = async () => {
     return apps.map((app) => {
         let state = 'loading';
         if (app.containersRunning) state = 'running';
-        if (app.message && app.message.match('unready')) state = 'loading';
-        if (app.message && app.message.match('DiskPressure')) state = 'error';
-        if (app.message && app.message.match('Insufficient memory')) state = 'error';
+        if (app.message && new RegExp('unready').test(app.message)) state = 'loading';
+        if (app.message && new RegExp('DiskPressure').test(app.message)) state = 'error';
+        if (app.message && new RegExp('Insufficient memory').test(app.message)) state = 'error';
         if (app.reason && app.reason === 'CrashLoopBackOff') state = 'error';
-        if (app.reason && app.reason === 'Error') state = 'error';
+        if (app.reason && app.reason === 'ContainerCreating') state = 'loading';
         if (app.ready) state = 'running';
         return { releaseName: app.releaseName, state };
     });
