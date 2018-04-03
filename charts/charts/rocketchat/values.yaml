@@ -10,5 +10,3 @@ service:
   internalPort: 3000
 ingress:
   enabled: false
-  hosts:
-    - rocketchat.local

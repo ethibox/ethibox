@@ -1,12 +1,12 @@
 {{- if .Values.ingress.enabled -}}
-{{- $serviceName := include "piwik.fullname" . -}}
+{{- $serviceName := include "matomo.fullname" . -}}
 {{- $servicePort := .Values.service.externalPort -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ template "piwik.fullname" . }}
+  name: {{ template "matomo.fullname" . }}
   labels:
-    app: {{ template "piwik.name" . }}
+    app: {{ template "matomo.name" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
