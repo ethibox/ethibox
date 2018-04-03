@@ -118,7 +118,7 @@ api.put('/applications/:releaseName', async (req, res) => {
                 });
             });
 
-            if (serverIp !== domainNameIp) {
+            if (process.env.NODE_ENV === 'production' && serverIp !== domainNameIp) {
                 return res.status(500).send({ success: false, message: `DNS error, create a correct A record for your domain: ${domainName}. IN A ${serverIp}.` });
             }
         }
