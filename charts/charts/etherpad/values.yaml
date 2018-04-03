@@ -10,5 +10,3 @@ service:
   internalPort: 9001
 ingress:
   enabled: false
-  hosts:
-    - etherpad.local

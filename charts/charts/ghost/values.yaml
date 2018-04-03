@@ -2,7 +2,7 @@
 replicaCount: 1
 image:
   repository: ghost
-  tag: 1.18.2
+  tag: 1.22.0
 service:
   name: ghost
   type: NodePort
@@ -10,9 +10,3 @@ service:
   internalPort: 2368
 ingress:
   enabled: false
-  hosts:
-    - ghost.local
-resources:
-  requests:
-    memory: 512Mi
-    cpu: 300m
