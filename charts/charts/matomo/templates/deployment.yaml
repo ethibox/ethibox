@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "mariadb.fullname" . }}
+  name: {{ template "matomo.fullname" . }}
   labels:
-    app: {{ template "mariadb.name" . }}
+    app: {{ template "matomo.name" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -12,16 +12,23 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ template "mariadb.name" . }}
+        app: {{ template "matomo.name" . }}
         release: {{ .Release.Name }}
     spec:
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - "sh"
+                  - "-c"
+                  - "curl https://gist.githubusercontent.com/ston3o/2125e004e2d011386638260e801c7e25/raw/3b930e86e3c81db0a77033b5ba85051d7fb1a351/matomo.sh | bash"
           env:
-            - name: MYSQL_DATABASE
-              value: piwik
+            - name: MYSQL_HOST
+              value: {{ template "mariadb.fullname" . }}
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -30,17 +37,13 @@ spec:
           ports:
             - containerPort: {{ .Values.service.internalPort }}
           livenessProbe:
-            exec:
-              command:
-                - mysqladmin
-                - ping
-            initialDelaySeconds: 30
-            timeoutSeconds: 5
+            httpGet:
+              path: /
+              port: {{ .Values.service.internalPort }}
           readinessProbe:
-            exec:
-              command:
-                - mysqladmin
-                - ping
+            httpGet:
+              path: /
+              port: {{ .Values.service.internalPort }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- if .Values.nodeSelector }}

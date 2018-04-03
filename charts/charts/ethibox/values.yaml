@@ -7,9 +7,7 @@ service:
   type: NodePort
   port: 4444
 ingress:
-  enabled: true
-  hosts:
-    - ethibox.local
+  enabled: false
 traefik:
   imageTag: 1.5.4
   serviceType: NodePort

@@ -2,13 +2,11 @@
 replicaCount: 1
 image:
   repository: piwik
-  tag: 3.2.1
+  tag: 3.3.0
 service:
-  name: piwik
+  name: matomo
   type: NodePort
   externalPort: 80
   internalPort: 80
 ingress:
   enabled: false
-  hosts:
-    - piwik.local

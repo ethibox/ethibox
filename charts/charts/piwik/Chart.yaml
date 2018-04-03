@@ -1,8 +1,0 @@
-apiVersion: v1
-description: A Helm chart for Kubernetes
-icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/piwik/icon.png
-name: piwik
-version: 0.1.0
-appVersion: 3.2.1
-keywords:
-  - Analytics
