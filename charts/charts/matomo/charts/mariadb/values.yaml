@@ -1,9 +1,0 @@
----
-replicaCount: 1
-image:
-  repository: mariadb
-  tag: 10.3.3
-service:
-  type: ClusterIP
-  internalPort: 3306
-  externalPort: 3306
