@@ -1,9 +1,0 @@
----
-apiVersion: v1
-description: A Helm chart for Kubernetes
-icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/rocketchat/icon.png
-name: rocketchat
-version: 0.1.0
-appVersion: 0.60.3
-keywords:
-  - Chat
