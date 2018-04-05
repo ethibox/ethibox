@@ -1,9 +1,0 @@
----
-replicaCount: 1
-image:
-  repository: mongo
-  tag: 3.0
-service:
-  type: ClusterIP
-  internalPort: 27017
-  externalPort: 27017
