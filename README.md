@@ -18,7 +18,7 @@
 * [x] **Let's Encrypt**: Free & automated certificates for each application.
 * [x] **Kubernetes Support**: Manage your kubernetes Infrastructure On-Prem.
 * [x] **Easy Domain Management**: Automated reverse-proxy installation. Create your vHosts in one click.
-* [ ] **Payment System**: Become hoster and monetize your infrastrucutre.
+* [x] **Monetization System**: Become hoster and monetize your infrastrucutre.
 * [ ] **Better Domain Management**: Buy, import and renew yours domains.
 * [ ] **Automated Backup Management**: Backup your persistent storages automatically.
 * [ ] **Unlimit Storage**: Decentralize storage with SIA.

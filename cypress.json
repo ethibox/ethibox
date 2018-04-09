@@ -4,6 +4,8 @@
     "supportFile": false,
     "videoRecording": false,
     "screenshotOnHeadlessFailure": false,
+    "defaultCommandTimeout": 10000,
+    "requestTimeout": 10000,
     "integrationFolder": "test",
     "baseUrl": "http://localhost:4444"
 }

@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import isEmail from 'validator/lib/isEmail';
 import { Container, Segment, Message, Grid, Button, Form } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
-import { register } from './UserActions';
+import { register } from './RegisterActions';
 import Loader from '../loader/Loader';
 import Header from '../app/Header';
 import Footer from '../app/Footer';
@@ -29,13 +29,16 @@ class Register extends React.Component {
         this.setState({ errors });
 
         if (!errors.length) {
-            this.props.register(email, password);
+            this.props.register(email, password).then(() => {
+                if (this.props.error) {
+                    this.setState({ errors: [this.props.error] });
+                }
+            });
         }
     }
 
     renderForm = () => {
         const { email, password, errors } = this.state;
-        const { registerError } = this.props;
 
         return (
             <Form size="large">
@@ -43,7 +46,6 @@ class Register extends React.Component {
                     <Form.Input icon="mail outline" iconPosition="left" type="text" placeholder="E-mail address" name="email" value={email} onChange={this.handleChange} />
                     <Form.Input icon="lock" iconPosition="left" type="password" placeholder="Password" name="password" value={password} onChange={this.handleChange} />
                     <Message header="Error" list={errors} visible={!!errors.length} error />
-                    <Message header="Error" content={registerError} visible={!!registerError} error />
                     <Button type="submit" color="teal" onClick={this.handleSubmit} fluid>Create an account</Button>
                 </Segment>
             </Form>
@@ -58,7 +60,7 @@ class Register extends React.Component {
                     <Grid.Column style={{ maxWidth: 450 }}>
                         <Header />
                         { this.renderForm() }
-                        <Message style={{ textAlign: 'center' }}><p>Already have an account? <Link to="/login">Sign in</Link></p></Message>
+                        <Message style={{ textAlign: 'center' }}><p>Already have an account? <Link to="/login" href="/login">Sign in</Link></p></Message>
                         <Footer />
                     </Grid.Column>
                 </Grid>
@@ -68,7 +70,7 @@ class Register extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({ ...state.UserReducer });
+const mapStateToProps = state => ({ ...state.RegisterReducer });
 const mapDispatchToProps = dispatch => bindActionCreators({ register }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Register);

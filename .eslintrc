@@ -18,9 +18,13 @@
       "assert",
       "browser",
       "socket",
+      "Stripe",
   },
   "env": {
       "browser": true,
       "mocha": true
-  }
+  },
+  "plugins": [
+       "graphql"
+  ]
 }
