@@ -1,0 +1,12 @@
+---
+replicaCount: 1
+image:
+  repository: nginx
+  tag: stable
+  pullPolicy: IfNotPresent
+service:
+  name: nginx
+  type: NodePort
+  port: 80
+ingress:
+  enabled: false
