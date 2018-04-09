@@ -1,9 +1,0 @@
-dependencies:
-- name: swift
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 0.3.0
-- name: traefik
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 1.24.1
-digest: sha256:e2f243205f892a02cf198dc15375a6a227bab9bf4af25a511fc269c8307e6418
-generated: 2018-03-08T17:14:49.174382556+01:00
