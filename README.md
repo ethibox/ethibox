@@ -54,7 +54,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Installation
 
 ```bash
-minikube start
+minikube start --extra-config=apiserver.Authorization.Mode=RBAC
 make install
 make enter
 make dev
