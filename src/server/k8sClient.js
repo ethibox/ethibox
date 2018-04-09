@@ -13,7 +13,7 @@ const NAMESPACE = 'default';
 
 export const listCharts = () => {
     const chartIndex = yaml.load(path.join(__dirname, (process.env.NODE_ENV === 'production') ? '../' : '../../', 'charts/packages/index.yaml'));
-    return Object.values(chartIndex.entries).filter(([chart]) => chart.name !== 'ethibox').map(([chart]) => ({ ...chart, category: chart.keywords[0] }));
+    return Object.values(chartIndex.entries).filter(([chart]) => !chart.name('ethibox|custom')).map(([chart]) => ({ ...chart, category: chart.keywords ? chart.keywords[0] : 'Unknow' }));
 };
 
 export const stateApplications = async () => {
@@ -102,6 +102,7 @@ export const editApplication = async (name, email, releaseName, domainName) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             chart_url: chartUrl,
+            reuse_values: true,
             values: { raw: JSON.stringify({ serviceType: 'NodePort', email: sha1(email), ingress: { enabled: !!domainName, hosts: [domainName] } }) },
         }),
     })
