@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Input, Dropdown, Modal, Header, Card, Image, Button, Icon, Dimmer, Loader } from 'semantic-ui-react';
 import { isFQDN, isIP } from 'validator';
-import { uninstallApplication, editApplication } from '../application/ApplicationActions';
+import { uninstallApplication, editDomainNameApplication } from '../application/ApplicationActions';
 import { STATES, ACTIONS } from '../utils';
 
 class Application extends React.Component {
@@ -32,10 +32,11 @@ class Application extends React.Component {
 
     enterDomainName = (key) => {
         const domainName = this.state.domainName.trim();
+        const { releaseName } = this.props;
 
         if (key === 'Enter') {
             if (isFQDN(domainName)) {
-                this.props.editApplication({ domainName, releaseName: this.props.releaseName });
+                this.props.editDomainNameApplication({ releaseName, domainName });
                 this.setState({ action: '', error: false, domainName });
             } else {
                 this.setState({ error: true });
@@ -44,7 +45,7 @@ class Application extends React.Component {
     }
 
     removeDomainName = () => {
-        this.props.editApplication({ domainName: '', releaseName: this.props.releaseName });
+        this.props.editDomainNameApplication({ releaseName: this.props.releaseName, domainName: '' });
         this.setState({ domainName: '' });
     }
 
@@ -100,7 +101,7 @@ class Application extends React.Component {
         }
 
         return (
-            <Button.Group color="red" widths={2}>
+            <Button.Group color="teal" widths={2}>
                 <Button style={{ width: '90%' }} onClick={() => this.setState({ action: ACTIONS.UNINSTALL })} fluid><Icon name="delete" /> Uninstall</Button>
                 <Dropdown options={options} style={{ width: 29 }} floating button className="icon" />
             </Button.Group>
@@ -110,9 +111,11 @@ class Application extends React.Component {
     render() {
         return (
             <Card>
-                <Dimmer active={this.props.state !== STATES.RUNNING && !this.props.error} inverted>
-                    <Loader style={{ textTransform: 'capitalize' }} indeterminate>{ this.props.state }...</Loader>
-                </Dimmer>
+                { this.props.state !== STATES.RUNNING && !this.props.error ?
+                    <Dimmer active inverted>
+                        <Loader style={{ textTransform: 'capitalize' }} indeterminate>{ this.props.state }...</Loader>
+                    </Dimmer> : null
+                }
                 <Card.Content>
                     <Card.Header>{this.props.releaseName}</Card.Header>
                     <Card.Meta>{this.props.category}</Card.Meta>
@@ -134,6 +137,6 @@ class Application extends React.Component {
 
 Application.defaultProps = { category: 'unknow' };
 const mapStateToProps = state => ({ ...state.ApplicationReducer });
-const mapDispatchToProps = dispatch => bindActionCreators({ uninstallApplication, editApplication }, dispatch);
+const mapDispatchToProps = dispatch => bindActionCreators({ uninstallApplication, editDomainNameApplication }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Application);

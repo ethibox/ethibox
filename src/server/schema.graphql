@@ -1,0 +1,56 @@
+type User {
+    id: Int
+    email: String
+    token: String
+    isAdmin: Boolean
+    isSubscribed: Boolean
+}
+
+type Package {
+    name: String
+    icon: String
+    category: String
+    description: String
+    version: String
+}
+
+type Application {
+    name: String
+    category: String
+    icon: String
+    releaseName: String
+    domainName: String
+    state: String
+    ip: String
+    port: Int
+    error: String
+}
+
+type Settings {
+    isDemoEnabled: Boolean
+    isMonetizationEnabled: Boolean
+    isAdmin: Boolean
+    stripePublishableKey: String
+    stripeSecretKey: String
+    stripePlanName: String
+    monthlyPrice: String
+}
+
+type Query {
+    applications: [Application]
+    packages: [Package]
+    settings: Settings
+    user: User
+}
+
+type Mutation {
+    installApplication(name: String!, releaseName: String!): Application
+    uninstallApplication(releaseName: String!): Application
+    editDomainNameApplication(releaseName: String!, domainName: String!): Application
+    register(email: String!, password: String!): User
+    login(email: String!, password: String!): User
+    updatePassword(password: String!): User
+    subscribe(stripeToken: String!): User
+    unsubscribe: User
+    updateAdminSettings(isMonetizationEnabled: Boolean, stripeSecretKey: String, stripePublishableKey: String, stripePlanName: String): Settings
+}

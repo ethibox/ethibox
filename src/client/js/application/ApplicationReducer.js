@@ -4,7 +4,7 @@ export default (state = { applications: [] }, action) => {
     localStorage.setItem('lastActionDate', Date.now());
 
     switch (action.type) {
-        case 'LIST_APPLICATIONS_SUCCESS': {
+        case 'LOAD_APPLICATIONS': {
             return { ...state, applications: action.applications || [] };
         }
 

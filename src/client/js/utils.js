@@ -1,28 +1,38 @@
+import createHistory from 'history/createBrowserHistory';
 import jwtDecode from 'jwt-decode';
 
 export const checkStatus = response => new Promise((resolve, reject) => {
-    if (response.status >= 200 && response.status < 300) {
-        return response.json().then(resolve);
-    }
+    response.json().then((res) => {
+        if (res.errors) {
+            reject(new Error(res.errors[0]));
+        }
 
-    return response.json().then(reject);
+        resolve(res);
+    });
 });
 
-export const dataToken = localStorage.getItem('token') ? jwtDecode(localStorage.getItem('token')) : {};
-
 export const isConnect = () => {
-    const token = localStorage.getItem('token');
-    if (!token) return false;
+    try {
+        const token = jwtDecode(localStorage.getItem('token'));
+        const tokenExpiration = token.exp;
+        const { userId } = token;
+        const now = Math.floor(Date.now() / 1000);
 
-    const now = Math.floor(Date.now() / 1000);
-    const tokenExpiration = jwtDecode(token).exp;
+        if (!userId || !tokenExpiration) {
+            return false;
+        }
 
-    if (now > tokenExpiration) {
+        if (now < tokenExpiration) {
+            return true;
+        }
+    } catch (e) {
         return false;
     }
 
-    return true;
+    return false;
 };
+
+export const history = createHistory();
 
 export const STATES = {
     RUNNING: 'running',
