@@ -43,7 +43,9 @@ enter:
 	@ telepresence --namespace kube-system --new-deployment ethibox --expose $(PORT) --run-shell
 
 test: ## Run tests
-	@ NODE_ENV=test ./node_modules/.bin/mocha -t 99999999 --require babel-register --require babel-polyfill test/hook.js test/specs/*.spec.js
+	@ ./node_modules/.bin/forever start ./node_modules/.bin/http-server public/static
+	@ ./node_modules/.bin/cypress run
+	@ ./node_modules/.bin/forever stop ./node_modules/.bin/http-server
 
 lint: ## Lint
 	@ ./node_modules/.bin/eslint src/
