@@ -40,7 +40,7 @@ enter:
 
 test: ## Run tests
 	@ ./node_modules/.bin/forever start ./node_modules/.bin/http-server public/static --push-state
-	@ ./node_modules/.bin/cypress run
+	@- ./node_modules/.bin/cypress run
 	@ ./node_modules/.bin/forever stop ./node_modules/.bin/http-server
 
 lint: ## Lint

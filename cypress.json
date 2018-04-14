@@ -3,5 +3,7 @@
     "pluginsFile": false,
     "supportFile": false,
     "videoRecording": false,
-    "integrationFolder": "test"
+    "screenshotOnHeadlessFailure": false,
+    "integrationFolder": "test",
+    "baseUrl": "http://localhost:8080"
 }
