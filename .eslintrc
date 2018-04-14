@@ -14,9 +14,6 @@
       "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"] }],
       "import/no-extraneous-dependencies": [0]
   },
-  "plugins": [
-      "cypress"
-  ],
   "globals": {
       "assert",
       "browser",
@@ -24,7 +21,6 @@
   },
   "env": {
       "browser": true,
-      "mocha": true,
-      "cypress/globals": true
+      "mocha": true
   }
 }
