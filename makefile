@@ -31,10 +31,6 @@ build: ## Build with webpack
 	@ NODE_ENV=production ./node_modules/.bin/babel --minified --no-comments --compact true -d public/ src/server
 	@ NODE_ENV=production ./node_modules/.bin/webpack -p --progress --colors
 
-start-selenium: ## Start Selenium
-	@ ./node_modules/.bin/selenium-standalone install
-	@ ./node_modules/.bin/selenium-standalone start
-
 enter:
 	@ command -v telepresence > /dev/null 2>&1 || (echo "telepresence is not available please install" && exit 1)
 	@ command -v kubectl > /dev/null 2>&1 || (echo "kubectl is not available please install" && exit 1)
