@@ -24,7 +24,7 @@
   },
   "env": {
       "browser": true,
-      "mocha": true
+      "mocha": true,
       "cypress/globals": true
   }
 }
