@@ -1,0 +1,9 @@
+{
+    "fixturesFolder": false,
+    "pluginsFile": false,
+    "supportFile": false,
+    "videoRecording": false,
+    "screenshotOnHeadlessFailure": false,
+    "integrationFolder": "test",
+    "baseUrl": "http://localhost:8080"
+}

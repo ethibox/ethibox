@@ -31,10 +31,6 @@ build: ## Build with webpack
 	@ NODE_ENV=production ./node_modules/.bin/babel --minified --no-comments --compact true -d public/ src/server
 	@ NODE_ENV=production ./node_modules/.bin/webpack -p --progress --colors
 
-start-selenium: ## Start Selenium
-	@ ./node_modules/.bin/selenium-standalone install
-	@ ./node_modules/.bin/selenium-standalone start
-
 enter:
 	@ command -v telepresence > /dev/null 2>&1 || (echo "telepresence is not available please install" && exit 1)
 	@ command -v kubectl > /dev/null 2>&1 || (echo "kubectl is not available please install" && exit 1)
@@ -43,7 +39,9 @@ enter:
 	@ telepresence --namespace kube-system --new-deployment ethibox --expose $(PORT) --run-shell
 
 test: ## Run tests
-	@ NODE_ENV=test ./node_modules/.bin/mocha -t 99999999 --require babel-register --require babel-polyfill test/hook.js test/specs/*.spec.js
+	@ ./node_modules/.bin/forever start ./node_modules/.bin/http-server public/static --push-state
+	@- ./node_modules/.bin/cypress run
+	@ ./node_modules/.bin/forever stop ./node_modules/.bin/http-server
 
 lint: ## Lint
 	@ ./node_modules/.bin/eslint src/
