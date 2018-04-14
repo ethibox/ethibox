@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 describe('Login Page', () => {
     it('Check title page', () => {
-        cy.visit('http://localhost:8080');
+        cy.visit('/');
         cy.title().should('eq', "Ethibox - Let's decentralize the internet!");
     });
 
@@ -11,9 +11,13 @@ describe('Login Page', () => {
         const token = jwt.sign({ email: 'contact@ethibox.fr' }, 'mysecret', { expiresIn: '1d' });
         cy.route('POST', '**/api/login', { success: true, message: 'Login succeeded', token });
 
-        cy.visit('http://localhost:8080/login', { onBeforeLoad: (win) => { win.fetch = null; } });
+        cy.visit('/login', { onBeforeLoad: (win) => { win.fetch = null; } });
         cy.get('input[name="email"]').type('contact@ethibox.fr');
         cy.get('input[name="password"]').type('myp@ssw0rd{enter}');
         cy.get('.sub.header').contains('Liste des applications');
+    });
+
+    it.skip('Logout', () => {
+        // @TODO
     });
 });
