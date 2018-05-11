@@ -4,9 +4,10 @@ import jwt from 'jsonwebtoken';
 import jwtDecode from 'jwt-decode';
 import isEmail from 'validator/lib/isEmail';
 import bcrypt from 'bcrypt';
-import { listApplications, installApplication, uninstallApplication, listCharts, editApplication } from './k8sClient';
-import { User } from './models';
-import { isAuthenticate, secret, externalIp } from './utils';
+import graphqlHTTP from 'express-graphql';
+import { buildSchema } from 'graphql';
+import { sequelize, Package, User, Application } from './models';
+import { isAuthenticate, secret, externalIp, STATES, ACTIONS } from './utils';
 
 const api = express();
 const tokenExpiration = '7d';
@@ -45,66 +46,53 @@ api.post('/login', async (req, res) => {
     return res.status(401).send({ success: false, message: 'Bad credentials' });
 });
 
-api.use((req, res, next) => {
+api.use(async (req, res, next) => {
     req.jwt_auth = false;
     const token = req.body.token || req.query.token || req.headers['x-access-token'];
 
-    if (isAuthenticate(token)) {
+    if (token && isAuthenticate(token)) {
         req.jwt_auth = true;
+        const { email } = jwtDecode(token);
+        req.body.user = await User.findOne({ where: { email } }) || false;
     }
 
-    next();
-});
-
-api.get('/applications', async (req, res) => {
-    if (!req.jwt_auth) return res.status(401).send({ success: false, message: 'Not authorized' });
-
-    try {
-        const apps = await listApplications();
-        return res.json(apps);
-    } catch ({ message }) {
-        return res.status(500).send({ success: false, message });
+    if (!token || !req.body.user) {
+        return res.status(401).send({ success: false, message: 'Not authorized' });
     }
+
+    return next();
 });
 
 api.post('/applications', async (req, res) => {
-    if (!req.jwt_auth) return res.status(401).send({ success: false, message: 'Not authorized' });
-
-    const token = req.body.token || req.query.token || req.headers['x-access-token'];
-    const { email } = jwtDecode(token);
-
     try {
-        const { name, releaseName } = req.body;
-        await installApplication(name, email, releaseName);
-        return res.json({ success: true, message: 'Application installed' });
+        const { name, releaseName, user } = req.body;
+        const pkg = await Package.findOne({ where: { name } });
+
+        Application.create({ releaseName, state: STATES.INSTALLING, action: ACTIONS.INSTALL, user, package: pkg }).then((application) => {
+            user.addApplication(application);
+            pkg.addApplication(application);
+        });
+
+        return res.json({ success: true, message: 'Application installing' });
     } catch ({ message }) {
         return res.status(500).send({ success: false, message });
     }
 });
 
-api.delete('/applications/:releaseName', (req, res) => {
-    if (!req.jwt_auth) return res.status(401).send({ success: false, message: 'Not authorized' });
-
+api.delete('/applications/:releaseName', async (req, res) => {
     try {
-        const token = req.body.token || req.query.token || req.headers['x-access-token'];
         const { releaseName } = req.params;
-        const { email } = jwtDecode(token);
+        Application.update({ state: STATES.UNINSTALLING, action: ACTIONS.UNINSTALL }, { where: { releaseName } });
 
-        uninstallApplication(releaseName, email);
-        return res.json({ success: true, message: 'Application uninstalled' });
+        return res.json({ success: true, message: 'Application uninstalling' });
     } catch ({ message }) {
         return res.status(500).send({ success: false, message });
     }
 });
 
 api.put('/applications/:releaseName', async (req, res) => {
-    if (!req.jwt_auth) return res.status(401).send({ success: false, message: 'Not authorized' });
-
     const { releaseName } = req.params;
-    const { domainName, name } = req.body;
-
-    const token = req.body.token || req.query.token || req.headers['x-access-token'];
-    const { email } = jwtDecode(token);
+    const { domainName } = req.body;
 
     try {
         if (domainName) {
@@ -123,22 +111,58 @@ api.put('/applications/:releaseName', async (req, res) => {
             }
         }
 
-        await editApplication(name, email, releaseName, domainName);
+        Application.update({ releaseName, domainName, action: ACTIONS.EDIT, state: STATES.EDITING }, { where: { releaseName } });
         return res.json({ success: true, message: 'Application edited' });
     } catch ({ message }) {
         return res.status(500).send({ success: false, message });
     }
 });
 
-api.get('/charts', (req, res) => {
-    if (!req.jwt_auth) return res.status(401).send({ success: false, message: 'Not authorized' });
+const schema = buildSchema(`
+  type Query {
+    packages: [Package]
+    applications(email: String!): [Application]
+  }
 
-    try {
-        const charts = listCharts();
-        return res.json(charts);
-    } catch ({ message }) {
-        return res.status(500).send({ success: false, message });
-    }
-});
+  type Package {
+    name: String
+    icon: String
+    category: String
+    description: String
+    version: String
+  }
+
+  type Application {
+    name: String
+    category: String
+    releaseName: String
+    domainName: String
+    state: String
+    ip: String
+    port: Int
+    error: String
+  }
+`);
+
+const rootValue = {
+    applications: async ({ email }) => {
+        const apps = await sequelize.query(`SELECT releaseName, domainName, state, port, error, name, category, applications.ip as ip
+           FROM applications
+           LEFT JOIN packages AS package ON applications.packageId = package.id
+           INNER JOIN users AS user ON applications.userId = user.id AND user.email = ?`, { replacements: [email], type: sequelize.QueryTypes.SELECT });
+        return apps;
+    },
+    packages: async () => {
+        const packages = await Package.findAll();
+        return packages;
+    },
+};
+
+api.use('/graphql', (req, res) => graphqlHTTP({
+    schema,
+    rootValue,
+    context: { req, res },
+    graphiql: (process.env.NODE_ENV !== 'production'),
+})(req, res));
 
 export default api;

@@ -1,4 +1,4 @@
-const initialState = { isOpen: false, hasErrored: false, title: '', errorMessage: '', successMessage: '' };
+const initialState = { isOpen: false, hasErrored: false, title: '', errorMessage: '', successMessage: '', redirect: false };
 
 export default (state = initialState, action) => {
     switch (action.type) {
@@ -7,6 +7,10 @@ export default (state = initialState, action) => {
         }
 
         case 'CLOSE_MODAL': {
+            if (action.params && action.params.redirect) {
+                localStorage.clear();
+                window.location.replace('/');
+            }
             return initialState;
         }
 

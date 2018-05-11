@@ -1,10 +1,12 @@
 FROM node:8.9.4
 
+ENV NODE_ENV=production
+
 WORKDIR /app
 COPY . /app
 
 RUN npm install
-RUN make build
+RUN npm run build
 RUN rm -rf node_modules
 RUN npm install --only=prod
 

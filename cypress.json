@@ -5,5 +5,5 @@
     "videoRecording": false,
     "screenshotOnHeadlessFailure": false,
     "integrationFolder": "test",
-    "baseUrl": "http://localhost:8080"
+    "baseUrl": "http://localhost:4444"
 }
