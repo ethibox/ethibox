@@ -1,21 +1,13 @@
 import React from 'react';
-import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Application from './Application';
-import { listApplications } from './ApplicationActions';
 
-class ApplicationList extends React.Component {
-    componentWillMount() {
-        this.props.listApplications();
-    }
+const ApplicationList = (props) => {
+    const applications = props.applications.sort((a, b) => a.releaseName.localeCompare(b.releaseName));
+    return applications.length ? applications.map(app => <Application {...app} key={app.releaseName} />) : null;
+};
 
-    render() {
-        const applications = this.props.applications.sort((a, b) => a.releaseName.localeCompare(b.releaseName));
-        return applications.length ? applications.map(app => <Application {...app} key={app.releaseName} />) : null;
-    }
-}
-
+ApplicationList.defaultProps = { applications: [] };
 const mapStateToProps = state => ({ ...state.ApplicationReducer });
-const mapDispatchToProps = dispatch => bindActionCreators({ listApplications }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(ApplicationList);
+export default connect(mapStateToProps)(ApplicationList);

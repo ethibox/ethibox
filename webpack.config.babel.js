@@ -7,14 +7,9 @@ import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
 import GitRevisionPlugin from 'git-revision-webpack-plugin';
 import webpack from 'webpack';
-import { exec } from 'shelljs';
-import yaml from 'yamljs';
 
 const env = process.env.NODE_ENV || 'development';
 const port = process.env.PORT || 4444;
-const minikubeIp = (env === 'development') ? exec('minikube ip', { silent: true }).stdout.trim() : '';
-const chartIndex = yaml.load(`${__dirname}/charts/packages/index.yaml`);
-const listCharts = Object.values(chartIndex.entries).filter(([chart]) => !chart.name.match('ethibox|custom')).map(([chart]) => ({ ...chart, category: chart.keywords[0] }));
 const gitRevisionPlugin = new GitRevisionPlugin({ lightweightTags: true });
 
 const config = {
@@ -77,16 +72,9 @@ const config = {
         ],
     },
     plugins: [
-        new HtmlWebpackPlugin({
-            filename: 'index.html',
-            template: `${__dirname}/src/client/index.html`,
-            hash: true,
-        }),
+        new HtmlWebpackPlugin({ filename: 'index.html', template: `${__dirname}/src/client/index.html`, hash: true }),
         new webpack.DefinePlugin({
-            'process.env.NODE_PORT': JSON.stringify(port),
             'process.env.NODE_ENV': JSON.stringify(env),
-            'process.env.MINIKUBE_IP': JSON.stringify(minikubeIp),
-            'process.env.CHARTS': JSON.stringify(listCharts),
             'process.env.VERSION': JSON.stringify(gitRevisionPlugin.version()),
         }),
         new ExtractTextPlugin({ filename: '[name].css', allChunks: false }),

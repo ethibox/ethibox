@@ -8,7 +8,7 @@ export default (props) => {
             <img src={logo} alt="logo" />
             <Header.Content>
                 Ethibox { props.demo && <small className="demo">demo</small> }
-                <Header.Subheader>Let&apos;s decentralize internet!</Header.Subheader>
+                <Header.Subheader>Host your websites effortlessly</Header.Subheader>
             </Header.Content>
         </Header>
     );

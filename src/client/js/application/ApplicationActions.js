@@ -1,23 +1,10 @@
-import { checkStatus, isConnect } from '../utils';
+import { checkStatus } from '../utils';
 import { openModal } from '../modal/ModalActions';
-import { openLoader, closeLoader } from '../loader/LoaderActions';
 
 export const installApplicationSuccess = application => ({ type: 'INSTALL_APPLICATION_SUCCESS', application });
 export const uninstallApplicationSuccess = (releaseName, force) => ({ type: 'UNINSTALL_APPLICATION_SUCCESS', releaseName, force });
 export const listApplicationsSuccess = applications => ({ type: 'LIST_APPLICATIONS_SUCCESS', applications });
-
-export const listApplications = () => (dispatch) => {
-    dispatch(openLoader('Loading applications...'));
-
-    socket.on('listApplications', (apps) => {
-        dispatch(closeLoader());
-        if (localStorage.getItem('lastActionDate') < Date.now() - 5000) {
-            dispatch(listApplicationsSuccess(apps));
-        }
-
-        if (!isConnect()) window.location.replace('/');
-    });
-};
+export const editApplicationSuccess = releaseName => ({ type: 'EDIT_APPLICATION_SUCCESS', releaseName });
 
 export const installApplication = application => async (dispatch) => {
     const { releaseName } = application;
@@ -46,8 +33,9 @@ export const uninstallApplication = releaseName => (dispatch) => {
         .catch(({ message }) => dispatch(openModal({ hasErrored: true, errorMessage: message })));
 };
 
-export const editDomainName = application => (dispatch) => {
+export const editApplication = application => (dispatch) => {
     const { releaseName } = application;
+    dispatch(editApplicationSuccess(releaseName));
 
     fetch(`/api/applications/${releaseName}`, {
         method: 'PUT',

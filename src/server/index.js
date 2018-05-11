@@ -6,7 +6,7 @@ import compression from 'compression';
 import bodyParser from 'body-parser';
 import http from 'http';
 import api from './api';
-import socketIo from './socketIo';
+import './connector';
 
 const app = aa(express());
 const publicPath = (process.env.NODE_ENV === 'production') ? './' : '../../public/';
@@ -17,12 +17,10 @@ app.use(bodyParser.json());
 
 app.use('/', express.static(path.join(__dirname, publicPath, '/static')));
 app.use('/api', api);
-app.use('/charts/', express.static(path.join(__dirname, publicPath, '../charts/packages/')));
+app.use('/packages/', express.static(path.join(__dirname, publicPath, '../charts/packages/')));
 app.use('/icons/', express.static(path.join(__dirname, publicPath, '../charts/charts/')));
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, publicPath, '/static/index.html')));
 
 const server = http.createServer(app);
-socketIo(server);
-
 server.listen(process.env.PORT || 4444);

@@ -5,19 +5,14 @@ import { Card, Image, Button, Icon, Input } from 'semantic-ui-react';
 import { installApplication } from '../application/ApplicationActions';
 import { openModal } from '../modal/ModalActions';
 
-class Chart extends React.Component {
+class Package extends React.Component {
     state = { action: '', releaseName: '', error: false }
 
-    install(releaseName) {
-        const { name, category } = this.props;
-        this.props.installApplication({ name, category, releaseName });
-    }
-
-    isValidReleaseName = releaseName => releaseName.trim().match(/^[a-z]([-a-z0-9]*[a-z0-9])?$/);
+    isValidReleaseName = releaseName => releaseName.match(/^[a-z]([-a-z0-9]*[a-z0-9])?$/);
     isAlreadyExist = releaseName => this.props.applications.map(release => release.releaseName).includes(releaseName);
 
     enterReleaseName = (key) => {
-        const { releaseName } = this.state;
+        const releaseName = this.state.releaseName.trim();
 
         if (key === 'Enter') {
             if (this.isAlreadyExist(releaseName)) {
@@ -27,7 +22,7 @@ class Chart extends React.Component {
             }
 
             if (this.isValidReleaseName(releaseName)) {
-                this.install(releaseName.trim());
+                this.props.installApplication({ name: this.props.name, releaseName, category: this.props.category });
                 this.setState({ action: '', releaseName: '' });
             } else {
                 this.setState({ error: true });
@@ -67,7 +62,7 @@ class Chart extends React.Component {
         return (
             <Card>
                 <Card.Content>
-                    <Card.Header>{name}</Card.Header>
+                    <Card.Header style={{ textTransform: 'capitalize' }}>{name}</Card.Header>
                     <Card.Meta>{category}</Card.Meta>
                     <Card.Description textAlign="center">
                         <Image src={`/icons/${name}/icon.png`} width="60" />
@@ -82,4 +77,4 @@ class Chart extends React.Component {
 const mapStateToProps = state => ({ ...state.ApplicationReducer });
 const mapDispatchToProps = dispatch => bindActionCreators({ installApplication, openModal }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(Chart);
+export default connect(mapStateToProps, mapDispatchToProps)(Package);
