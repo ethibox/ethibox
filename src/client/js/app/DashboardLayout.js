@@ -18,7 +18,7 @@ class DashboardLayout extends Component {
         return [
             <Sidebar as={Menu} animation="overlay" width="thin" visible={this.state.visible} icon="labeled" key="sidebar" vertical inverted>
                 <Menu.Item header><img src={whiteLogo} style={{ margin: 'auto' }} alt="logo" /> Ethibox { dataToken.demo && <small className="demo">demo</small> }</Menu.Item>
-                <Menu.Item name="apps" as={NavLink} to="/" exact><Icon name="grid layout" />Apps</Menu.Item>
+                <Menu.Item name="apps" as={NavLink} to="/" exact><Icon name="cubes" />Apps</Menu.Item>
                 <Menu.Item name="logout" onClick={() => { localStorage.clear(); window.location.replace('/'); }}><Icon name="sign out" />Logout</Menu.Item>
             </Sidebar>,
             <Sidebar.Pusher key="pusher">
