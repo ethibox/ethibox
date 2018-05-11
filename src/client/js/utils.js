@@ -23,3 +23,17 @@ export const isConnect = () => {
 
     return true;
 };
+
+export const STATES = {
+    RUNNING: 'running',
+    LOADING: 'loading',
+    UNINSTALLING: 'uninstalling',
+    INSTALLING: 'installing',
+    EDITING: 'editing',
+};
+
+export const ACTIONS = {
+    INSTALL: 'install',
+    UNINSTALL: 'uninstall',
+    EDIT: 'edit',
+};
