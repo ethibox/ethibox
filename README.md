@@ -36,19 +36,6 @@
 ### Installation
 
 ```bash
-npm install
-TOKEN=$TOKEN KUBE_APISERVER_IP=$KUBE_APISERVER_IP npm start
-```
-
-### Running with Docker
-
-```bash
-docker run -p 4444:4444 -e TOKEN=$TOKEN -e KUBE_APISERVER_IP=$KUBE_APISERVER_IP ston3o/ethibox
-```
-
-### Deployment
-
-```bash
 helm install --namespace kube-system --name ethibox https://github.com/ston3o/ethibox/raw/master/charts/packages/ethibox-0.1.0.tgz
 ```
 
