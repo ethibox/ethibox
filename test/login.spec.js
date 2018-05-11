@@ -1,15 +1,16 @@
 import jwt from 'jsonwebtoken';
 
 describe('Login Page', () => {
-    it('Check title page', () => {
+    it('Should display title page', () => {
         cy.visit('/');
-        cy.title().should('eq', "Ethibox - Let's decentralize the internet!");
+        cy.title().should('eq', 'Ethibox - Host your websites effortlessly');
     });
 
-    it('Sign in', () => {
+    it('Should sign in', () => {
         cy.server();
         const token = jwt.sign({ email: 'contact@ethibox.fr' }, 'mysecret', { expiresIn: '1d' });
         cy.route('POST', '**/api/login', { success: true, message: 'Login succeeded', token });
+        cy.route('GET', '**/api/applications', { success: true, apps: [] });
 
         cy.visit('/login', { onBeforeLoad: (win) => { win.fetch = null; } });
         cy.get('input[name="email"]').type('contact@ethibox.fr');
@@ -17,7 +18,25 @@ describe('Login Page', () => {
         cy.get('.sub.header').contains('Liste des applications');
     });
 
-    it.skip('Logout', () => {
-        // @TODO
+    it('Should logout', () => {
+        const token = jwt.sign({ email: 'contact@ethibox.fr' }, 'mysecret', { expiresIn: '1d' });
+        cy.visit('/', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
+        cy.get('.sidebar a:last-child').click({ force: true });
+        cy.get('.sub.header').contains('Host your websites effortlessly');
+    });
+
+    it('Should not connect user with bad token', () => {
+        const token = jwt.sign({ email: 'contact@ethibox.fr' }, 'badsecret', { expiresIn: '1d' });
+        cy.visit('/', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
+        cy.get('.actions > button.red').click({ force: true });
+        cy.get('.sub.header').contains('Host your websites effortlessly');
+    });
+
+    it('Should disconnect user with expired token', () => {
+        const token = jwt.sign({ email: 'contact@ethibox.fr' }, 'mysecret', { expiresIn: 2 });
+        cy.visit('/', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
+        cy.wait(3000);
+        cy.visit('/', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
+        cy.get('.sub.header').contains('Host your websites effortlessly');
     });
 });
