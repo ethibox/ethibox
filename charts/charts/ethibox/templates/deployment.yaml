@@ -30,13 +30,16 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: SECRET
+              value: {{ randAlphaNum 10 | b64enc | quote }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           {{- if .Values.persistence.enabled }}
           volumeMounts:
-            - mountPath: "/tmp"
+            - mountPath: "/root/.ethibox"
               name: ethibox-storage
           {{ end }}
           resources:
