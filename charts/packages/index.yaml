@@ -3,7 +3,7 @@ entries:
   custom:
   - apiVersion: v1
     appVersion: "1.0"
-    created: 2018-05-10T23:14:53.849539235+02:00
+    created: 2018-05-11T19:00:23.155029744+02:00
     description: A Helm chart for Kubernetes
     digest: 86f72b1c3d6a14eb44c2aa4373a8ae33d4a8689eca99df60038b67a6890ccd55
     keywords:
@@ -14,7 +14,7 @@ entries:
     version: 0.1.0
   etherpad:
   - apiVersion: v1
-    created: 2018-05-10T23:14:53.84992996+02:00
+    created: 2018-05-11T19:00:23.155411823+02:00
     description: A Helm chart for Kubernetes
     digest: 88f23afa072fab4ce8df4b714d80ac6489470a36b4a98411adfee8def36dd8b3
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/etherpad/icon.png
@@ -26,10 +26,10 @@ entries:
     version: 0.1.0
   ethibox:
   - apiVersion: v1
-    appVersion: 0.8.1
-    created: 2018-05-10T23:14:53.851820444+02:00
+    appVersion: 0.8.3
+    created: 2018-05-11T19:00:23.157027557+02:00
     description: A Helm chart for Kubernetes
-    digest: 41caf0d3303719648f0f44b1d8e7cb60498db063341f29728b4f4a8fecbf7329
+    digest: 2c0d26ded790c1d59ae91a4a1c040787eab1a30fac0c96c29836cd2cdefea401
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/ethibox/icon.png
     name: ethibox
     urls:
@@ -38,7 +38,7 @@ entries:
   freshrss:
   - apiVersion: v1
     appVersion: 1.7.0
-    created: 2018-05-10T23:14:53.852235775+02:00
+    created: 2018-05-11T19:00:23.157473506+02:00
     description: A Helm chart for Kubernetes
     digest: 10116a32ab5b49a169b64442db638ae1207cf746052342488622b0eb65677f98
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/freshrss/icon.png
@@ -51,7 +51,7 @@ entries:
   ghost:
   - apiVersion: v1
     appVersion: 1.18.2
-    created: 2018-05-10T23:14:53.852518394+02:00
+    created: 2018-05-11T19:00:23.157744348+02:00
     description: A Helm chart for Kubernetes
     digest: 4290461102aea187a4091490c8e2c84e3fb817035f4b7c544cbbf4180a5a0fbb
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/ghost/icon.png
@@ -64,7 +64,7 @@ entries:
   mediawiki:
   - apiVersion: v1
     appVersion: 1.27.4
-    created: 2018-05-10T23:14:53.854074525+02:00
+    created: 2018-05-11T19:00:23.159054415+02:00
     description: A Helm chart for Kubernetes
     digest: 8a9dbcd55bfc31f79cce7a798976fc95953ac23fab9b2dab7da0187593a5a918
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/mediawiki/icon.png
@@ -77,7 +77,7 @@ entries:
   owncloud:
   - apiVersion: v1
     appVersion: "9"
-    created: 2018-05-10T23:14:53.854518329+02:00
+    created: 2018-05-11T19:00:23.159478543+02:00
     description: A Helm chart for Kubernetes
     digest: 985d4a5f4fa0979b177671a53ef3ec9d597464c8d63ae7f2456affbfd531ab5a
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/owncloud/icon.png
@@ -90,7 +90,7 @@ entries:
   searx:
   - apiVersion: v1
     appVersion: 0.13.1
-    created: 2018-05-10T23:14:53.857906366+02:00
+    created: 2018-05-11T19:00:23.162953911+02:00
     description: A Helm chart for Kubernetes
     digest: 19fc5c448ddd4f0ca0a3b587c770ce7e2f6554e417852ae7ad10b512b824a604
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/searx/icon.png
@@ -103,7 +103,7 @@ entries:
   wekan:
   - apiVersion: v1
     appVersion: v0.63
-    created: 2018-05-10T23:14:53.858332477+02:00
+    created: 2018-05-11T19:00:23.163724983+02:00
     description: A Helm chart for Kubernetes
     digest: 3158aa12bae5eba9c33fb506147a629371e5c07003cfb5e2825a7fff130515ef
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/wekan/icon.png
@@ -116,7 +116,7 @@ entries:
   wordpress:
   - apiVersion: v1
     appVersion: 4.9.1
-    created: 2018-05-10T23:14:53.858992388+02:00
+    created: 2018-05-11T19:00:23.164369489+02:00
     description: A Helm chart for Kubernetes
     digest: 8221081ea5fff227eff7f189407b74db71d2f22ea00916389a414263ef92c689
     icon: https://rawgit.com/ston3o/ethibox/master/charts/charts/wordpress/icon.png
@@ -126,4 +126,4 @@ entries:
     urls:
     - wordpress-0.1.0.tgz
     version: 0.1.0
-generated: 2018-05-10T23:14:53.848614055+02:00
+generated: 2018-05-11T19:00:23.154187612+02:00
