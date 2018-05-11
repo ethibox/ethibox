@@ -6,7 +6,7 @@ import https from 'https';
 import { checkStatus, findVal, ACTIONS, STATES } from './utils';
 import { sequelize, Package, Application } from './models';
 
-const TOKEN_PATH = `${process.env.TELEPRESENCE_ROOT}/var/run/secrets/kubernetes.io/serviceaccount/token`;
+const TOKEN_PATH = `${process.env.TELEPRESENCE_ROOT || ''}/var/run/secrets/kubernetes.io/serviceaccount/token`;
 const TOKEN = fs.existsSync(TOKEN_PATH) ? fs.readFileSync(TOKEN_PATH, 'utf8') : process.env.TOKEN;
 const KUBE_APISERVER_IP = process.env.KUBERNETES_SERVICE_HOST || process.env.KUBE_APISERVER_IP;
 const KUBE_APISERVER_ENDPOINT = process.env.KUBERNETES_SERVICE_HOST ? `https://${process.env.KUBERNETES_SERVICE_HOST}` : `https://${KUBE_APISERVER_IP}:8443`;
