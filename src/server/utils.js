@@ -35,7 +35,7 @@ export const isAuthenticate = (token) => {
     }
 };
 
-export const externalIp = async () => {
+export const publicIp = async () => {
     const ip = await fetch('http://ipinfo.io/ip', { headers: { 'User-Agent': 'curl/7.37.1' } });
     return (await ip.text()).trim();
 };
