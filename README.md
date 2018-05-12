@@ -39,6 +39,15 @@
 helm install --namespace kube-system --name ethibox https://github.com/ston3o/ethibox/raw/master/charts/packages/ethibox-0.1.0.tgz
 ```
 
+Go to `http://<IP-SERVER>:4444`
+
+### Development
+
+```
+npm install
+TOKEN=$TOKEN KUBE_APISERVER_IP=$KUBE_APISERVER_IP npm start
+```
+
 ### Running the tests
 
 ```bash
