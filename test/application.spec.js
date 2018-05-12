@@ -64,7 +64,7 @@ describe('Applications Page', () => {
         cy.get('.cards .card:first-child .menu .item').click();
         cy.get('.cards .card:first-child input').type('domain.fr{enter}');
         cy.route('POST', '**/api/graphql', { data: {
-            applications: [{ name: 'etherpad', domain: 'domain.fr', releaseName: 'myapp', category: 'Editor', state: 'running' }],
+            applications: [{ name: 'etherpad', domainName: 'domain.fr', releaseName: 'myapp', category: 'Editor', state: 'running' }],
         } });
         cy.wait(5000);
         cy.get('.cards .card:first-child .meta').contains('https://domain.fr');

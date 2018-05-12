@@ -2,12 +2,28 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Input, Dropdown, Modal, Header, Card, Image, Button, Icon, Dimmer, Loader } from 'semantic-ui-react';
-import isFQDN from 'validator/lib/isFQDN';
+import { isFQDN, isIP } from 'validator';
 import { uninstallApplication, editApplication } from '../application/ApplicationActions';
 import { STATES, ACTIONS } from '../utils';
 
 class Application extends React.Component {
     state = { action: '', domainName: this.props.domainName || '', error: false };
+
+    geturl = () => {
+        let url;
+
+        if (this.props.domainName) {
+            url = `https://${this.props.domainName}`;
+        } else if (isIP(window.location.hostname)) {
+            url = `http://${window.location.hostname}:${this.props.port}`;
+        } else if (this.props.ip) {
+            url = `http://${this.props.ip}:${this.props.port}`;
+        } else {
+            url = 'https://ethibox.fr/404';
+        }
+
+        return url;
+    }
 
     uninstall = () => {
         this.setState({ action: '' });
@@ -33,9 +49,8 @@ class Application extends React.Component {
     }
 
     renderDescription = () => {
-        const { name, port, state, error, ip } = this.props;
-        const { domainName } = this.state;
-        const hyperlink = domainName ? `https://${domainName}` : ip ? `http://${ip}:${port}` : 'unknow'; // eslint-disable-line
+        const { name, state, error } = this.props;
+        const url = this.geturl();
 
         return (
             <Card.Description textAlign="center">
@@ -43,8 +58,8 @@ class Application extends React.Component {
                 {
                     state === STATES.RUNNING &&
                     <Card.Meta>
-                        <a href={hyperlink} target="_blank">
-                            <Icon name="external" /> {hyperlink}
+                        <a href={url} target="_blank">
+                            <Icon name="external" /> {url}
                         </a>
                     </Card.Meta>
                 }

@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt';
 import graphqlHTTP from 'express-graphql';
 import { buildSchema } from 'graphql';
 import { sequelize, Package, User, Application } from './models';
-import { isAuthenticate, secret, externalIp, STATES, ACTIONS } from './utils';
+import { isAuthenticate, secret, publicIp, STATES, ACTIONS } from './utils';
 
 const api = express();
 const tokenExpiration = '7d';
@@ -96,7 +96,7 @@ api.put('/applications/:releaseName', async (req, res) => {
 
     try {
         if (domainName) {
-            const serverIp = await externalIp();
+            const serverIp = await publicIp();
             const domainNameIp = await new Promise((resolve, reject) => {
                 dns.lookup(domainName, (error, address) => {
                     if (error) {

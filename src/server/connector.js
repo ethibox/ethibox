@@ -3,7 +3,7 @@ import yaml from 'yamljs';
 import fetch from 'node-fetch';
 import path from 'path';
 import https from 'https';
-import { checkStatus, findVal, ACTIONS, STATES } from './utils';
+import { checkStatus, findVal, publicIp, ACTIONS, STATES } from './utils';
 import { sequelize, Package, Application } from './models';
 
 const TOKEN_PATH = `${process.env.TELEPRESENCE_ROOT || ''}/var/run/secrets/kubernetes.io/serviceaccount/token`;
@@ -12,11 +12,6 @@ const KUBE_APISERVER_IP = process.env.KUBERNETES_SERVICE_HOST || process.env.KUB
 const KUBE_APISERVER_ENDPOINT = process.env.KUBERNETES_SERVICE_HOST ? `https://${process.env.KUBERNETES_SERVICE_HOST}` : `https://${KUBE_APISERVER_IP}:8443`;
 const SWIFT_ENDPOINT = `${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/kube-system/services/http:swift-ethibox:9855/proxy`;
 const CHART_REPOSITORY = process.env.CHART_REPOSITORY || 'https://github.com/ston3o/ethibox/raw/master/charts/packages';
-
-if (!TOKEN || !KUBE_APISERVER_IP) {
-    console.error('Error: Kubernetes configuration missing!');
-    console.error('Error: Add KUBE_APISERVER_IP and TOKEN environment variables');
-}
 
 const agent = new https.Agent({ rejectUnauthorized: false });
 
@@ -32,7 +27,7 @@ listPackages().forEach(async ({ name, category }) => {
     Package.update({ name, category }, { where: { name } });
 });
 
-export const stateApplications = async () => {
+const stateApplications = async () => {
     const apps = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/default/pods/`, { headers: { Authorization: `Bearer ${TOKEN}` }, agent })
         .then(checkStatus)
         .then(({ items }) => {
@@ -62,7 +57,7 @@ export const stateApplications = async () => {
     });
 };
 
-export const listApplications = async () => {
+const listApplications = async () => {
     const apps = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/default/services/?labelSelector=heritage=Tiller`, {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
         agent,
@@ -73,7 +68,6 @@ export const listApplications = async () => {
             return data.items.map(item => ({
                 name: item.metadata.labels.app,
                 releaseName: item.metadata.labels.release,
-                ip: KUBE_APISERVER_IP,
                 port: item.spec.ports[0].nodePort,
                 domain: item.metadata.labels.domain,
             }));
@@ -87,7 +81,7 @@ export const listApplications = async () => {
     });
 };
 
-export const installApplication = async (name, userId, releaseName) => {
+const installApplication = async (name, userId, releaseName) => {
     const chartUrl = `${CHART_REPOSITORY}/${name}-0.1.0.tgz`;
     await fetch(`${SWIFT_ENDPOINT}/tiller/v2/releases/${releaseName}-${userId}/json`, {
         method: 'POST',
@@ -101,7 +95,7 @@ export const installApplication = async (name, userId, releaseName) => {
         .then(checkStatus);
 };
 
-export const uninstallApplication = (releaseName, userId) => {
+const uninstallApplication = (releaseName, userId) => {
     fetch(`${SWIFT_ENDPOINT}/tiller/v2/releases/${releaseName}-${userId}/json?purge=true`, {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
         method: 'DELETE',
@@ -110,7 +104,7 @@ export const uninstallApplication = (releaseName, userId) => {
         .then(checkStatus);
 };
 
-export const editApplication = async (name, userId, releaseName, domainName, version = '0.1.0') => {
+const editApplication = async (name, userId, releaseName, domainName, version = '0.1.0') => {
     const chartUrl = `${CHART_REPOSITORY}/${name}-${version}.tgz`;
     await fetch(`${SWIFT_ENDPOINT}/tiller/v2/releases/${releaseName}-${userId}/json`, {
         method: 'PUT',
@@ -125,47 +119,55 @@ export const editApplication = async (name, userId, releaseName, domainName, ver
         .then(checkStatus);
 };
 
-let isRunning;
-setInterval(async () => {
-    if (!isRunning) {
-        isRunning = true;
+const synchronize = async () => {
+    const k8sApps = await listApplications();
+    process.env.PUBLIC_IP = process.env.PUBLIC_IP || await publicIp();
+    const ip = process.env.TELEPRESENCE_ROOT ? '192.168.99.100' : (process.env.KUBE_APISERVER_IP || process.env.PUBLIC_IP);
 
-        const applications = await sequelize.query(`SELECT releaseName, domainName, state, port, error, name, category, applications.ip as ip, userId, action
-           FROM applications
-           LEFT JOIN packages AS package ON applications.packageId = package.id
-           INNER JOIN users AS user ON applications.userId = user.id`, { type: sequelize.QueryTypes.SELECT });
+    k8sApps.forEach((app) => {
+        const { port, state, error } = app;
+        const userId = (app.releaseName.match(/[0-9]+$/) && app.releaseName.match(/[0-9]+$/)[0]) || 0;
+        const releaseName = app.releaseName.replace(/-[0-9]+$/, '');
+        Application.update({ ip, port, state, error }, { where: { releaseName, userId } });
+    });
 
-        const k8sApps = await listApplications();
+    const applications = await sequelize.query(`SELECT releaseName, domainName, state, port, error, name, category, applications.ip as ip, userId, action
+       FROM applications
+       LEFT JOIN packages AS package ON applications.packageId = package.id
+       INNER JOIN users AS user ON applications.userId = user.id`, { type: sequelize.QueryTypes.SELECT });
 
-        k8sApps.forEach((app) => {
-            const ip = KUBE_APISERVER_IP;
-            const { port, state, error } = app;
-            const userId = (app.releaseName.match(/[0-9]+$/) && app.releaseName.match(/[0-9]+$/)[0]) || 0;
-            const releaseName = app.releaseName.replace(/-[0-9]+$/, '');
-            Application.update({ ip, port, state, error }, { where: { releaseName, userId } });
-        });
+    applications.forEach(async (app) => {
+        const { name, userId, action, releaseName, domainName } = app;
 
-        applications.forEach(async (app) => {
-            const { name, userId, action, releaseName, domainName } = app;
+        switch (action) {
+            case ACTIONS.INSTALL:
+                await installApplication(name, userId, releaseName);
+                break;
+            case ACTIONS.UNINSTALL:
+                await uninstallApplication(releaseName, userId);
+                Application.destroy({ where: { releaseName } });
+                break;
+            case ACTIONS.EDIT:
+                await editApplication(name, userId, releaseName, domainName);
+                break;
+            default:
+                break;
+        }
 
-            switch (action) {
-                case ACTIONS.INSTALL:
-                    await installApplication(name, userId, releaseName);
-                    break;
-                case ACTIONS.UNINSTALL:
-                    await uninstallApplication(releaseName, userId);
-                    Application.destroy({ where: { releaseName } });
-                    break;
-                case ACTIONS.EDIT:
-                    await editApplication(name, userId, releaseName, domainName);
-                    break;
-                default:
-                    break;
-            }
+        Application.update({ action: null }, { where: { releaseName } });
+    });
+};
 
-            Application.update({ action: null }, { where: { releaseName } });
-        });
-
-        isRunning = false;
-    }
-}, 5000);
+if (TOKEN && KUBE_APISERVER_IP) {
+    let isSynchronizationRunning;
+    setInterval(async () => {
+        if (!isSynchronizationRunning) {
+            isSynchronizationRunning = true;
+            await synchronize();
+            isSynchronizationRunning = false;
+        }
+    }, 5000);
+} else {
+    console.error('Error: Kubernetes configuration missing!');
+    console.error('Error: Add KUBE_APISERVER_IP and TOKEN environment variables');
+}
