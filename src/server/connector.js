@@ -156,11 +156,11 @@ const listPackages = async () => {
 
 (async () => {
     const packages = await listPackages();
-    packages.forEach(async ({ name, category }) => {
+    packages.forEach(async ({ name, icon, category }) => {
         if (!await Package.findOne({ where: { name }, raw: true })) {
-            Package.create({ name, category });
+            Package.create({ name, icon, category });
         }
-        Package.update({ name, category }, { where: { name } });
+        Package.update({ name, icon, category }, { where: { name } });
     });
 })();
 

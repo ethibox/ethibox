@@ -57,7 +57,7 @@ class Package extends React.Component {
     }
 
     render() {
-        const { name, category } = this.props;
+        const { name, icon, category } = this.props;
 
         return (
             <Card>
@@ -65,7 +65,7 @@ class Package extends React.Component {
                     <Card.Header style={{ textTransform: 'capitalize' }}>{name}</Card.Header>
                     <Card.Meta>{category}</Card.Meta>
                     <Card.Description textAlign="center">
-                        <Image src={`/icons/${name}/icon.png`} width="60" />
+                        <Image src={icon} width="60" />
                     </Card.Description>
                 </Card.Content>
                 <Card.Content extra>{ this.renderButtons() }</Card.Content>
