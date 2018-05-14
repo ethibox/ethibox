@@ -12,8 +12,8 @@
 
 ## Features
 
-* [x] **Web-Based UI**: Extensible & modular UI to provision, manage and scale your applications in one place.
-* [x] **Free-Software Store**: Search, discover and install packages with one click.
+* [x] **WebUI**: Extensible & modular UI to provision, manage and scale your applications in one place.
+* [x] **App Store**: Search, discover and install applications in one click.
 * [x] **Auto-Scaling**: Auto-Scale your infrastructure.
 * [x] **Let's Encrypt**: Free & automated certificates for each application.
 * [x] **Kubernetes Support**: Manage your kubernetes Infrastructure On-Prem.
@@ -24,7 +24,8 @@
 * [ ] **Unlimit Storage**: Decentralize storage with SIA.
 * [ ] **VPN Support**: Configure public static IP to expose your applications behind NAT or firewall.
 * [ ] **TOR Support**: Access your applications on TOR network.
-* [ ] **Deploy custom packages**: Create and deploy custom packages easily.
+* [ ] **Deploy Custom Packages**: Create and deploy custom packages easily.
+* [ ] **Single Sign-on**: Single sign-on to access all apps.
 
 ## Getting Started
 
@@ -36,7 +37,7 @@
 ### Installation
 
 ```bash
-helm install --namespace kube-system --name ethibox https://charts.ethibox.fr/ethibox-0.1.0.tgz
+helm install --namespace kube-system --name ethibox https://charts.ethibox.fr/packages/ethibox-0.1.0.tgz
 ```
 
 Go to `http://<IP-SERVER>:4444`
