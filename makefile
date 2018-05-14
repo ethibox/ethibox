@@ -7,8 +7,3 @@ enter:
 	@- kubectl --namespace kube-system delete deployment ethibox > /dev/null 2>&1
 	@- kubectl --namespace kube-system delete service ethibox > /dev/null 2>&1
 	@ telepresence --namespace kube-system --new-deployment ethibox --expose 4444 --run-shell
-
-package:
-	@ command -v helm > /dev/null 2>&1 || (echo "helm is not available please install" && exit 1)
-	@ helm package ./charts/charts/* -d ./charts/packages/
-	@ helm repo index ./charts/packages/
