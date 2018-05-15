@@ -1,7 +1,6 @@
 import fs from 'fs';
 import yaml from 'yamljs';
 import fetch from 'node-fetch';
-import path from 'path';
 import https from 'https';
 import { checkStatus, findVal, publicIp, ACTIONS, STATES } from './utils';
 import { sequelize, Package, Application } from './models';
@@ -11,21 +10,9 @@ const TOKEN = fs.existsSync(TOKEN_PATH) ? fs.readFileSync(TOKEN_PATH, 'utf8') : 
 const KUBE_APISERVER_IP = process.env.KUBERNETES_SERVICE_HOST || process.env.KUBE_APISERVER_IP;
 const KUBE_APISERVER_ENDPOINT = process.env.KUBERNETES_SERVICE_HOST ? `https://${process.env.KUBERNETES_SERVICE_HOST}` : `https://${KUBE_APISERVER_IP}:8443`;
 const SWIFT_ENDPOINT = `${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/kube-system/services/http:swift-ethibox:9855/proxy`;
-const CHART_REPOSITORY = process.env.CHART_REPOSITORY || 'https://github.com/ston3o/ethibox/raw/master/charts/packages';
+const CHART_REPOSITORY = process.env.CHART_REPOSITORY || 'https://charts.ethibox.fr/packages/';
 
 const agent = new https.Agent({ rejectUnauthorized: false });
-
-const listPackages = () => {
-    const packageIndex = yaml.load(path.join(__dirname, (process.env.NODE_ENV === 'production') ? '../' : '../../', 'charts/packages/index.yaml'));
-    return Object.values(packageIndex.entries).filter(([pkg]) => !pkg.name.match('ethibox|custom')).map(([pkg]) => ({ ...pkg, category: pkg.keywords ? pkg.keywords[0] : 'Unknow' }));
-};
-
-listPackages().forEach(async ({ name, category }) => {
-    if (!await Package.findOne({ where: { name }, raw: true })) {
-        Package.create({ name, category });
-    }
-    Package.update({ name, category }, { where: { name } });
-});
 
 const stateApplications = async () => {
     const apps = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/default/pods/`, { headers: { Authorization: `Bearer ${TOKEN}` }, agent })
@@ -158,6 +145,25 @@ const synchronize = async () => {
     });
 };
 
+const listPackages = async () => {
+    const index = await fetch(`${CHART_REPOSITORY}/index.yaml`).then(res => res.text());
+    const packages = await yaml.parse(index).entries;
+
+    return Object.values(packages)
+        .filter(([pkg]) => !pkg.name.match('ethibox|custom'))
+        .map(([pkg]) => ({ ...pkg, category: pkg.keywords ? pkg.keywords[0] : 'Unknow' }));
+};
+
+(async () => {
+    const packages = await listPackages();
+    packages.forEach(async ({ name, icon, category }) => {
+        if (!await Package.findOne({ where: { name }, raw: true })) {
+            Package.create({ name, icon, category });
+        }
+        Package.update({ name, icon, category }, { where: { name } });
+    });
+})();
+
 if (TOKEN && KUBE_APISERVER_IP) {
     let isSynchronizationRunning;
     setInterval(async () => {
@@ -168,6 +174,6 @@ if (TOKEN && KUBE_APISERVER_IP) {
         }
     }, 5000);
 } else {
-    console.error('Error: Kubernetes configuration missing!');
-    console.error('Error: Add KUBE_APISERVER_IP and TOKEN environment variables');
+    console.error('Error: Kubernetes configuration missing!'); // eslint-disable-line
+    console.error('Error: Add KUBE_APISERVER_IP and TOKEN environment variables'); //eslint-disable-line
 }

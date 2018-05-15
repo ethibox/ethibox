@@ -49,12 +49,12 @@ class Application extends React.Component {
     }
 
     renderDescription = () => {
-        const { name, state, error } = this.props;
+        const { icon, state, error } = this.props;
         const url = this.geturl();
 
         return (
             <Card.Description textAlign="center">
-                <Image src={`/icons/${name}/icon.png`} width="60" />
+                <Image src={icon} width="60" />
                 {
                     state === STATES.RUNNING &&
                     <Card.Meta>
