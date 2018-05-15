@@ -15,8 +15,8 @@ export default (store) => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'x-access-token': localStorage.getItem('token') },
                 body: JSON.stringify({ query: `{ 
-                    packages { name category }
-                    applications(email: "${dataToken.email}") { name releaseName domainName category state ip port error }
+                    packages { name category icon }
+                    applications(email: "${dataToken.email}") { name releaseName domainName category icon state ip port error }
                 }` }),
             })
                 .then(checkStatus)
