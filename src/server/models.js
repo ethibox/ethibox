@@ -9,7 +9,7 @@ const DB_PATH = `${DB_DIR}/${DB_FILE}`;
 if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR);
 
 const db = `sqlite://${DB_PATH}`;
-export const sequelize = new Sequelize(db, { logging: (process.env.NODE_ENV !== 'production'), operatorsAliases: Sequelize.Op });
+export const sequelize = new Sequelize(db, { logging: false, operatorsAliases: Sequelize.Op });
 
 export const User = sequelize.define('user', {
     ip: { type: Sequelize.STRING, validate: { isIP: true } },
