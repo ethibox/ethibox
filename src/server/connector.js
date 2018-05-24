@@ -2,6 +2,7 @@ import fs from 'fs';
 import yaml from 'yamljs';
 import fetch from 'node-fetch';
 import https from 'https';
+import winston from 'winston';
 import { checkStatus, findVal, publicIp, ACTIONS, STATES } from './utils';
 import { sequelize, Package, Application } from './models';
 
@@ -27,7 +28,8 @@ const stateApplications = async () => {
                 reason: findVal(item.status.containerStatuses, 'reason'),
                 ready: findVal(item, 'ready'),
             }));
-        });
+        })
+        .catch(message => winston.log('error', message));
 
     return apps.map((app) => {
         let state = STATES.LOADING;
@@ -52,13 +54,14 @@ const listApplications = async () => {
         .then(checkStatus)
         .then((data) => {
             if (!data.items.length) return [];
-            return data.items.map(item => ({
+            return data.items.filter(item => !['mysql', 'mariadb', 'mongodb'].includes(item.metadata.labels.app)).map(item => ({
                 name: item.metadata.labels.app,
                 releaseName: item.metadata.labels.release,
                 port: item.spec.ports[0].nodePort,
                 domain: item.metadata.labels.domain,
             }));
-        });
+        })
+        .catch(message => winston.log('error', message));
 
     const stateApps = await stateApplications();
     return apps.map((app) => {
@@ -79,7 +82,8 @@ const installApplication = async (name, userId, releaseName) => {
         }),
         agent,
     })
-        .then(checkStatus);
+        .then(checkStatus)
+        .catch(message => winston.log('error', message));
 };
 
 const uninstallApplication = (releaseName, userId) => {
@@ -88,7 +92,8 @@ const uninstallApplication = (releaseName, userId) => {
         method: 'DELETE',
         agent,
     })
-        .then(checkStatus);
+        .then(checkStatus)
+        .catch(message => winston.log('error', message));
 };
 
 const editApplication = async (name, userId, releaseName, domainName, version = '0.1.0') => {
@@ -103,7 +108,8 @@ const editApplication = async (name, userId, releaseName, domainName, version = 
         }),
         agent,
     })
-        .then(checkStatus);
+        .then(checkStatus)
+        .catch(message => winston.log('error', message));
 };
 
 const synchronize = async () => {
@@ -174,6 +180,6 @@ if (TOKEN && KUBE_APISERVER_IP) {
         }
     }, 5000);
 } else {
-    console.error('Error: Kubernetes configuration missing!'); // eslint-disable-line
-    console.error('Error: Add KUBE_APISERVER_IP and TOKEN environment variables'); //eslint-disable-line
+    winston.log('error', 'Kubernetes configuration missing!');
+    winston.log('error', 'Add KUBE_APISERVER_IP and TOKEN environment variables');
 }
