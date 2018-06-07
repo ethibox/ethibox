@@ -91,7 +91,6 @@ class SettingsUser extends Component {
                         iconPosition="left"
                         onChange={this.handleChange}
                         value={confirmPassword}
-                        onKeyPress={e => (e.key === 'Enter') && e.target.blur()}
                     />
                 </Form.Group>
                 <Message header="There was some errors with your submission" list={errors} visible={!!errors.length} error />
