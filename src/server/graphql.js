@@ -1,4 +1,3 @@
-import dns from 'dns';
 import path from 'path';
 import fs from 'fs';
 import express from 'express';
@@ -10,7 +9,7 @@ import graphqlHTTP from 'express-graphql';
 import stripePackage from 'stripe';
 import { makeExecutableSchema } from 'graphql-tools';
 import { sequelize, Package, User, Settings, Application } from './models';
-import { isAuthenticate, secret, publicIp, STATES, ACTIONS } from './utils';
+import { isAuthenticate, secret, publicIp, checkDnsRecord, STATES, ACTIONS } from './utils';
 
 const app = express();
 const tokenExpiration = '7d';
@@ -82,14 +81,7 @@ const resolvers = {
 
                 if (process.env.NODE_ENV === 'production' && !process.env.TRAVIS) {
                     const serverIp = await publicIp();
-                    const domainNameIp = await new Promise((resolve, reject) => {
-                        dns.lookup(domainName, (error, address) => {
-                            if (error || serverIp !== domainNameIp) {
-                                return reject(new Error(`DNS error, create a correct A record for your domain: ${domainName}. IN A ${serverIp}.`));
-                            }
-                            return resolve(address);
-                        });
-                    });
+                    await checkDnsRecord(domainName, serverIp);
                 }
 
                 Application.update({ releaseName, domainName, action: ACTIONS.EDIT, state: STATES.EDITING }, { where: { releaseName } });
@@ -136,14 +128,15 @@ const resolvers = {
             await User.update({ isSubscribed: false }, { where: { id } });
             return id;
         },
-        register: async (_, { email, password }) => {
+        register: async (_, { email, password }, context) => {
             if (!isEmail(email) || password.length < 6) {
                 throw new Error('Email/password error');
             }
 
             if (!await User.count({ where: { email } })) {
+                const ip = context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress;
                 const hashPassword = bcrypt.hashSync(password, 10);
-                const user = await User.create({ ip: '9.9.9.9', email, password: hashPassword }); // TODO: GET IP
+                const user = await User.create({ ip, email, password: hashPassword });
                 const payload = { userId: user.dataValues.id };
                 const token = jwt.sign(payload, secret, { expiresIn: tokenExpiration });
 

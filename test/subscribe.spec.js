@@ -89,10 +89,6 @@ describe('Subscribe', () => {
         cy.get('.message').contains('Bad stripe publishable key');
     });
 
-    /* it('Should subscribe with promo code', () => {
-        // TODO
-    }); */
-
     after(() => {
         cy.request('GET', '/test/reset');
     });
