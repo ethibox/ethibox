@@ -7,12 +7,6 @@ import { closeModal } from './ModalActions';
 const ModalComponent = (props) => {
     const { hasErrored, title, errorMessage, successMessage, isOpen, redirectUrl } = props;
 
-    document.addEventListener('keypress', ({ key }) => {
-        if (isOpen && (key === 'Escape' || key === 'Enter')) {
-            props.closeModal({ redirectUrl });
-        }
-    });
-
     return (
         <Modal open={isOpen} size="large" basic>
             { hasErrored ? <Header icon="warning sign" content={title || 'Error'} /> : <Header icon="checkmark" content={title || 'Success'} /> }

@@ -42,7 +42,6 @@ class SettingsAdmin extends Component {
                     name="stripeSecretKey"
                     value={stripeSecretKey}
                     onChange={this.handleChange}
-                    onKeyPress={e => (e.key === 'Enter') && e.target.blur()}
                 />
                 <Form.Field
                     control={Input}
@@ -54,7 +53,6 @@ class SettingsAdmin extends Component {
                     name="stripePublishableKey"
                     value={stripePublishableKey}
                     onChange={this.handleChange}
-                    onKeyPress={e => (e.key === 'Enter') && e.target.blur()}
                 />
             </Form.Group>,
             <Form.Field
@@ -68,7 +66,6 @@ class SettingsAdmin extends Component {
                 name="stripePlanName"
                 value={stripePlanName}
                 onChange={this.handleChange}
-                onKeyPress={e => (e.key === 'Enter') && e.target.blur()}
             />,
         ];
     }
