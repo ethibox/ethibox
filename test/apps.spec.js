@@ -51,8 +51,4 @@ describe('Applications Page', () => {
         cy.request('PUT', '/test/applications/myapp3', { state: 'running' });
         cy.contains('.cards .card:last-child .meta', 'http://192.168.99.100:30348');
     });
-
-    /* it.skip('Display error if operation is too long', () => {
-        // TODO
-    }); */
 });
