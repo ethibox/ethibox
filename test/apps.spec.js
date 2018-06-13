@@ -40,7 +40,7 @@ describe('Applications Page', () => {
         cy.get('.cards .card:first-child input').type('domain.fr{enter}');
         cy.wait(2000);
         cy.request('PUT', '/test/applications/myapp', { state: 'running' });
-        cy.contains('.cards .card:first-child .meta', 'https://domain.fr');
+        cy.contains('.cards .card:first-child', 'https://domain.fr');
     });
 
     it('Should remove domain of an application', () => {
