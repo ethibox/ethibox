@@ -76,9 +76,6 @@ class SettingsAdmin extends Component {
         return (
             <Form>
                 <Header dividing>Admin settings</Header>
-                { /* <Form.Field label="Store repository" control={Input} iconPosition="left" icon="linkify" value="https://charts.ethibox.fr" action="Synchronize" /> */ }
-                { /* <Form.Field label="User applications limit" control={Input} placeholder="0" type="number" iconPosition="left" icon="hand paper" /> */ }
-                { /* <Form.Field label="Enable registration" control={Radio} toggle /> */ }
                 <Form.Field label="Enable Monetization" className="monetization" onClick={this.toggleMonetization} control={Radio} checked={displayStripeForm} toggle />
                 { displayStripeForm && this.StripeForm() }
                 <Button onClick={this.handleSubmit} name="save">Save settings</Button>
