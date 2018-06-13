@@ -15,6 +15,14 @@ export const User = sequelize.define('user', {
     ip: { type: Sequelize.STRING, validate: { isIP: true } },
     email: { type: Sequelize.STRING, validate: { isEmail: true } },
     password: { type: Sequelize.STRING },
+    stripeCustomerId: { type: Sequelize.STRING },
+    isSubscribed: { type: Sequelize.BOOLEAN, defaultValue: false },
+    isAdmin: { type: Sequelize.BOOLEAN, defaultValue: false },
+});
+
+export const Settings = sequelize.define('settings', {
+    name: { type: Sequelize.STRING },
+    value: { type: Sequelize.STRING },
 });
 
 export const Application = sequelize.define('application', {
@@ -43,3 +51,22 @@ Package.Applications = Package.hasMany(Application);
 User.sync();
 Application.sync();
 Package.sync();
+Settings.sync();
+
+const initializeSettings = () => {
+    const settings = [
+        { name: 'stripeSecretKey' },
+        { name: 'stripePublishableKey' },
+        { name: 'stripePlanName' },
+        { name: 'isMonetizationEnabled', value: false },
+        { name: 'isDemoEnabled', value: false },
+        { name: 'monthlyPrice', value: '$0' },
+    ];
+    settings.forEach(({ name, value }) => Settings.findOne({ where: { name } }).then((setting) => {
+        if (!setting) {
+            Settings.create({ name, value });
+        }
+    }));
+};
+
+initializeSettings();

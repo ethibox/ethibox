@@ -1,42 +1,44 @@
 import jwt from 'jsonwebtoken';
 
 describe('Login Page', () => {
-    it('Should display title page', () => {
-        cy.visit('/');
-        cy.title().should('eq', 'Ethibox - Host your websites effortlessly');
+    before(() => {
+        cy.request('GET', '/test/reset');
+        cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd' }] });
+    });
+
+    it('Should not sign in if bad logins', () => {
+        cy.visit('/login', { onBeforeLoad: (win) => { win.fetch = null; } });
+        cy.get('input[name="email"]').type('contact@ethibox.fr');
+        cy.get('input[name="password"]').type('badpassword{enter}');
+        cy.contains('.error', 'Bad logins');
     });
 
     it('Should sign in', () => {
-        cy.server();
-        const token = jwt.sign({ email: 'contact@ethibox.fr' }, 'mysecret', { expiresIn: '1d' });
-        cy.route('POST', '**/api/login', { success: true, message: 'Login succeeded', token });
-        cy.route('GET', '**/api/applications', { success: true, apps: [] });
-
         cy.visit('/login', { onBeforeLoad: (win) => { win.fetch = null; } });
         cy.get('input[name="email"]').type('contact@ethibox.fr');
         cy.get('input[name="password"]').type('myp@ssw0rd{enter}');
-        cy.get('.sub.header').contains('Liste des applications');
+        cy.get('.menu').contains('Logout');
     });
 
-    it('Should logout', () => {
-        const token = jwt.sign({ email: 'contact@ethibox.fr' }, 'mysecret', { expiresIn: '1d' });
+    it('Should not connect user with bad token secret', () => {
+        const token = jwt.sign({ userId: 1 }, 'badsecret', { expiresIn: '1d' });
         cy.visit('/', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
-        cy.get('.sidebar a:last-child').click({ force: true });
-        cy.get('.sub.header').contains('Host your websites effortlessly');
+        cy.get('.modal').contains('Not authorized');
+        cy.get('.modal button').click();
+        cy.url().should('contain', '/login');
     });
 
     it('Should not connect user with bad token', () => {
-        const token = jwt.sign({ email: 'contact@ethibox.fr' }, 'badsecret', { expiresIn: '1d' });
+        const token = 'badtoken';
         cy.visit('/', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
-        cy.get('.actions > button.red').click({ force: true });
-        cy.get('.sub.header').contains('Host your websites effortlessly');
+        cy.get('.message').contains('New to us?');
     });
 
     it('Should disconnect user with expired token', () => {
-        const token = jwt.sign({ email: 'contact@ethibox.fr' }, 'mysecret', { expiresIn: 2 });
-        cy.visit('/', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
+        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: 2 });
         cy.wait(3000);
         cy.visit('/', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
-        cy.get('.sub.header').contains('Host your websites effortlessly');
+        cy.url().should('contain', '/login');
+        cy.get('.message').contains('New to us?');
     });
 });

@@ -1,23 +1,21 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Card, Image, Button, Icon, Input } from 'semantic-ui-react';
+import { Form, Label, Card, Image, Button, Icon, Input } from 'semantic-ui-react';
 import { installApplication } from '../application/ApplicationActions';
-import { openModal } from '../modal/ModalActions';
 
 class Package extends React.Component {
-    state = { action: '', releaseName: '', error: false }
+    state = { action: '', releaseName: '', error: false, errorMessage: '' }
 
-    isValidReleaseName = releaseName => releaseName.match(/^[a-z]([-a-z0-9]*[a-z0-9])?$/);
+    isValidReleaseName = releaseName => releaseName.match(/^[a-z]([-a-z0-9]*[a-z0-9])?$/i);
     isAlreadyExist = releaseName => this.props.applications.map(release => release.releaseName).includes(releaseName);
 
     enterReleaseName = (key) => {
-        const releaseName = this.state.releaseName.trim();
+        const releaseName = this.state.releaseName.trim().toLowerCase();
 
         if (key === 'Enter') {
             if (this.isAlreadyExist(releaseName)) {
-                this.props.openModal({ hasErrored: true, errorMessage: "Application's name already taken" });
-                this.setState({ error: true });
+                this.setState({ error: true, errorMessage: 'Application\'s name already taken' });
                 return;
             }
 
@@ -25,27 +23,30 @@ class Package extends React.Component {
                 this.props.installApplication({ name: this.props.name, releaseName, category: this.props.category });
                 this.setState({ action: '', releaseName: '' });
             } else {
-                this.setState({ error: true });
+                this.setState({ error: true, errorMessage: 'Please enter a valid name' });
             }
         }
     }
 
     renderButtons = () => {
-        const { action, releaseName, error } = this.state;
+        const { action, releaseName, error, errorMessage } = this.state;
 
         if (action === 'editReleaseName') {
             return (
-                <Input
-                    error={error}
-                    onBlur={() => this.setState({ action: '' })}
-                    value={releaseName}
-                    onChange={(e, data) => this.setState({ releaseName: data.value, error: false })}
-                    onKeyDown={e => this.enterReleaseName(e.key)}
-                    placeholder="Enter application's name..."
-                    transparent
-                    autoFocus
-                    fluid
-                />
+                <Form.Field>
+                    <Input
+                        error={error}
+                        onBlur={() => this.setState({ action: '' })}
+                        value={releaseName}
+                        onChange={(e, data) => this.setState({ releaseName: data.value, error: false, errorMessage: '' })}
+                        onKeyDown={e => this.enterReleaseName(e.key)}
+                        placeholder="Enter application's name..."
+                        transparent
+                        autoFocus
+                        fluid
+                    />
+                    { error ? <Label color="red" basic pointing>{ errorMessage }</Label> : '' }
+                </Form.Field>
             );
         }
 
@@ -75,6 +76,6 @@ class Package extends React.Component {
 }
 
 const mapStateToProps = state => ({ ...state.ApplicationReducer });
-const mapDispatchToProps = dispatch => bindActionCreators({ installApplication, openModal }, dispatch);
+const mapDispatchToProps = dispatch => bindActionCreators({ installApplication }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Package);

@@ -1,6 +1,6 @@
 export default (state = { packages: [] }, action) => {
     switch (action.type) {
-        case 'LIST_PACKAGES': {
+        case 'LOAD_PACKAGES': {
             return { ...state, ...action };
         }
 
