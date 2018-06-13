@@ -9,11 +9,12 @@
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
     "start:prod": "NODE_ENV=production node public/index.js",
     "start:dev": "npm-run-all --parallel watch:server watch:client",
+    "start:test": "NODE_ENV=production CI=true node public/index.js",
     "watch:client": "webpack --watch -d",
     "watch:server": "nodemon -i test -i public -i src/client --exec babel-node -- src/server/index.js",
     "build": "NODE_ENV=production babel --minified --no-comments --compact true -d public/ src/server && webpack -p --progress --colors",
     "test": "cypress run",
-    "test:ci": "start-server-and-test start:prod http://localhost:4444 test"
+    "test:ci": "server-test start:test 4444"
   },
   "engines": {
     "node": "8.9.4",

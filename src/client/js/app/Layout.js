@@ -17,7 +17,7 @@ class Layout extends Component {
     state = { visible: false };
 
     componentWillMount() {
-        const interval = process.env.NODE_ENV === 'production' && !process.env.TRAVIS ? 5000 : 2000;
+        const interval = process.env.NODE_ENV === 'production' ? 5000 : 2000;
         this.props.synchronizeInterval({ interval });
     }
 

@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 app.use('/', express.static(path.join(__dirname, publicPath, '/static')));
 app.use('/graphql', graphql);
 
-if (process.env.NODE_ENV !== 'production' || process.env.TRAVIS) {
+if (process.env.NODE_ENV !== 'production' || process.env.CI) {
     app.use('/test', test);
 }
 
