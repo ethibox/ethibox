@@ -1,3 +1,4 @@
+import dns from 'dns';
 import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 
@@ -32,6 +33,20 @@ export const isAuthenticate = (token) => {
         return true;
     } catch ({ message }) {
         return false;
+    }
+};
+
+export const checkDnsRecord = async (domainName, serverIp) => {
+    const dnsError = `DNS error, create a correct A record for your domain: ${domainName}. IN A ${serverIp}.`;
+    const domainNameIp = await new Promise((resolve, reject) => dns.lookup(domainName, (error, address) => {
+        if (error) {
+            reject(new Error(dnsError));
+        }
+        resolve(address);
+    }));
+
+    if (serverIp !== domainNameIp) {
+        throw new Error(dnsError);
     }
 };
 

@@ -5,7 +5,8 @@ import path from 'path';
 import compression from 'compression';
 import bodyParser from 'body-parser';
 import http from 'http';
-import api from './api';
+import graphql from './graphql';
+import test from './test';
 import './connector';
 
 const app = aa(express());
@@ -16,9 +17,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use('/', express.static(path.join(__dirname, publicPath, '/static')));
-app.use('/api', api);
-app.use('/packages/', express.static(path.join(__dirname, publicPath, '../charts/packages/')));
-app.use('/icons/', express.static(path.join(__dirname, publicPath, '../charts/charts/')));
+app.use('/graphql', graphql);
+
+if (process.env.NODE_ENV !== 'production' || process.env.CI) {
+    app.use('/test', test);
+}
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, publicPath, '/static/index.html')));
 

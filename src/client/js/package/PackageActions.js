@@ -1,1 +1,1 @@
-export const listPackages = packages => ({ type: 'LIST_PACKAGES', packages });
+export const loadPackages = packages => ({ type: 'LOAD_PACKAGES', packages });

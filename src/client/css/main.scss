@@ -74,12 +74,20 @@ a:hover {
 
 // DROPDOWN
 
-.ui.dropdown > .text {
+.ui.dropdown.icon > .text {
     display: none;
 }
 
 // CENTERED
 
-#root {
+#root, .pusher, .main {
     height: 100%;
+}
+
+// TOGGLE COLOR
+
+.ui.toggle.checkbox input:checked ~ label::before,
+.ui.toggle.checkbox input:focus:checked~.box:before,
+.ui.toggle.checkbox input:focus:checked~label:before {
+    background-color: teal !important
 }
