@@ -79,7 +79,7 @@ const resolvers = {
             try {
                 if (!context.req.user) return new Error('Not authorized');
 
-                if (process.env.NODE_ENV === 'production') {
+                if (process.env.NODE_ENV === 'production' && !process.env.CI) {
                     const serverIp = await publicIp();
                     await checkDnsRecord(domainName, serverIp);
                 }
