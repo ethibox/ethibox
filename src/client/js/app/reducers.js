@@ -19,7 +19,6 @@ const reducers = combineReducers({
     SettingsReducer,
     SubscribeReducer,
     SynchronizeReducer,
-    lastAction: (state = null, action) => action, // eslint-disable-line
 });
 
 export default reducers;
