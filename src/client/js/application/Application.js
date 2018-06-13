@@ -16,10 +16,10 @@ class Application extends React.Component {
             url = `https://${this.props.domainName}`;
         } else if (isIP(window.location.hostname)) {
             url = `http://${window.location.hostname}:${this.props.port}`;
-        } else if (this.props.ip) {
+        } else if (this.props.ip && this.props.port) {
             url = `http://${this.props.ip}:${this.props.port}`;
         } else {
-            url = 'https://ethibox.fr/404';
+            url = 'http://127.0.0.1';
         }
 
         return url;
@@ -114,8 +114,7 @@ class Application extends React.Component {
                 { this.props.state !== STATES.RUNNING && !this.props.error ?
                     <Dimmer active inverted>
                         <Loader style={{ textTransform: 'capitalize' }} indeterminate>{ this.props.state }...</Loader>
-                    </Dimmer> : null
-                }
+                    </Dimmer> : null }
                 <Card.Content>
                     <Card.Header>{this.props.releaseName}</Card.Header>
                     <Card.Meta>{this.props.category}</Card.Meta>
