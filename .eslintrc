@@ -15,14 +15,10 @@
       "import/no-extraneous-dependencies": [0]
   },
   "globals": {
-      "assert",
-      "browser",
-      "socket",
       "Stripe",
   },
   "env": {
-      "browser": true,
-      "mocha": true
+      "browser": true
   },
   "plugins": [
        "graphql"
