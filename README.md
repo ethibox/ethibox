@@ -21,7 +21,7 @@
 * [x] **Monetization System**: Become hoster and monetize your infrastrucutre.
 * [ ] **Better Domain Management**: Buy, import and renew yours domains.
 * [ ] **Automated Backup Management**: Backup your persistent storages automatically.
-* [ ] **Unlimit Storage**: Decentralize storage with SIA.
+* [ ] **Unlimited Storage**: Decentralize storage with SIA.
 * [ ] **VPN Support**: Configure public static IP to expose your applications behind NAT or firewall.
 * [ ] **TOR Support**: Access your applications on TOR network.
 * [ ] **Deploy Custom Packages**: Create and deploy custom packages easily.
