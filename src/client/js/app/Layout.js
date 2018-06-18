@@ -28,7 +28,7 @@ class Layout extends Component {
 
         return [
             <Sidebar as={Menu} animation="overlay" width="thin" visible={this.state.visible} icon="labeled" key="sidebar" vertical inverted>
-                { isDemoEnabled && <Label color="red" corner="right" floating={false}><div style={{ transform: 'rotate(45deg)', paddingLeft: 20 }}>Demo</div></Label> }
+                { isDemoEnabled && <Label color="red" corner="right" floating={false}><div style={{ transform: 'rotate(45deg)', marginLeft: 13, marginTop: 13 }}>Demo</div></Label> }
                 <Menu.Item header>
                     <img src={whiteLogo} style={{ margin: 'auto' }} alt="logo" /> Ethibox
                 </Menu.Item>
