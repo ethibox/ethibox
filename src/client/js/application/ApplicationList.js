@@ -8,7 +8,7 @@ const Empty = () => {
     return (
         <Container style={{ height: '100%' }}>
             <Grid verticalAlign="middle" style={{ height: '100%' }} centered stackable>
-                <Grid.Column style={{ maxWidth: 450, textAlign: 'center' }}>
+                <Grid.Column textAlign="center" style={{ maxWidth: 450 }}>
                     <Header as="h1" color="grey" icon>
                         <Icon name="cube" size="massive" />
                         No applications
