@@ -10,13 +10,14 @@ const TOKEN_PATH = `${process.env.TELEPRESENCE_ROOT || ''}/var/run/secrets/kuber
 const TOKEN = fs.existsSync(TOKEN_PATH) ? fs.readFileSync(TOKEN_PATH, 'utf8') : process.env.TOKEN;
 const KUBE_APISERVER_IP = process.env.KUBERNETES_SERVICE_HOST || process.env.KUBE_APISERVER_IP;
 const KUBE_APISERVER_ENDPOINT = process.env.KUBERNETES_SERVICE_HOST ? `https://${process.env.KUBERNETES_SERVICE_HOST}` : `https://${KUBE_APISERVER_IP}:8443`;
-const SWIFT_ENDPOINT = `${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/kube-system/services/http:swift-ethibox:9855/proxy`;
+const SWIFT_ENDPOINT = `${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/ethibox-system/services/http:swift-ethibox:9855/proxy`;
 const CHART_REPOSITORY = process.env.CHART_REPOSITORY || 'https://charts.ethibox.fr/packages/';
+const ETHIBOX_NAMESPACE = 'ethibox';
 
 const agent = new https.Agent({ rejectUnauthorized: false });
 
 const stateApplications = async () => {
-    const apps = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/default/pods/`, { headers: { Authorization: `Bearer ${TOKEN}` }, agent })
+    const apps = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/${ETHIBOX_NAMESPACE}/pods/`, { headers: { Authorization: `Bearer ${TOKEN}` }, agent })
         .then(checkStatus)
         .then(({ items }) => {
             if (!items.length) return [];
@@ -47,7 +48,7 @@ const stateApplications = async () => {
 };
 
 const listApplications = async () => {
-    const apps = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/default/services/?labelSelector=heritage=Tiller`, {
+    const apps = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/${ETHIBOX_NAMESPACE}/services/?labelSelector=heritage=Tiller`, {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
         agent,
     })
@@ -78,6 +79,7 @@ const installApplication = async (name, userId, releaseName) => {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
         body: JSON.stringify({
             chart_url: chartUrl,
+            namespace: ETHIBOX_NAMESPACE,
             values: { raw: JSON.stringify({ serviceType: 'NodePort' }) },
         }),
         agent,

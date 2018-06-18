@@ -21,7 +21,7 @@
 * [x] **Monetization System**: Become hoster and monetize your infrastrucutre.
 * [ ] **Better Domain Management**: Buy, import and renew yours domains.
 * [ ] **Automated Backup Management**: Backup your persistent storages automatically.
-* [ ] **Unlimit Storage**: Decentralize storage with SIA.
+* [ ] **Unlimited Storage**: Decentralize storage with SIA.
 * [ ] **VPN Support**: Configure public static IP to expose your applications behind NAT or firewall.
 * [ ] **TOR Support**: Access your applications on TOR network.
 * [ ] **Deploy Custom Packages**: Create and deploy custom packages easily.
@@ -31,16 +31,20 @@
 
 ### Requirements
 
-* [Kubernetes](https://github.com/kubernetes/kubernetes) - Production-Grade Container Scheduling and Management.
-* [Node.js](https://github.com/nodejs/node) - JavaScript runtime.
+* [Kubernetes v1.10 or higher](https://github.com/kubernetes/kubernetes) - Production-Grade Container Scheduling and Management.
+* [Node.js v8 or higher](https://github.com/nodejs/node) - JavaScript runtime.
+* +2GB of memory
+* +5GB of space
 
 ### Installation
 
 ```bash
-helm install --namespace kube-system --name ethibox https://charts.ethibox.fr/packages/ethibox-0.1.0.tgz
+helm install --name ethibox --namespace ethibox-system https://charts.ethibox.fr/packages/ethibox-0.1.0.tgz
 ```
 
 Go to `http://<IP-SERVER>:4444`
+
+> **Tip**: More detail on [Chart Repository](https://github.com/ston3o/charts/tree/master/charts/ethibox)
 
 ### Development
 

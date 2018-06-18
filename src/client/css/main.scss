@@ -1,20 +1,5 @@
 @import '~semantic-ui-css/semantic.min.css';
 
-// DEMO
-
-small.demo {
-    line-height: 1px;
-    font-size: 9px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    position: absolute;
-    padding: 6px 3px;
-    border-radius: 2px;
-    border: 1px solid red;
-    color: red;
-    margin-left: 2px;
-}
-
 // FORK
 
 .fork {
@@ -59,6 +44,7 @@ a:hover {
     }
 
     .ui.left.overlay.sidebar {
+        box-shadow: 0 0 20px rgba(34,36,38,.15);
         transform: translateZ(0);
         visibility: visible;
     }
