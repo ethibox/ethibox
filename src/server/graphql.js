@@ -136,7 +136,7 @@ const resolvers = {
             if (!await User.count({ where: { email } })) {
                 const ip = context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress;
                 const hashPassword = bcrypt.hashSync(password, 10);
-                const user = await User.create({ ip, email, password: hashPassword });
+                const user = await User.create({ ip, email, password: hashPassword, isAdmin: !await User.count() });
                 const payload = { userId: user.dataValues.id };
                 const token = jwt.sign(payload, secret, { expiresIn: tokenExpiration });
 

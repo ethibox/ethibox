@@ -66,4 +66,9 @@ app.put('/applications/:releaseName', async (req, res) => {
     return res.send('ok');
 });
 
+app.get('/users', async (req, res) => {
+    const users = await User.findAll();
+    return res.json(users);
+});
+
 export default app;
