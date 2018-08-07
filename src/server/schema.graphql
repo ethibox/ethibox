@@ -12,6 +12,8 @@ type Package {
     category: String
     description: String
     version: String
+    image: String
+    repositoryUrl: String
 }
 
 type Application {
@@ -34,6 +36,7 @@ type Settings {
     stripeSecretKey: String
     stripePlanName: String
     monthlyPrice: String
+    storeRepositoryUrl: String
 }
 
 type Query {
@@ -52,5 +55,5 @@ type Mutation {
     updatePassword(password: String!): User
     subscribe(stripeToken: String!): User
     unsubscribe: User
-    updateAdminSettings(isMonetizationEnabled: Boolean, stripeSecretKey: String, stripePublishableKey: String, stripePlanName: String): Settings
+    updateAdminSettings(storeRepositoryUrl: String, isMonetizationEnabled: Boolean, stripeSecretKey: String, stripePublishableKey: String, stripePlanName: String): Settings
 }
