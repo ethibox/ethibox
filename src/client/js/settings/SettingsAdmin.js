@@ -5,7 +5,7 @@ import { Input, Divider, Header, Form, Button, Radio } from 'semantic-ui-react';
 import { unsubscribe, updatePassword, updateAdminSettings } from './SettingsActions';
 
 class SettingsAdmin extends Component {
-    state = { stripeSecretKey: '', stripePublishableKey: '', stripePlanName: '', displayStripeForm: false };
+    state = { stripeSecretKey: '', stripePublishableKey: '', stripePlanName: '', displayStripeForm: false, storeRepositoryUrl: '' };
 
     componentWillMount() {
         this.setState({
@@ -13,6 +13,7 @@ class SettingsAdmin extends Component {
             stripePublishableKey: this.props.settings.stripePublishableKey || '',
             stripePlanName: this.props.settings.stripePlanName || '',
             displayStripeForm: this.props.settings.isMonetizationEnabled || false,
+            storeRepositoryUrl: this.props.settings.storeRepositoryUrl || '',
         });
     }
 
@@ -24,8 +25,8 @@ class SettingsAdmin extends Component {
 
     handleSubmit = (e) => {
         e.target.blur();
-        const { displayStripeForm, stripeSecretKey, stripePublishableKey, stripePlanName } = this.state;
-        this.props.updateAdminSettings({ isMonetizationEnabled: displayStripeForm, stripeSecretKey, stripePublishableKey, stripePlanName });
+        const { storeRepositoryUrl, displayStripeForm, stripeSecretKey, stripePublishableKey, stripePlanName } = this.state;
+        this.props.updateAdminSettings({ storeRepositoryUrl, isMonetizationEnabled: displayStripeForm, stripeSecretKey, stripePublishableKey, stripePlanName });
     }
 
     StripeForm = () => {
@@ -71,11 +72,23 @@ class SettingsAdmin extends Component {
     }
 
     render() {
-        const { displayStripeForm } = this.state;
+        const { displayStripeForm, storeRepositoryUrl } = this.state;
 
         return (
             <Form>
                 <Header dividing>Admin settings</Header>
+                <Form.Field
+                    control={Input}
+                    type="text"
+                    label="Store repository URL"
+                    placeholder="https://charts.ethibox.fr/packages.json"
+                    iconPosition="left"
+                    icon="sync"
+                    key="storeRepositoryUrl"
+                    name="storeRepositoryUrl"
+                    value={storeRepositoryUrl}
+                    onChange={this.handleChange}
+                />
                 <Form.Field label="Enable Monetization" className="monetization" onClick={this.toggleMonetization} control={Radio} checked={displayStripeForm} toggle />
                 { displayStripeForm && this.StripeForm() }
                 <Button onClick={this.handleSubmit} name="save">Save settings</Button>

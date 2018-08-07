@@ -41,6 +41,9 @@ export const Package = sequelize.define('package', {
     category: { type: Sequelize.STRING },
     description: { type: Sequelize.STRING },
     version: { type: Sequelize.STRING },
+    appVersion: { type: Sequelize.STRING },
+    image: { type: Sequelize.STRING },
+    repositoryUrl: { type: Sequelize.STRING },
 });
 
 Application.User = Application.belongsTo(User);
@@ -61,6 +64,7 @@ const initializeSettings = () => {
         { name: 'isMonetizationEnabled', value: false },
         { name: 'isDemoEnabled', value: false },
         { name: 'monthlyPrice', value: '$0' },
+        { name: 'storeRepositoryUrl', value: 'https://charts.ethibox.fr/packages.json' },
     ];
     settings.forEach(({ name, value }) => Settings.findOne({ where: { name } }).then((setting) => {
         if (!setting) {

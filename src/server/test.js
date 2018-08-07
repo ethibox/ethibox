@@ -71,4 +71,38 @@ app.get('/users', async (req, res) => {
     return res.json(users);
 });
 
+app.get('/packages', async (req, res) => {
+    const packages = await Package.findAll();
+    return res.json(packages);
+});
+
+app.get('/packages.json', async (req, res) => {
+    const packagesFile = {
+        packages: [
+            {
+                name: 'wordpress',
+                icon: 'https://charts.ethibox.fr/charts/wordpress/icon.png',
+                category: 'Blog',
+                description: 'WordPress is open source software you can use to create a beautiful website, blog, or app.',
+                version: '0.1.0',
+                appVersion: '4.9.1',
+                image: 'ethibox/wordpress',
+                repository_url: 'https://charts.ethibox.fr/',
+            },
+            {
+                name: 'etherpad',
+                icon: 'https://charts.ethibox.fr/charts/etherpad/icon.png',
+                category: 'Editor',
+                description: 'Real-time collaborative document editing.',
+                version: '0.1.0',
+                appVersion: 'stable',
+                image: 'ethibox/etherpad',
+                repository_url: 'https://charts.ethibox.fr/',
+            },
+        ],
+    };
+
+    return res.json(packagesFile);
+});
+
 export default app;
