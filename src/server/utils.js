@@ -60,6 +60,7 @@ export const synchronizeStore = async (storeRepositoryUrl) => {
     try {
         const res = await fetch(storeRepositoryUrl);
         const { packages } = (await res.json());
+        await Package.destroy({ where: {} });
         packages.forEach(async (pkg) => {
             if (!await Package.findOne({ where: { name: pkg.name }, raw: true })) {
                 Package.create(pkg);

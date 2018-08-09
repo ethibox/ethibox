@@ -41,7 +41,7 @@ describe('Settings page', () => {
         cy.contains('.error', 'Your password must be at least 6 characters');
     });
 
-    it('Should synchronize store', () => {
+    it('Should import store packages with packages.json file', () => {
         const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
         cy.visit('/settings', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
         cy.get('input[name="storeRepositoryUrl"]').type('http://localhost:3000/test/packages.json');
@@ -50,6 +50,14 @@ describe('Settings page', () => {
         cy.request('GET', '/test/packages').then((response) => {
             expect(response.body).to.have.lengthOf(2);
         });
+    });
+
+    it('Should no import bad packages.json file', () => {
+        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
+        cy.visit('/settings', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
+        cy.get('input[name="storeRepositoryUrl"]').type('http://bad-url.com/packages.json');
+        cy.get('button[name="save"]').click();
+        cy.contains('.modal', 'Invalid store repository URL');
     });
 
     it('Should enable monetization', () => {
