@@ -1,3 +1,4 @@
+import { synchronizeStore } from './utils';
 import Sequelize from 'sequelize';
 import os from 'os';
 import fs from 'fs';
@@ -56,7 +57,7 @@ Application.sync();
 Package.sync();
 Settings.sync();
 
-const initializeSettings = () => {
+const initializeSettings = async () => {
     const settings = [
         { name: 'stripeSecretKey' },
         { name: 'stripePublishableKey' },
@@ -66,11 +67,16 @@ const initializeSettings = () => {
         { name: 'monthlyPrice', value: '$0' },
         { name: 'storeRepositoryUrl', value: 'https://charts.ethibox.fr/packages.json' },
     ];
-    settings.forEach(({ name, value }) => Settings.findOne({ where: { name } }).then((setting) => {
-        if (!setting) {
-            Settings.create({ name, value });
+    await Promise.all(settings.map(async ({ name, value }) => {
+        if (!await Settings.findOne({ where: { name } })) {
+            await Settings.create({ name, value });
         }
     }));
+
+    const { storeRepositoryUrl } = await Settings.find({ attributes: [['value', 'storeRepositoryUrl']], where: { name: 'storeRepositoryUrl' }, raw: true });
+    await synchronizeStore(storeRepositoryUrl);
 };
 
-initializeSettings();
+(async () => {
+    await initializeSettings();
+})();
