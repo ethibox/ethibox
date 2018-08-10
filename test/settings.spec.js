@@ -11,6 +11,7 @@ describe('Settings page', () => {
             { name: 'isMonetizationEnabled', value: false },
             { name: 'isDemoEnabled', value: false },
             { name: 'monthlyPrice', value: 0 },
+            { name: 'storeRepositoryUrl', value: 'https://charts.ethibox.fr/packages.json' },
         ] });
     });
 
@@ -39,6 +40,25 @@ describe('Settings page', () => {
         cy.get('input[name="confirmPassword"]').type('new');
         cy.get('button[name="password"]').click();
         cy.contains('.error', 'Your password must be at least 6 characters');
+    });
+
+    it('Should import store packages with packages.json file', () => {
+        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
+        cy.visit('/settings', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
+        cy.get('input[name="storeRepositoryUrl"]').type('{selectall}{del}http://localhost:4444/test/packages.json');
+        cy.get('button[name="save"]').click();
+        cy.contains('.modal', 'Configuration updated!');
+        cy.request('GET', '/test/packages').then((response) => {
+            expect(response.body).to.have.lengthOf(2);
+        });
+    });
+
+    it('Should no import bad packages.json file', () => {
+        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
+        cy.visit('/settings', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
+        cy.get('input[name="storeRepositoryUrl"]').type('{selectall}{del}http://bad-url.com/packages.json');
+        cy.get('button[name="save"]').click();
+        cy.contains('.modal', 'Invalid store repository URL');
     });
 
     it('Should enable monetization', () => {

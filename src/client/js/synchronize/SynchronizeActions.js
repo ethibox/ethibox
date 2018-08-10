@@ -16,7 +16,7 @@ export const synchronize = ({ singleSync } = { singleSync: true }) => async (dis
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-access-token': localStorage.getItem('token') },
         body: JSON.stringify({ query: `{ 
-            settings { isDemoEnabled isMonetizationEnabled stripePublishableKey stripeSecretKey stripePlanName monthlyPrice }
+            settings { isDemoEnabled isMonetizationEnabled stripePublishableKey stripeSecretKey stripePlanName monthlyPrice storeRepositoryUrl }
             applications { name releaseName domainName category icon state ip port error }
             packages { name category icon }
             user { isAdmin isSubscribed }

@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 import os from 'os';
 import fs from 'fs';
+import { synchronizeStore } from './utils';
 
 const DB_FILE = 'db.sqlite';
 const DB_DIR = `${os.homedir()}/.ethibox/`;
@@ -41,19 +42,12 @@ export const Package = sequelize.define('package', {
     category: { type: Sequelize.STRING },
     description: { type: Sequelize.STRING },
     version: { type: Sequelize.STRING },
+    appVersion: { type: Sequelize.STRING },
+    image: { type: Sequelize.STRING },
+    repositoryUrl: { type: Sequelize.STRING },
 });
 
-Application.User = Application.belongsTo(User);
-User.Applications = User.hasMany(Application);
-Application.Package = Application.belongsTo(Package);
-Package.Applications = Package.hasMany(Application);
-
-User.sync();
-Application.sync();
-Package.sync();
-Settings.sync();
-
-const initializeSettings = () => {
+export const initializeSettings = async () => {
     const settings = [
         { name: 'stripeSecretKey' },
         { name: 'stripePublishableKey' },
@@ -61,12 +55,28 @@ const initializeSettings = () => {
         { name: 'isMonetizationEnabled', value: false },
         { name: 'isDemoEnabled', value: false },
         { name: 'monthlyPrice', value: '$0' },
+        { name: 'storeRepositoryUrl', value: 'https://charts.ethibox.fr/packages.json' },
     ];
-    settings.forEach(({ name, value }) => Settings.findOne({ where: { name } }).then((setting) => {
-        if (!setting) {
-            Settings.create({ name, value });
+    await Promise.all(settings.map(async ({ name, value }) => {
+        if (!await Settings.findOne({ where: { name } })) {
+            await Settings.create({ name, value });
         }
     }));
 };
 
-initializeSettings();
+(async () => {
+    Application.User = Application.belongsTo(User);
+    User.Applications = User.hasMany(Application);
+    Application.Package = Application.belongsTo(Package);
+    Package.Applications = Package.hasMany(Application);
+
+    User.sync();
+    Application.sync();
+    Package.sync();
+    Settings.sync();
+
+    await initializeSettings();
+
+    const { storeRepositoryUrl } = await Settings.find({ attributes: [['value', 'storeRepositoryUrl']], where: { name: 'storeRepositoryUrl' }, raw: true });
+    await synchronizeStore(storeRepositoryUrl);
+})();

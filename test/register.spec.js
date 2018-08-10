@@ -7,6 +7,7 @@ describe('Register Page', () => {
         cy.visit('/register', { onBeforeLoad: (win) => { win.fetch = null; } });
         cy.get('input[name="email"]').type('admin@ethibox.fr');
         cy.get('input[name="password"]').type('myp@ssw0rd{enter}');
+        cy.wait(500);
         cy.request('GET', '/test/users').then((response) => {
             expect(response.body[0]).to.have.property('isAdmin', true);
         });

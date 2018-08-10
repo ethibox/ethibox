@@ -9,7 +9,7 @@ import graphqlHTTP from 'express-graphql';
 import stripePackage from 'stripe';
 import { makeExecutableSchema } from 'graphql-tools';
 import { sequelize, Package, User, Settings, Application } from './models';
-import { isAuthenticate, secret, publicIp, checkDnsRecord, STATES, ACTIONS } from './utils';
+import { isAuthenticate, secret, publicIp, checkDnsRecord, synchronizeStore, STATES, ACTIONS } from './utils';
 
 const app = express();
 const tokenExpiration = '7d';
@@ -171,22 +171,22 @@ const resolvers = {
             if (!context.req.user.isAdmin) return new Error('Not authorized');
 
             try {
-                if (!new RegExp(/^sk_/).test(settings.stripeSecretKey)) {
-                    throw new Error('Invalid secret key');
+                if (settings.isMonetizationEnabled) {
+                    if (!new RegExp(/^sk_/).test(settings.stripeSecretKey)) {
+                        throw new Error('Invalid secret key');
+                    }
+
+                    if (!new RegExp(/^pk_/).test(settings.stripePublishableKey)) {
+                        throw new Error('Invalid publishable key');
+                    }
+
+                    const stripe = await stripePackage(settings.stripeSecretKey);
+                    const plan = await stripe.plans.retrieve(settings.stripePlanName);
+                    const { amount, currency } = plan;
+                    settings.monthlyPrice = (currency === 'eur') ? `${amount / 100}€` : `$${amount / 100}`;
                 }
 
-                if (!new RegExp(/^pk_/).test(settings.stripePublishableKey)) {
-                    throw new Error('Invalid publishable key');
-                }
-
-                if (!new RegExp(/^plan_/).test(settings.stripePlanName)) {
-                    throw new Error('Invalid plan name');
-                }
-
-                const stripe = await stripePackage(settings.stripeSecretKey);
-                const plan = await stripe.plans.retrieve(settings.stripePlanName);
-                const { amount, currency } = plan;
-                settings.monthlyPrice = (currency === 'eur') ? `${amount / 100}€` : `$${amount / 100}`;
+                await synchronizeStore(settings.storeRepositoryUrl);
 
                 Object.entries(settings)
                     .map(([name, value]) => ({ name, value }))

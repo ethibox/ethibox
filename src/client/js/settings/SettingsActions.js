@@ -57,6 +57,7 @@ export const updateAdminSettings = settings => async (dispatch) => {
         headers: { 'Content-Type': 'application/json', 'x-access-token': localStorage.getItem('token') },
         body: JSON.stringify({ query: `mutation {
             updateAdminSettings(
+                storeRepositoryUrl: "${settings.storeRepositoryUrl}",
                 isMonetizationEnabled: ${settings.isMonetizationEnabled},
                 stripeSecretKey: "${settings.stripeSecretKey}",
                 stripePublishableKey: "${settings.stripePublishableKey}"

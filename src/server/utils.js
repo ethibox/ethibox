@@ -1,6 +1,7 @@
 import dns from 'dns';
 import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
+import { Package } from './models';
 
 export const secret = process.env.SECRET || 'mysecret';
 
@@ -53,6 +54,22 @@ export const checkDnsRecord = async (domainName, serverIp) => {
 export const publicIp = async () => {
     const ip = await fetch('http://ipinfo.io/ip', { headers: { 'User-Agent': 'curl/7.37.1' } });
     return (await ip.text()).trim();
+};
+
+export const synchronizeStore = async (storeRepositoryUrl) => {
+    try {
+        const res = await fetch(storeRepositoryUrl);
+        const { packages } = (await res.json());
+        await Package.destroy({ where: {} });
+        packages.forEach(async (pkg) => {
+            if (!await Package.findOne({ where: { name: pkg.name }, raw: true })) {
+                Package.create(pkg);
+            }
+            Package.update(pkg, { where: { name: pkg.name } });
+        });
+    } catch (e) {
+        throw new Error('Invalid store repository URL');
+    }
 };
 
 export const STATES = {
