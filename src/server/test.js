@@ -50,6 +50,7 @@ app.get('/reset', async (req, res) => {
 
     Settings.destroy({ force: true, truncate: true, cascade: true });
     sequelize.query('UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME="settings";');
+
     return res.send('ok');
 });
 

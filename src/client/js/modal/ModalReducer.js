@@ -1,4 +1,4 @@
-const initialState = { isOpen: false, hasErrored: false, title: '', errorMessage: '', successMessage: '' };
+const initialState = { isOpen: false, hasErrored: false, title: '', errorMessage: '', successMessage: '', redirectUrl: '' };
 
 export default (state = initialState, action) => {
     switch (action.type) {
