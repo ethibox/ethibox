@@ -11,7 +11,7 @@ describe('Store Page', () => {
         cy.visit('/login', { onBeforeLoad: (win) => { win.fetch = null; } });
         cy.get('input[name="email"]').type('contact@ethibox.fr');
         cy.get('input[name="password"]').type('myp@ssw0rd{enter}');
-        cy.get('.item[href="/store"]').click();
+        cy.get('.item[href="/store"]').click({ force: true });
         cy.get('.cards .card:last-child .header').contains('owncloud');
     });
 

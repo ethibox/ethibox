@@ -82,8 +82,6 @@ class SettingsAdmin extends Component {
                     type="text"
                     label="Store repository URL"
                     placeholder="https://charts.ethibox.fr/packages.json"
-                    iconPosition="left"
-                    icon="sync"
                     key="storeRepositoryUrl"
                     name="storeRepositoryUrl"
                     value={storeRepositoryUrl}

@@ -1,7 +1,7 @@
-import { synchronizeStore } from './utils';
 import Sequelize from 'sequelize';
 import os from 'os';
 import fs from 'fs';
+import { synchronizeStore } from './utils';
 
 const DB_FILE = 'db.sqlite';
 const DB_DIR = `${os.homedir()}/.ethibox/`;
@@ -47,17 +47,7 @@ export const Package = sequelize.define('package', {
     repositoryUrl: { type: Sequelize.STRING },
 });
 
-Application.User = Application.belongsTo(User);
-User.Applications = User.hasMany(Application);
-Application.Package = Application.belongsTo(Package);
-Package.Applications = Package.hasMany(Application);
-
-User.sync();
-Application.sync();
-Package.sync();
-Settings.sync();
-
-const initializeSettings = async () => {
+export const initializeSettings = async () => {
     const settings = [
         { name: 'stripeSecretKey' },
         { name: 'stripePublishableKey' },
@@ -72,11 +62,21 @@ const initializeSettings = async () => {
             await Settings.create({ name, value });
         }
     }));
-
-    const { storeRepositoryUrl } = await Settings.find({ attributes: [['value', 'storeRepositoryUrl']], where: { name: 'storeRepositoryUrl' }, raw: true });
-    await synchronizeStore(storeRepositoryUrl);
 };
 
 (async () => {
+    Application.User = Application.belongsTo(User);
+    User.Applications = User.hasMany(Application);
+    Application.Package = Application.belongsTo(Package);
+    Package.Applications = Package.hasMany(Application);
+
+    User.sync();
+    Application.sync();
+    Package.sync();
+    Settings.sync();
+
     await initializeSettings();
+
+    const { storeRepositoryUrl } = await Settings.find({ attributes: [['value', 'storeRepositoryUrl']], where: { name: 'storeRepositoryUrl' }, raw: true });
+    await synchronizeStore(storeRepositoryUrl);
 })();
