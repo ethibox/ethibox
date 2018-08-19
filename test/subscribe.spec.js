@@ -8,7 +8,7 @@ describe('Subscribe', () => {
         cy.request('POST', '/test/packages', { packages: [{ name: 'etherpad', category: 'Editor' }, { name: 'owncloud', category: 'Storage' }] });
 
         const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/store', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
+        cy.visit('/store', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
         cy.get('.cards .card:first-child .buttons').click();
         cy.get('.cards .card:first-child input').type('myapp{enter}');
         cy.wait(1000);
@@ -22,7 +22,7 @@ describe('Subscribe', () => {
         cy.request('POST', '/test/packages', { packages: [{ name: 'etherpad', category: 'Editor' }, { name: 'owncloud', category: 'Storage' }] });
 
         const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/store', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
+        cy.visit('/store', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
         cy.get('.cards .card:first-child .buttons').click();
         cy.get('.cards .card:first-child input').type('myapp{enter}');
         cy.get('.cards .card:first-child .header').contains('myapp');
@@ -40,7 +40,7 @@ describe('Subscribe', () => {
         ] });
 
         const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/subscribe', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
+        cy.visit('/subscribe', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
         cy.get('.message.error').should('not.be.visible');
         cy.get('input[name="name"]').type('John Doe');
         cy.get('input[name="number"]').type('4242 4242 4242 4242');
@@ -59,7 +59,7 @@ describe('Subscribe', () => {
         cy.request('POST', '/test/settings', { settings: [{ name: 'isMonetizationEnabled', value: true }] });
 
         const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/settings', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
+        cy.visit('/settings', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
         cy.get('.checkbox').click();
         cy.get('.modal button.positive').click();
         cy.get('.modal').contains('Unsubscribe successfull');
@@ -72,7 +72,7 @@ describe('Subscribe', () => {
         cy.request('POST', '/test/settings', { settings: [{ name: 'isMonetizationEnabled', value: false }] });
 
         const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/subscribe', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
+        cy.visit('/subscribe', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
         cy.contains('.form .message.error', 'Monetization is not activated');
     });
 
@@ -85,7 +85,7 @@ describe('Subscribe', () => {
         ] });
 
         const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/subscribe', { onBeforeLoad: (win) => { win.fetch = null; win.localStorage.setItem('token', token); } });
+        cy.visit('/subscribe', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
         cy.get('.message').contains('Bad stripe publishable key');
     });
 

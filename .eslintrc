@@ -18,9 +18,11 @@
       "Stripe",
   },
   "env": {
-      "browser": true
+      "browser": true,
+      "jest/globals": true
   },
   "plugins": [
-       "graphql"
+       "graphql",
+        "jest"
   ]
 }

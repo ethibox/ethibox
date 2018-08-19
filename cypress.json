@@ -1,7 +1,7 @@
 {
     "fixturesFolder": false,
     "pluginsFile": false,
-    "supportFile": false,
+    "supportFile": "test/support.js",
     "video": false,
     "defaultCommandTimeout": 10000,
     "requestTimeout": 10000,
