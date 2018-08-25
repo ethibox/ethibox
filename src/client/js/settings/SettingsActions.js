@@ -11,7 +11,7 @@ export const loadSettings = () => async (dispatch) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-access-token': localStorage.getItem('token') },
         body: JSON.stringify({ query: `{ 
-            settings { isDemoEnabled isMonetizationEnabled stripePublishableKey stripeSecretKey monthlyPrice stripePlanName }
+            settings { orchestratorName orchestratorEndpoint orchestratorToken isDemoEnabled isMonetizationEnabled stripePublishableKey stripeSecretKey monthlyPrice stripePlanName }
             user { isAdmin isSubscribed }
         }` }),
     })
@@ -57,11 +57,16 @@ export const updateAdminSettings = settings => async (dispatch) => {
         headers: { 'Content-Type': 'application/json', 'x-access-token': localStorage.getItem('token') },
         body: JSON.stringify({ query: `mutation {
             updateAdminSettings(
-                storeRepositoryUrl: "${settings.storeRepositoryUrl}",
-                isMonetizationEnabled: ${settings.isMonetizationEnabled},
-                stripeSecretKey: "${settings.stripeSecretKey}",
-                stripePublishableKey: "${settings.stripePublishableKey}"
-                stripePlanName: "${settings.stripePlanName}") { isMonetizationEnabled }
+                settings: {
+                    orchestratorName: "${settings.orchestratorName}",
+                    orchestratorEndpoint: "${settings.orchestratorEndpoint}",
+                    orchestratorToken: "${settings.orchestratorToken}",
+                    storeRepositoryUrl: "${settings.storeRepositoryUrl}",
+                    isMonetizationEnabled: ${settings.isMonetizationEnabled},
+                    stripeSecretKey: "${settings.stripeSecretKey}",
+                    stripePublishableKey: "${settings.stripePublishableKey}"
+                    stripePlanName: "${settings.stripePlanName}"
+                }) { isMonetizationEnabled }
         }` }),
     })
         .then(checkStatus)

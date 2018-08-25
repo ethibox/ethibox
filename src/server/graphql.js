@@ -1,4 +1,5 @@
 import path from 'path';
+import url from 'url';
 import fs from 'fs';
 import express from 'express';
 import jwt from 'jsonwebtoken';
@@ -9,7 +10,7 @@ import graphqlHTTP from 'express-graphql';
 import stripePackage from 'stripe';
 import { makeExecutableSchema } from 'graphql-tools';
 import { sequelize, Package, User, Settings, Application } from './models';
-import { isAuthenticate, secret, publicIp, checkDnsRecord, synchronizeStore, STATES, ACTIONS } from './utils';
+import { isAuthenticate, secret, publicIp, checkDnsRecord, synchronizeStore, getSettings, checkOrchestratorConnection, STATES, ACTIONS } from './utils';
 
 const app = express();
 const tokenExpiration = '7d';
@@ -19,12 +20,14 @@ const resolvers = {
         applications: async (_, args, context) => {
             if (!context.req.user) return new Error('Not authorized');
             const { id } = context.req.user;
+            const { orchestratorIp } = context.req.settings;
 
-            const apps = await sequelize.query(`SELECT releaseName, domainName, state, port, error, name, category, package.icon icon, applications.ip ip
+            const apps = await sequelize.query(`SELECT releaseName, domainName, state, port, error, name, category, package.icon icon
                FROM applications
                LEFT JOIN packages AS package ON applications.packageId = package.id
                INNER JOIN users AS user ON applications.userId = user.id AND user.id = ?`, { replacements: [id], type: sequelize.QueryTypes.SELECT });
-            return apps;
+
+            return apps.map(application => ({ ...application, ip: orchestratorIp }));
         },
         user: async (_, __, context) => {
             if (!context.req.user) return new Error('Not authorized');
@@ -32,12 +35,24 @@ const resolvers = {
         },
         settings: async (_, args, context) => {
             if (!context.req.user) return new Error('Not authorized');
-            const settings = {};
+            const { settings } = context.req;
 
-            const data = await Settings.findAll({ attributes: ['name', 'value'], raw: true });
-            data.forEach((param) => {
-                settings[param.name] = (['0', '1'].includes(param.value)) ? param.value == true : param.value; // eslint-disable-line
-            });
+            settings.isOrchestratorConfigMissing = !(
+                settings.orchestratorName &&
+                settings.orchestratorEndpoint &&
+                settings.orchestratorToken
+            );
+
+            if (!context.req.user.isAdmin) {
+                return {
+                    isOrchestratorOnline: settings.isOrchestratorOnline,
+                    isOrchestratorConfigMissing: settings.isOrchestratorConfigMissing,
+                    isDemoEnabled: settings.isDemoEnabled,
+                    isMonetizationEnabled: settings.isMonetizationEnabled,
+                    stripePublishableKey: settings.stripePublishableKey,
+                    monthlyPrice: settings.monthlyPrice,
+                };
+            }
 
             return settings;
         },
@@ -49,8 +64,11 @@ const resolvers = {
     Mutation: {
         installApplication: async (_, { name, releaseName }, context) => {
             try {
-                if (!context.req.user) return new Error('Not authorized');
-                if (context.req.isMonetizationEnabled && !context.req.user.isSubscribed) return new Error('Subscription is required');
+                const { isMonetizationEnabled, isOrchestratorOnline } = context.req.settings;
+
+                if (!context.req.user) throw new Error('Not authorized');
+                if (isMonetizationEnabled && !context.req.user.isSubscribed) throw new Error('Subscription is required');
+                if (!isOrchestratorOnline) throw new Error('Orchestrator connection failed!');
 
                 const pkg = await Package.findOne({ where: { name } });
                 const { user } = context.req;
@@ -67,8 +85,11 @@ const resolvers = {
         },
         uninstallApplication: async (_, { releaseName }, context) => {
             try {
-                if (!context.req.user) return new Error('Not authorized');
-                Application.update({ state: STATES.UNINSTALLING, action: ACTIONS.UNINSTALL }, { where: { releaseName } });
+                if (!context.req.user) throw new Error('Not authorized');
+                if (!context.req.settings.isOrchestratorOnline) throw new Error('Orchestrator connection failed!');
+
+                const application = await Application.find({ where: { releaseName } });
+                application.update({ state: STATES.UNINSTALLING, action: ACTIONS.UNINSTALL });
 
                 return { releaseName };
             } catch ({ message }) {
@@ -77,7 +98,8 @@ const resolvers = {
         },
         editDomainNameApplication: async (_, { releaseName, domainName }, context) => {
             try {
-                if (!context.req.user) return new Error('Not authorized');
+                if (!context.req.user) throw new Error('Not authorized');
+                if (!context.req.settings.isOrchestratorOnline) throw new Error('Orchestrator connection failed!');
 
                 if (process.env.NODE_ENV === 'production' && !process.env.CI) {
                     const serverIp = await publicIp();
@@ -93,9 +115,8 @@ const resolvers = {
         },
         subscribe: async (_, { stripeToken }, context) => {
             try {
-                if (!context.req.user) return new Error('Not authorized');
-                const { stripePlanName } = await Settings.find({ attributes: [['value', 'stripePlanName']], where: { name: 'stripePlanName' }, raw: true });
-                const { stripeSecretKey } = await Settings.find({ attributes: [['value', 'stripeSecretKey']], where: { name: 'stripeSecretKey' }, raw: true });
+                if (!context.req.user) throw new Error('Not authorized');
+                const { stripePlanName, stripeSecretKey } = context.req.settings;
 
                 const stripe = stripePackage(stripeSecretKey);
                 const { id, email } = context.req.user;
@@ -135,12 +156,13 @@ const resolvers = {
 
             if (!await User.count({ where: { email } })) {
                 const ip = context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress;
+                const isAdmin = !await User.count();
                 const hashPassword = bcrypt.hashSync(password, 10);
-                const user = await User.create({ ip, email, password: hashPassword, isAdmin: !await User.count() });
+                const user = await User.create({ ip, email, password: hashPassword, isAdmin });
                 const payload = { userId: user.dataValues.id };
                 const token = jwt.sign(payload, secret, { expiresIn: tokenExpiration });
 
-                return { token };
+                return { token, isAdmin };
             }
 
             throw new Error('User already exist');
@@ -167,11 +189,13 @@ const resolvers = {
             await User.update({ password: hashPassword }, { where: { id } });
             return id;
         },
-        updateAdminSettings: async (_, settings, context) => {
-            if (!context.req.user.isAdmin) return new Error('Not authorized');
-
+        updateAdminSettings: async (_, { settings }, context) => {
             try {
-                if (settings.isMonetizationEnabled) {
+                if (!context.req.user.isAdmin) throw new Error('Not authorized');
+                const { disableOrchestratorCheck } = context.req.settings;
+                const { isMonetizationEnabled, orchestratorEndpoint, orchestratorToken, storeRepositoryUrl } = settings;
+
+                if (isMonetizationEnabled) {
                     if (!new RegExp(/^sk_/).test(settings.stripeSecretKey)) {
                         throw new Error('Invalid secret key');
                     }
@@ -186,16 +210,32 @@ const resolvers = {
                     settings.monthlyPrice = (currency === 'eur') ? `${amount / 100}€` : `$${amount / 100}`;
                 }
 
-                await synchronizeStore(settings.storeRepositoryUrl);
+                if (storeRepositoryUrl) {
+                    await synchronizeStore(storeRepositoryUrl);
+                }
+
+                if (orchestratorEndpoint && orchestratorToken) {
+                    settings.orchestratorIp = url.parse(orchestratorEndpoint).hostname;
+
+                    if (!disableOrchestratorCheck) {
+                        settings.isOrchestratorOnline = await checkOrchestratorConnection(orchestratorEndpoint, orchestratorToken);
+                    } else {
+                        settings.isOrchestratorOnline = true;
+                    }
+
+                    if (!settings.isOrchestratorOnline) {
+                        throw new Error('Orchestrator connection failed!');
+                    }
+                }
 
                 Object.entries(settings)
                     .map(([name, value]) => ({ name, value }))
                     .forEach(setting => Settings.update(setting, { where: { name: setting.name } }));
+
+                return settings;
             } catch ({ message }) {
                 return new Error(message);
             }
-
-            return settings;
         },
     },
 };
@@ -209,13 +249,7 @@ app.use('/', async (req, res, next) => {
         req.user = await User.findOne({ where: { id: userId } }) || false;
     }
 
-    const { isMonetizationEnabled } = await Settings.findOne({
-        attributes: [['value', 'isMonetizationEnabled']],
-        where: { name: 'isMonetizationEnabled' },
-        raw: true,
-    }) || false;
-
-    req.isMonetizationEnabled = (isMonetizationEnabled == true); // eslint-disable-line
+    req.settings = await getSettings();
 
     return next();
 });

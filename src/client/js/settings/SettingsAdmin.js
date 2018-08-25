@@ -1,32 +1,32 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Input, Divider, Header, Form, Button, Radio } from 'semantic-ui-react';
+import { Dropdown, Input, Divider, Header, Form, Button, Radio } from 'semantic-ui-react';
 import { unsubscribe, updatePassword, updateAdminSettings } from './SettingsActions';
 
 class SettingsAdmin extends Component {
-    state = { stripeSecretKey: '', stripePublishableKey: '', stripePlanName: '', displayStripeForm: false, storeRepositoryUrl: '' };
-
     componentWillMount() {
         this.setState({
             stripeSecretKey: this.props.settings.stripeSecretKey || '',
             stripePublishableKey: this.props.settings.stripePublishableKey || '',
             stripePlanName: this.props.settings.stripePlanName || '',
-            displayStripeForm: this.props.settings.isMonetizationEnabled || false,
+            isMonetizationEnabled: this.props.settings.isMonetizationEnabled || false,
             storeRepositoryUrl: this.props.settings.storeRepositoryUrl || '',
+            orchestratorName: this.props.settings.orchestratorName || 'kubernetes',
+            orchestratorToken: this.props.settings.orchestratorToken || '',
+            orchestratorEndpoint: this.props.settings.orchestratorEndpoint || '',
         });
     }
 
-    handleChange = e => this.setState({ [e.target.name]: e.target.value });
+    handleChange = (e, { name, value }) => this.setState({ [name]: value })
 
     toggleMonetization = (e, { checked }) => {
-        this.setState({ displayStripeForm: checked });
+        this.setState({ isMonetizationEnabled: checked });
     }
 
     handleSubmit = (e) => {
         e.target.blur();
-        const { storeRepositoryUrl, displayStripeForm, stripeSecretKey, stripePublishableKey, stripePlanName } = this.state;
-        this.props.updateAdminSettings({ storeRepositoryUrl, isMonetizationEnabled: displayStripeForm, stripeSecretKey, stripePublishableKey, stripePlanName });
+        this.props.updateAdminSettings(this.state);
     }
 
     StripeForm = () => {
@@ -71,24 +71,69 @@ class SettingsAdmin extends Component {
         ];
     }
 
+    orchestratorForm = () => {
+        const { storeRepositoryUrl, orchestratorName, orchestratorToken, orchestratorEndpoint } = this.state;
+        const orchestrators = [{ text: 'Kubernetes', value: 'kubernetes' }, { text: 'Docker Swarm', value: 'swarm' }];
+
+        return [
+            <Form.Field
+                label="Orchestrator"
+                placeholder="Kubernetes"
+                control={Dropdown}
+                name="orchestratorName"
+                key="orchestratorName"
+                options={orchestrators}
+                value={orchestratorName}
+                onChange={this.handleChange}
+                fluid
+                selection
+            />,
+            <Form.Input
+                icon="plug"
+                iconPosition="left"
+                type="text"
+                label="Orchestrator Endpoint"
+                placeholder="https://192.168.99.100:8443"
+                name="orchestratorEndpoint"
+                key="orchestratorEndpoint"
+                value={orchestratorEndpoint}
+                onChange={this.handleChange}
+            />,
+            <Form.Input
+                icon="key"
+                iconPosition="left"
+                type="text"
+                label="Orchestrator Token"
+                placeholder="eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aW"
+                name="orchestratorToken"
+                key="orchestratorToken"
+                value={orchestratorToken}
+                onChange={this.handleChange}
+            />,
+            <Form.Field
+                control={Input}
+                type="text"
+                label="Store repository URL"
+                iconPosition="left"
+                icon="linkify"
+                placeholder="https://store.ethibox.fr/apps.json"
+                key="storeRepositoryUrl"
+                name="storeRepositoryUrl"
+                value={storeRepositoryUrl}
+                onChange={this.handleChange}
+            />,
+        ];
+    }
+
     render() {
-        const { displayStripeForm, storeRepositoryUrl } = this.state;
+        const { isMonetizationEnabled } = this.state;
 
         return (
             <Form>
                 <Header dividing>Admin settings</Header>
-                <Form.Field
-                    control={Input}
-                    type="text"
-                    label="Store repository URL"
-                    placeholder="https://charts.ethibox.fr/packages.json"
-                    key="storeRepositoryUrl"
-                    name="storeRepositoryUrl"
-                    value={storeRepositoryUrl}
-                    onChange={this.handleChange}
-                />
-                <Form.Field label="Enable Monetization" className="monetization" onClick={this.toggleMonetization} control={Radio} checked={displayStripeForm} toggle />
-                { displayStripeForm && this.StripeForm() }
+                { this.orchestratorForm() }
+                <Form.Field label="Enable Monetization" className="monetization" onClick={this.toggleMonetization} control={Radio} checked={isMonetizationEnabled} toggle />
+                { isMonetizationEnabled && this.StripeForm() }
                 <Button onClick={this.handleSubmit} name="save">Save settings</Button>
                 <Divider hidden />
             </Form>

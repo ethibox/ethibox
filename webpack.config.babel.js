@@ -85,7 +85,7 @@ const config = {
 
 if (env === 'development') {
     config.plugins.push(
-        new BrowserSyncPlugin({ proxy: `http://0.0.0.0:${port}` }),
+        new BrowserSyncPlugin({ proxy: `http://0.0.0.0:${port}`, open: false }),
         new BundleAnalyzerPlugin({ openAnalyzer: false, defaultSizes: 'gzip', analyzerMode: 'static' }),
     );
 }

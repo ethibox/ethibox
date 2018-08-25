@@ -13,6 +13,7 @@ describe('Settings page', () => {
             { name: 'monthlyPrice', value: 0 },
             { name: 'storeRepositoryUrl', value: 'https://charts.ethibox.fr/apps.json' },
             { name: 'disableOrchestratorCheck', value: true },
+            { name: 'isOrchestratorOnline', value: true },
         ] });
     });
 

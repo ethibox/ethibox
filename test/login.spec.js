@@ -17,19 +17,19 @@ describe('Login Page', () => {
         cy.visit('/login');
         cy.get('input[name="email"]').type('contact@ethibox.fr');
         cy.get('input[name="password"]').type('myp@ssw0rd{enter}');
-        cy.get('.menu').contains('Logout');
+        cy.contains('.menu', 'Logout');
     });
 
     it('Should not sign in an user with bad secret token', () => {
         const token = jwt.sign({ userId: 1 }, 'badsecret', { expiresIn: '1d' });
         cy.visit('/', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('.ui-alerts').contains('Not authorized!');
+        cy.contains('.ui-alerts', 'Not authorized!');
         cy.url().should('contain', '/login');
     });
 
     it('Should not sign in an user with bad token', () => {
         const token = 'badtoken';
         cy.visit('/', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('.message').contains('New to us?');
+        cy.contains('.message', 'New to us?');
     });
 });

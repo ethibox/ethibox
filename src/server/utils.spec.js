@@ -1,5 +1,5 @@
 import fetchMock from 'fetch-mock';
-import { checkOrchestratorConnection } from './connector';
+import { checkOrchestratorConnection } from './utils';
 
 test('Check orchestrator connection', async () => {
     const orchestratorEndpoint = 'https://192.168.99.100:8443';

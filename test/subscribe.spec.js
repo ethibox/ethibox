@@ -18,7 +18,11 @@ describe('Subscribe', () => {
     it('Should give applications access if user is subscribed and monetization is enabled', () => {
         cy.request('GET', '/test/reset');
         cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd', isSubscribed: true }] });
-        cy.request('POST', '/test/settings', { settings: [{ name: 'isMonetizationEnabled', value: true }] });
+        cy.request('POST', '/test/settings', { settings: [
+            { name: 'isOrchestratorOnline', value: true },
+            { name: 'disableOrchestratorSync', value: true },
+            { name: 'isMonetizationEnabled', value: true },
+        ] });
         cy.request('POST', '/test/packages', { packages: [{ name: 'etherpad', category: 'Editor' }, { name: 'owncloud', category: 'Storage' }] });
 
         const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });

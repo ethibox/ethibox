@@ -1,10 +1,9 @@
 import Sequelize from 'sequelize';
-import os from 'os';
 import fs from 'fs';
-import { synchronizeStore } from './utils';
+import { synchronizeStore, getSettings } from './utils';
 
 const DB_FILE = 'db.sqlite';
-const DB_DIR = `${os.homedir()}/.ethibox/`;
+const DB_DIR = 'data/';
 const DB_PATH = `${DB_DIR}/${DB_FILE}`;
 
 if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR);
@@ -31,7 +30,6 @@ export const Application = sequelize.define('application', {
     domainName: { type: Sequelize.STRING },
     state: { type: Sequelize.STRING },
     action: { type: Sequelize.STRING },
-    ip: { type: Sequelize.STRING },
     port: { type: Sequelize.STRING },
     error: { type: Sequelize.STRING },
 });
@@ -40,22 +38,23 @@ export const Package = sequelize.define('package', {
     name: { type: Sequelize.STRING },
     icon: { type: Sequelize.STRING },
     category: { type: Sequelize.STRING },
-    description: { type: Sequelize.STRING },
-    version: { type: Sequelize.STRING },
-    appVersion: { type: Sequelize.STRING },
-    image: { type: Sequelize.STRING },
-    repositoryUrl: { type: Sequelize.STRING },
+    stackFileUrl: { type: Sequelize.STRING },
 });
 
 export const initializeSettings = async () => {
     const settings = [
+        { name: 'orchestratorName' },
+        { name: 'orchestratorEndpoint' },
+        { name: 'orchestratorToken' },
+        { name: 'orchestratorIp' },
+        { name: 'isOrchestratorOnline', value: false },
         { name: 'stripeSecretKey' },
         { name: 'stripePublishableKey' },
         { name: 'stripePlanName' },
         { name: 'isMonetizationEnabled', value: false },
         { name: 'isDemoEnabled', value: false },
         { name: 'monthlyPrice', value: '$0' },
-        { name: 'storeRepositoryUrl', value: 'https://charts.ethibox.fr/packages.json' },
+        { name: 'storeRepositoryUrl', value: 'https://charts.ethibox.fr/apps.json' },
     ];
     await Promise.all(settings.map(async ({ name, value }) => {
         if (!await Settings.findOne({ where: { name } })) {
@@ -77,6 +76,6 @@ export const initializeSettings = async () => {
 
     await initializeSettings();
 
-    const { storeRepositoryUrl } = await Settings.find({ attributes: [['value', 'storeRepositoryUrl']], where: { name: 'storeRepositoryUrl' }, raw: true });
+    const { storeRepositoryUrl } = await getSettings();
     await synchronizeStore(storeRepositoryUrl);
 })();
