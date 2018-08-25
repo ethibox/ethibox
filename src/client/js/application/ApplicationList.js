@@ -25,9 +25,12 @@ const Empty = () => {
 
 const ApplicationList = (props) => {
     const applications = props.applications.sort((a, b) => a.releaseName.localeCompare(b.releaseName));
-    return applications.length ?
-        <Card.Group itemsPerRow={4} stackable>{applications.map(app => <Application {...app} key={app.releaseName} />)}</Card.Group>
-        : <Empty />;
+
+    if (!applications.length) {
+        return <Empty />;
+    }
+
+    return <Card.Group itemsPerRow={4} stackable>{applications.map(app => <Application {...app} key={app.releaseName} />)}</Card.Group>;
 };
 
 ApplicationList.defaultProps = { applications: [] };

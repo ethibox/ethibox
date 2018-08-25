@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Input, Dropdown, Modal, Header, Card, Image, Button, Icon, Dimmer, Loader } from 'semantic-ui-react';
-import { isFQDN, isIP } from 'validator';
+import { isFQDN } from 'validator';
 import { uninstallApplication, editDomainNameApplication } from '../application/ApplicationActions';
 import { STATES, ACTIONS } from '../utils';
 
@@ -13,13 +13,9 @@ class Application extends React.Component {
         let url;
 
         if (this.props.domainName) {
-            url = `https://${this.props.domainName}`;
-        } else if (isIP(window.location.hostname)) {
-            url = `http://${window.location.hostname}:${this.props.port}`;
+            url = `http://${this.props.domainName}`;
         } else if (this.props.ip && this.props.port) {
             url = `http://${this.props.ip}:${this.props.port}`;
-        } else {
-            url = 'http://127.0.0.1';
         }
 
         return url;
@@ -59,9 +55,7 @@ class Application extends React.Component {
                 {
                     state === STATES.RUNNING &&
                     <Card.Meta>
-                        <a href={url} target="_blank">
-                            <Icon name="external" /> {url}
-                        </a>
+                        { url && <a href={url} target="_blank" rel="noopener noreferrer"><Icon name="external" /> {url}</a> }
                     </Card.Meta>
                 }
                 {
