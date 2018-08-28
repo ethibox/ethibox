@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Dropdown, Input, Divider, Header, Form, Button, Radio } from 'semantic-ui-react';
+import { Icon, Message, Dropdown, Input, Divider, Header, Form, Button, Radio } from 'semantic-ui-react';
 import { unsubscribe, updatePassword, updateAdminSettings } from './SettingsActions';
 
 class SettingsAdmin extends Component {
@@ -12,7 +12,7 @@ class SettingsAdmin extends Component {
             stripePlanName: this.props.settings.stripePlanName || '',
             isMonetizationEnabled: this.props.settings.isMonetizationEnabled || false,
             storeRepositoryUrl: this.props.settings.storeRepositoryUrl || '',
-            orchestratorName: this.props.settings.orchestratorName || 'kubernetes',
+            orchestratorName: this.props.settings.orchestratorName || '',
             orchestratorToken: this.props.settings.orchestratorToken || '',
             orchestratorEndpoint: this.props.settings.orchestratorEndpoint || '',
         });
@@ -76,6 +76,7 @@ class SettingsAdmin extends Component {
         const orchestrators = [{ text: 'Kubernetes', value: 'kubernetes' }, { text: 'Docker Swarm', value: 'swarm' }];
 
         return [
+            orchestratorName === 'swarm' && <Message key="message" info><Icon name="info" />Docker Swarm is not available for the moment. Coming soon!</Message>,
             <Form.Field
                 label="Orchestrator"
                 placeholder="Kubernetes"
@@ -88,22 +89,22 @@ class SettingsAdmin extends Component {
                 fluid
                 selection
             />,
-            <Form.Input
+            orchestratorName === 'kubernetes' && <Form.Input
                 icon="plug"
                 iconPosition="left"
                 type="text"
-                label="Orchestrator Endpoint"
+                label="Kubernetes Endpoint"
                 placeholder="https://192.168.99.100:8443"
                 name="orchestratorEndpoint"
                 key="orchestratorEndpoint"
                 value={orchestratorEndpoint}
                 onChange={this.handleChange}
             />,
-            <Form.Input
+            orchestratorName === 'kubernetes' && <Form.Input
                 icon="key"
                 iconPosition="left"
                 type="text"
-                label="Orchestrator Token"
+                label="Kubernetes Token"
                 placeholder="eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aW"
                 name="orchestratorToken"
                 key="orchestratorToken"
@@ -126,7 +127,7 @@ class SettingsAdmin extends Component {
     }
 
     render() {
-        const { isMonetizationEnabled } = this.state;
+        const { isMonetizationEnabled, orchestratorName } = this.state;
 
         return (
             <Form>
@@ -134,7 +135,7 @@ class SettingsAdmin extends Component {
                 { this.orchestratorForm() }
                 <Form.Field label="Enable Monetization" className="monetization" onClick={this.toggleMonetization} control={Radio} checked={isMonetizationEnabled} toggle />
                 { isMonetizationEnabled && this.StripeForm() }
-                <Button onClick={this.handleSubmit} name="save">Save settings</Button>
+                <Button onClick={this.handleSubmit} disabled={orchestratorName === 'swarm'} name="save">Save settings</Button>
                 <Divider hidden />
             </Form>
         );

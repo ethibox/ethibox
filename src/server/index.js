@@ -7,6 +7,7 @@ import bodyParser from 'body-parser';
 import http from 'http';
 import graphql from './graphql';
 import test from './test';
+import './initialize';
 import './synchronize';
 
 const app = aa(express());

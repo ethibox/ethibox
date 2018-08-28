@@ -1,8 +1,7 @@
 import Sequelize from 'sequelize';
 import fs from 'fs';
-import { synchronizeStore, getSettings } from './utils';
 
-const DB_FILE = 'db.sqlite';
+const DB_FILE = process.env.NODE_ENV ? 'test.sqlite' : 'db.sqlite';
 const DB_DIR = 'data/';
 const DB_PATH = `${DB_DIR}/${DB_FILE}`;
 
@@ -41,41 +40,12 @@ export const Package = sequelize.define('package', {
     stackFileUrl: { type: Sequelize.STRING },
 });
 
-export const initializeSettings = async () => {
-    const settings = [
-        { name: 'orchestratorName' },
-        { name: 'orchestratorEndpoint' },
-        { name: 'orchestratorToken' },
-        { name: 'orchestratorIp' },
-        { name: 'isOrchestratorOnline', value: false },
-        { name: 'stripeSecretKey' },
-        { name: 'stripePublishableKey' },
-        { name: 'stripePlanName' },
-        { name: 'isMonetizationEnabled', value: false },
-        { name: 'isDemoEnabled', value: false },
-        { name: 'monthlyPrice', value: '$0' },
-        { name: 'storeRepositoryUrl', value: 'https://charts.ethibox.fr/apps.json' },
-    ];
-    await Promise.all(settings.map(async ({ name, value }) => {
-        if (!await Settings.findOne({ where: { name } })) {
-            await Settings.create({ name, value });
-        }
-    }));
-};
+Application.User = Application.belongsTo(User);
+User.Applications = User.hasMany(Application);
+Application.Package = Application.belongsTo(Package);
+Package.Applications = Package.hasMany(Application);
 
-(async () => {
-    Application.User = Application.belongsTo(User);
-    User.Applications = User.hasMany(Application);
-    Application.Package = Application.belongsTo(Package);
-    Package.Applications = Package.hasMany(Application);
-
-    User.sync();
-    Application.sync();
-    Package.sync();
-    Settings.sync();
-
-    await initializeSettings();
-
-    const { storeRepositoryUrl } = await getSettings();
-    await synchronizeStore(storeRepositoryUrl);
-})();
+User.sync();
+Application.sync();
+Package.sync();
+Settings.sync();

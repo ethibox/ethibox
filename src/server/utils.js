@@ -2,7 +2,7 @@ import 'isomorphic-fetch';
 import dns from 'dns';
 import https from 'https';
 import jwt from 'jsonwebtoken';
-import { Settings, Package } from './models';
+import { sequelize, Package, Application, User, Settings } from './models';
 
 export const secret = process.env.SECRET || 'mysecret';
 
@@ -23,24 +23,15 @@ export const isAuthenticate = (token) => {
     }
 };
 
-export const checkDnsRecord = async (domainName, serverIp) => {
-    const dnsError = `DNS error, create a correct A record for your domain: ${domainName}. IN A ${serverIp}.`;
-    const domainNameIp = await new Promise((resolve, reject) => dns.lookup(domainName, (error, address) => {
-        if (error) {
-            reject(new Error(dnsError));
+export const checkDnsRecord = (domainName, serverIp) => new Promise((resolve) => {
+    return dns.lookup(domainName, (error, address) => {
+        if (serverIp === address) {
+            resolve(true);
         }
-        resolve(address);
-    }));
 
-    if (serverIp !== domainNameIp) {
-        throw new Error(dnsError);
-    }
-};
-
-export const publicIp = async () => {
-    const ip = await fetch('http://ipinfo.io/ip', { headers: { 'User-Agent': 'curl/7.37.1' } });
-    return (await ip.text()).trim();
-};
+        resolve(false);
+    });
+});
 
 export const synchronizeStore = async (storeRepositoryUrl) => {
     try {
@@ -93,6 +84,20 @@ export const checkOrchestratorConnection = async (endpoint, token) => {
     } catch (e) {
         return false;
     }
+};
+
+export const reset = async () => {
+    User.destroy({ force: true, truncate: true, cascade: true });
+    sequelize.query('DELETE FROM sqlite_sequence WHERE name="users";');
+
+    Application.destroy({ force: true, truncate: true, cascade: true });
+    sequelize.query('DELETE FROM sqlite_sequence WHERE name="applications";');
+
+    Package.destroy({ force: true, truncate: true, cascade: true });
+    sequelize.query('DELETE FROM sqlite_sequence WHERE name="packages";');
+
+    Settings.destroy({ force: true, truncate: true, cascade: true });
+    sequelize.query('DELETE FROM sqlite_sequence WHERE name="settings";');
 };
 
 export const STATES = {

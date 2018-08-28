@@ -1,6 +1,7 @@
 import { exec } from 'shelljs';
+import { Op } from 'sequelize';
 import { STATES, ACTIONS } from './utils';
-import { sequelize, User, Application, Package } from './models';
+import { User, Application, Package } from './models';
 
 export const initOrchestrator = (endpoint, token) => {
     exec(`kubectl config set-cluster kubernetes --insecure-skip-tls-verify=true --server=${endpoint}`);
@@ -20,9 +21,9 @@ export const uninstallApplication = (releaseName) => {
 
 export const editApplication = async (releaseName, domainName, stackFileUrl) => {
     if (domainName) {
-        exec(`helm upgrade --install ${releaseName} --set ingress.enabled=${!!domainName},ingress.hosts[0]=${domainName} --reuse-values ${stackFileUrl}`, { silent: true });
+        exec(`helm upgrade ${releaseName} --set ingress.enabled=true,ingress.hosts[0]=${domainName} ${stackFileUrl}`, { silent: true });
     } else {
-        exec(`helm upgrade --install ${releaseName} --set ingress.enabled=false --reuse-values ${stackFileUrl}`, { silent: true });
+        exec(`helm upgrade ${releaseName} --set ingress.enabled=false ${stackFileUrl}`, { silent: true });
     }
 };
 
@@ -47,57 +48,50 @@ export const listOrchestratorApps = async (namespace = 'default') => {
     return apps;
 };
 
-export const synchronizeOrchestrator = async () => {
-    const applications = await sequelize.query(`SELECT releaseName, domainName, state, port, error, name, category, userId, action, stackFileUrl
-       FROM applications
-       LEFT JOIN packages AS package ON applications.packageId = package.id
-       INNER JOIN users AS user ON applications.userId = user.id`, { type: sequelize.QueryTypes.SELECT });
-
-    applications.forEach(async (application) => {
-        const { action, releaseName, stackFileUrl, domainName, userId } = application;
+export const synchronizeOrchestrator = async (ethiboxApps) => {
+    await Promise.all(ethiboxApps.map(async (app) => {
+        const { action, releaseName, domainName, userId } = app;
+        const { stackFileUrl } = app.package;
         const helmReleaseName = `${releaseName}-${userId}`;
 
         switch (action) {
             case ACTIONS.INSTALL:
                 await installApplication(helmReleaseName, stackFileUrl);
-                await Application.update({ action: null }, { where: { releaseName } });
+                await app.update({ action: null });
                 break;
             case ACTIONS.UNINSTALL:
                 await uninstallApplication(helmReleaseName);
-                await Application.update({ action: null }, { where: { releaseName } });
+                await app.update({ action: null });
                 break;
             case ACTIONS.EDIT:
                 await editApplication(helmReleaseName, domainName, stackFileUrl);
-                await Application.update({ action: null }, { where: { releaseName } });
+                await app.update({ action: null });
                 break;
             default:
                 break;
         }
-    });
+    }));
 };
 
-export const synchronizeEthibox = async () => {
-    const orchestratorApps = await listOrchestratorApps();
-
-    orchestratorApps.forEach(async (app) => {
+export const synchronizeEthibox = async (orchestratorApps) => {
+    await Promise.all(orchestratorApps.map(async (app) => {
         const { name, releaseName, userId } = app;
-        if (!await Application.findOne({ where: { releaseName, userId }, raw: true })) {
+        const ethiboxApp = await Application.findOne({ where: { releaseName, userId } });
+        if (!ethiboxApp) {
             const pkg = await Package.findOne({ where: { name } });
             const user = await User.findOne({ where: { id: userId } });
 
-            if (user && pkg) {
-                const application = Application.build({ ...app, state: STATES.INSTALLING });
-                application.setPackage(pkg, { save: false });
-                application.setUser(user, { save: false });
-                application.save();
-            }
+            const application = Application.build({ ...app, state: STATES.INSTALLING });
+            application.setPackage(pkg, { save: false });
+            application.setUser(user, { save: false });
+            application.save();
         } else {
-            Application.update(app, { where: { releaseName } });
+            await ethiboxApp.update(app);
         }
-    });
+    }));
 
     const orchestratorAppsName = orchestratorApps.map(app => (app.releaseName));
-    const ethiboxApps = await Application.findAll({ raw: true });
+    const ethiboxApps = await Application.findAll({ where: { [Op.not]: { state: STATES.INSTALLING } }, raw: true });
     const ethiboxAppsName = ethiboxApps.map(app => (app.releaseName));
     const deletedOrchestratorApps = ethiboxAppsName.filter(name => !orchestratorAppsName.includes(name));
 
