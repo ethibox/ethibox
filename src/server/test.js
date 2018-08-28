@@ -1,6 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
-import { sequelize, Package, Application, User, Settings } from './models';
+import { Package, Application, User, Settings } from './models';
+import { reset } from './utils';
 
 const app = express();
 
@@ -39,18 +40,7 @@ app.post('/users', async (req, res) => {
 });
 
 app.get('/reset', async (req, res) => {
-    User.destroy({ force: true, truncate: true, cascade: true });
-    sequelize.query('UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME="users";');
-
-    Application.destroy({ force: true, truncate: true, cascade: true });
-    sequelize.query('UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME="applications";');
-
-    Package.destroy({ force: true, truncate: true, cascade: true });
-    sequelize.query('UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME="packages";');
-
-    Settings.destroy({ force: true, truncate: true, cascade: true });
-    sequelize.query('UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME="settings";');
-
+    await reset();
     return res.send('ok');
 });
 

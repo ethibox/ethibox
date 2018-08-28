@@ -1,7 +1,7 @@
 import 'isomorphic-fetch';
-import { Application, Settings } from './models';
-import { getSettings, checkUrl, checkOrchestratorConnection, ACTIONS, STATES } from './utils';
-import { synchronizeEthibox, synchronizeOrchestrator } from './connector';
+import { Package, Application, Settings } from './models';
+import { getSettings, checkUrl, checkOrchestratorConnection, checkDnsRecord, ACTIONS, STATES } from './utils';
+import { synchronizeEthibox, synchronizeOrchestrator, listOrchestratorApps } from './connector';
 
 export const trackStuckActions = async () => {
     const secondsToWaitAction = process.env.NODE_ENV === 'production' ? 15 : 5;
@@ -17,15 +17,32 @@ export const trackStuckActions = async () => {
     });
 };
 
-export const trackInstallingApps = async (orchestratorIp) => {
-    const apps = await Application.findAll({ where: { state: [STATES.INSTALLING] } }, { raw: true });
-
-    apps.forEach(async (app) => {
-        const entrypoint = `http://${orchestratorIp}:${app.port}`;
-        if (await checkUrl(entrypoint)) {
-            app.update({ state: STATES.RUNNING }, { where: { id: app.id } });
+export const trackCompletedActions = async (orchestratorIp) => {
+    const ethiboxApps = await Application.findAll({ include: [{ model: Package }] });
+    const { checkDnsEnabled } = await getSettings();
+    await Promise.all(ethiboxApps.map(async (app) => {
+        const { domainName, port } = app;
+        const entrypoint = `http://${orchestratorIp}:${port}`;
+        switch (app.state) {
+            case STATES.INSTALLING:
+                if (await checkUrl(entrypoint)) {
+                    await app.update({ state: STATES.RUNNING });
+                }
+                break;
+            case STATES.EDITING: {
+                if (checkDnsEnabled && domainName) {
+                    if (await checkDnsRecord(domainName, orchestratorIp)) {
+                        await app.update({ state: STATES.RUNNING });
+                    }
+                } else if (await checkUrl(entrypoint)) {
+                    await app.update({ state: STATES.RUNNING });
+                }
+                break;
+            }
+            default:
+                break;
         }
-    });
+    }));
 };
 
 setInterval(async () => {
@@ -36,9 +53,13 @@ setInterval(async () => {
         await Settings.update({ value: isOrchestratorOnline }, { where: { name: 'isOrchestratorOnline' } });
 
         if (isOrchestratorOnline) {
-            await synchronizeOrchestrator();
-            await synchronizeEthibox();
-            await trackInstallingApps(orchestratorIp);
+            const ethiboxApps = await Application.findAll({ include: [{ model: Package }] });
+            await synchronizeOrchestrator(ethiboxApps);
+
+            const orchestratorApps = await listOrchestratorApps();
+            await synchronizeEthibox(orchestratorApps);
+
+            await trackCompletedActions(orchestratorIp);
         }
     }
 
