@@ -1,14 +1,25 @@
 import { exec } from 'shelljs';
+import https from 'https';
 import { Op } from 'sequelize';
-import { STATES, ACTIONS } from './utils';
+import { timeout, STATES, ACTIONS } from './utils';
 import { User, Application, Package } from './models';
 
 export const initOrchestrator = (endpoint, token) => {
-    exec(`kubectl config set-cluster kubernetes --insecure-skip-tls-verify=true --server=${endpoint}`);
-    exec('kubectl config set-context kubernetes --cluster=kubernetes --user=kubernetes-admin --namespace=default');
-    exec(`kubectl config set-credentials kubernetes --token=${token}`);
-    exec('kubectl config use-context kubernetes');
-    exec('helm init');
+    exec(`kubectl config set-cluster kubernetes --insecure-skip-tls-verify=true --server=${endpoint}`, { silent: false });
+    exec('kubectl config set-context kubernetes --cluster=kubernetes --user=kubernetes --namespace=default', { silent: false });
+    exec(`kubectl config set-credentials kubernetes --token=${token}`, { silent: false });
+    exec('kubectl config use-context kubernetes', { silent: false });
+    exec('helm init', { silent: false });
+};
+
+export const checkOrchestratorConnection = async (endpoint, token) => {
+    try {
+        const agent = new https.Agent({ rejectUnauthorized: false });
+        const { status } = await timeout(10000, fetch(`${endpoint}/healthz`, { headers: { Authorization: `Bearer ${token}` }, agent }));
+        return (status === 200);
+    } catch (e) {
+        return false;
+    }
 };
 
 export const installApplication = async (releaseName, stackFileUrl) => {

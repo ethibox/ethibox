@@ -11,7 +11,7 @@ export const loadSettings = () => async (dispatch) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-access-token': localStorage.getItem('token') },
         body: JSON.stringify({ query: `{ 
-            settings { orchestratorName orchestratorEndpoint orchestratorToken isDemoEnabled isMonetizationEnabled stripePublishableKey stripeSecretKey monthlyPrice stripePlanName }
+            settings { orchestratorName orchestratorEndpoint orchestratorToken storeRepositoryUrl isDemoEnabled isMonetizationEnabled stripePublishableKey stripeSecretKey monthlyPrice stripePlanName }
             user { isAdmin isSubscribed }
         }` }),
     })

@@ -2,17 +2,9 @@ import jwt from 'jsonwebtoken';
 
 describe('Store Page', () => {
     before(() => {
-        cy.request('GET', '/test/reset');
-        cy.request('POST', '/test/packages', { packages: [{ name: 'etherpad', category: 'Editor' }, { name: 'owncloud', category: 'Storage' }] });
+        const defaultSettings = { orchestratorIp: '192.168.99.100', isOrchestratorOnline: true };
+        cy.request('POST', '/test/reset', { defaultSettings });
         cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd' }] });
-        cy.request('POST', '/test/settings', { settings: [
-            { name: 'orchestratorName', value: 'kubernetes' },
-            { name: 'orchestratorEndpoint', value: 'https://192.168.99.100:8443' },
-            { name: 'orchestratorToken', value: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlca' },
-            { name: 'isOrchestratorOnline', value: true },
-            { name: 'orchestratorIp', value: '192.168.99.100' },
-            { name: 'disableOrchestratorSync', value: true },
-        ] });
     });
 
     it('Should display packages after connect', () => {
@@ -20,7 +12,7 @@ describe('Store Page', () => {
         cy.get('input[name="email"]').type('contact@ethibox.fr');
         cy.get('input[name="password"]').type('myp@ssw0rd{enter}');
         cy.get('.item[href="/store"]').click({ force: true });
-        cy.get('.cards .card:last-child .header').contains('owncloud');
+        cy.contains('.cards .card:last-child', 'Blog');
     });
 
     it('Should install an application', () => {
@@ -70,7 +62,8 @@ describe('Store Page', () => {
     });
 
     it('Should display empty store if no packages', () => {
-        cy.request('GET', '/test/reset');
+        cy.request('POST', '/test/reset', { disableSynchronizeStore: true });
+        cy.request('DELETE', '/test/packages');
         cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd' }] });
         const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
         cy.visit('/store', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });

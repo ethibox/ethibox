@@ -26,6 +26,12 @@ class SettingsAdmin extends Component {
 
     handleSubmit = (e) => {
         e.target.blur();
+        const { orchestratorEndpoint, orchestratorToken, storeRepositoryUrl } = this.state;
+
+        if (!orchestratorEndpoint || !orchestratorToken || !storeRepositoryUrl) {
+            return;
+        }
+
         this.props.updateAdminSettings(this.state);
     }
 
@@ -88,28 +94,31 @@ class SettingsAdmin extends Component {
                 onChange={this.handleChange}
                 fluid
                 selection
+                required
             />,
             orchestratorName === 'kubernetes' && <Form.Input
                 icon="plug"
                 iconPosition="left"
                 type="text"
-                label="Kubernetes Endpoint"
+                label="Endpoint URL"
                 placeholder="https://192.168.99.100:8443"
                 name="orchestratorEndpoint"
                 key="orchestratorEndpoint"
                 value={orchestratorEndpoint}
                 onChange={this.handleChange}
+                required
             />,
             orchestratorName === 'kubernetes' && <Form.Input
                 icon="key"
                 iconPosition="left"
                 type="text"
-                label="Kubernetes Token"
+                label="Token"
                 placeholder="eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aW"
                 name="orchestratorToken"
                 key="orchestratorToken"
                 value={orchestratorToken}
                 onChange={this.handleChange}
+                required
             />,
             <Form.Field
                 control={Input}
@@ -122,6 +131,7 @@ class SettingsAdmin extends Component {
                 name="storeRepositoryUrl"
                 value={storeRepositoryUrl}
                 onChange={this.handleChange}
+                required
             />,
         ];
     }

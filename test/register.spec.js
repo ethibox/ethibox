@@ -1,6 +1,6 @@
 describe('Register Page', () => {
     before(() => {
-        cy.request('GET', '/test/reset');
+        cy.request('POST', '/test/reset');
     });
 
     it('Should register the first account as admin', () => {
