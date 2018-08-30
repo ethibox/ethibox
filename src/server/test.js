@@ -1,7 +1,8 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import { Package, Application, User, Settings } from './models';
-import { reset } from './utils';
+import { reset, synchronizeStore } from './utils';
+import { initializeSettings } from './initialize';
 
 const app = express();
 
@@ -39,21 +40,29 @@ app.post('/users', async (req, res) => {
     return res.send('ok');
 });
 
-app.get('/reset', async (req, res) => {
+app.post('/reset', async (req, res) => {
+    const { defaultSettings } = req.body;
     await reset();
+    const { storeRepositoryUrl } = await initializeSettings({ ...defaultSettings, disableOrchestratorSync: true });
+    await synchronizeStore(storeRepositoryUrl);
+    return res.send('ok');
+});
+
+app.delete('/packages', async (req, res) => {
+    await Package.destroy({ force: true, truncate: true, cascade: true });
     return res.send('ok');
 });
 
 app.delete('/applications/:releaseName', async (req, res) => {
     const { releaseName } = req.params;
-    Application.destroy({ where: { releaseName } });
+    await Application.destroy({ where: { releaseName } });
     return res.send('ok');
 });
 
 app.put('/applications/:releaseName', async (req, res) => {
     const { releaseName } = req.params;
     const { state } = req.body;
-    Application.update({ state }, { where: { releaseName } });
+    await Application.update({ state }, { where: { releaseName } });
     return res.send('ok');
 });
 

@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 describe('Login Page', () => {
     before(() => {
-        cy.request('GET', '/test/reset');
+        cy.request('POST', '/test/reset');
         cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd' }] });
     });
 

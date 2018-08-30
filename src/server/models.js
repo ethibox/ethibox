@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import fs from 'fs';
 
-const DB_FILE = process.env.NODE_ENV ? 'test.sqlite' : 'db.sqlite';
+const DB_FILE = process.env.NODE_ENV === 'test' ? 'test.sqlite' : 'db.sqlite';
 const DB_DIR = 'data/';
 const DB_PATH = `${DB_DIR}/${DB_FILE}`;
 

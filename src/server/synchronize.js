@@ -1,7 +1,7 @@
 import 'isomorphic-fetch';
 import { Package, Application, Settings } from './models';
-import { getSettings, checkUrl, checkOrchestratorConnection, checkDnsRecord, ACTIONS, STATES } from './utils';
-import { synchronizeEthibox, synchronizeOrchestrator, listOrchestratorApps } from './connector';
+import { getSettings, checkUrl, checkDnsRecord, ACTIONS, STATES } from './utils';
+import { checkOrchestratorConnection, synchronizeEthibox, synchronizeOrchestrator, listOrchestratorApps } from './connector';
 
 export const trackStuckActions = async () => {
     const secondsToWaitAction = process.env.NODE_ENV === 'production' ? 15 : 5;
@@ -48,7 +48,7 @@ export const trackCompletedActions = async (orchestratorIp) => {
 setInterval(async () => {
     const { orchestratorEndpoint, orchestratorToken, orchestratorIp, disableOrchestratorSync } = await getSettings();
 
-    if (!disableOrchestratorSync && orchestratorToken && orchestratorToken) {
+    if (!disableOrchestratorSync && orchestratorEndpoint && orchestratorToken) {
         const isOrchestratorOnline = await checkOrchestratorConnection(orchestratorEndpoint, orchestratorToken);
         await Settings.update({ value: isOrchestratorOnline }, { where: { name: 'isOrchestratorOnline' } });
 

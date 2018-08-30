@@ -1,6 +1,5 @@
 import 'isomorphic-fetch';
 import dns from 'dns';
-import https from 'https';
 import jwt from 'jsonwebtoken';
 import { sequelize, Package, Application, User, Settings } from './models';
 
@@ -76,28 +75,23 @@ export const checkUrl = async (url) => {
     }
 };
 
-export const checkOrchestratorConnection = async (endpoint, token) => {
-    try {
-        const agent = new https.Agent({ rejectUnauthorized: false });
-        const { status } = await timeout(10000, fetch(`${endpoint}/healthz`, { headers: { Authorization: `Bearer ${token}` }, agent }));
-        return (status === 200);
-    } catch (e) {
-        return false;
-    }
-};
-
 export const reset = async () => {
-    User.destroy({ force: true, truncate: true, cascade: true });
-    sequelize.query('DELETE FROM sqlite_sequence WHERE name="users";');
+    User.sync();
+    Application.sync();
+    Package.sync();
+    Settings.sync();
 
-    Application.destroy({ force: true, truncate: true, cascade: true });
-    sequelize.query('DELETE FROM sqlite_sequence WHERE name="applications";');
+    await User.destroy({ force: true, truncate: true, cascade: true });
+    await sequelize.query('DELETE FROM sqlite_sequence WHERE name="users";');
 
-    Package.destroy({ force: true, truncate: true, cascade: true });
-    sequelize.query('DELETE FROM sqlite_sequence WHERE name="packages";');
+    await Application.destroy({ force: true, truncate: true, cascade: true });
+    await sequelize.query('DELETE FROM sqlite_sequence WHERE name="applications";');
 
-    Settings.destroy({ force: true, truncate: true, cascade: true });
-    sequelize.query('DELETE FROM sqlite_sequence WHERE name="settings";');
+    await Package.destroy({ force: true, truncate: true, cascade: true });
+    await sequelize.query('DELETE FROM sqlite_sequence WHERE name="packages";');
+
+    await Settings.destroy({ force: true, truncate: true, cascade: true });
+    await sequelize.query('DELETE FROM sqlite_sequence WHERE name="settings";');
 };
 
 export const STATES = {

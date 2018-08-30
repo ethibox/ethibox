@@ -2,19 +2,9 @@ import jwt from 'jsonwebtoken';
 
 describe('Settings page', () => {
     before(() => {
-        cy.request('GET', '/test/reset');
+        const defaultSettings = { disableOrchestratorCheck: true };
+        cy.request('POST', '/test/reset', { defaultSettings });
         cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd', isAdmin: true }] });
-        cy.request('POST', '/test/settings', { settings: [
-            { name: 'stripeSecretKey' },
-            { name: 'stripePublishableKey' },
-            { name: 'stripePlanName' },
-            { name: 'isMonetizationEnabled', value: false },
-            { name: 'isDemoEnabled', value: false },
-            { name: 'monthlyPrice', value: 0 },
-            { name: 'storeRepositoryUrl', value: 'https://charts.ethibox.fr/apps.json' },
-            { name: 'disableOrchestratorCheck', value: true },
-            { name: 'isOrchestratorOnline', value: true },
-        ] });
     });
 
     it('Should change user password', () => {
@@ -42,6 +32,17 @@ describe('Settings page', () => {
         cy.get('input[name="confirmPassword"]').type('new');
         cy.get('button[name="password"]').click();
         cy.contains('.error', 'Your password must be at least 6 characters');
+    });
+
+    it('Should setup orchestrator settings', () => {
+        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
+        cy.visit('/settings', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
+        cy.get('.dropdown[name="orchestratorName"]').click();
+        cy.get('.dropdown[name="orchestratorName"] .item').contains('Kubernetes').click();
+        cy.get('input[name="orchestratorEndpoint"]').type('https://192.168.99.100:8443');
+        cy.get('input[name="orchestratorToken"]').type('eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlca');
+        cy.get('button[name="save"]').click();
+        cy.contains('.modal', 'Configuration updated!');
     });
 
     it('Should import store packages with apps.json file', () => {
@@ -75,16 +76,5 @@ describe('Settings page', () => {
         cy.get('.modal button').click();
         cy.get('.subscribe .checkbox').click();
         cy.get('.message').not('Bad stripe publishable key');
-    });
-
-    it('Should setup orchestrator settings', () => {
-        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/settings', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('.dropdown[name="orchestratorName"]').click();
-        cy.get('.dropdown[name="orchestratorName"] .item').contains('Kubernetes').click();
-        cy.get('input[name="orchestratorEndpoint"]').type('https://192.168.99.100:8443');
-        cy.get('input[name="orchestratorToken"]').type('eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlca');
-        cy.get('button[name="save"]').click();
-        cy.contains('.modal', 'Configuration updated!');
     });
 });

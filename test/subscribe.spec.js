@@ -2,9 +2,8 @@ import jwt from 'jsonwebtoken';
 
 describe('Subscribe', () => {
     it('Should restrict applications access and redirect user if he is not subscribed and monetization is enabled', () => {
-        cy.request('GET', '/test/reset');
+        cy.request('POST', '/test/reset', { defaultSettings: { isMonetizationEnabled: true } });
         cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd', isSubscribed: false }] });
-        cy.request('POST', '/test/settings', { settings: [{ name: 'isMonetizationEnabled', value: true }] });
         cy.request('POST', '/test/packages', { packages: [{ name: 'etherpad', category: 'Editor' }, { name: 'owncloud', category: 'Storage' }] });
 
         const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
@@ -16,13 +15,9 @@ describe('Subscribe', () => {
     });
 
     it('Should give applications access if user is subscribed and monetization is enabled', () => {
-        cy.request('GET', '/test/reset');
+        const defaultSettings = { isOrchestratorOnline: true, isMonetizationEnabled: true };
+        cy.request('POST', '/test/reset', { defaultSettings });
         cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd', isSubscribed: true }] });
-        cy.request('POST', '/test/settings', { settings: [
-            { name: 'isOrchestratorOnline', value: true },
-            { name: 'disableOrchestratorSync', value: true },
-            { name: 'isMonetizationEnabled', value: true },
-        ] });
         cy.request('POST', '/test/packages', { packages: [{ name: 'etherpad', category: 'Editor' }, { name: 'owncloud', category: 'Storage' }] });
 
         const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
@@ -33,7 +28,7 @@ describe('Subscribe', () => {
     });
 
     it('Should validate subscription if data is correct', () => {
-        cy.request('GET', '/test/reset');
+        cy.request('POST', '/test/reset');
         cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd', isSubscribed: false }] });
         cy.request('POST', '/test/settings', { settings: [
             { name: 'isMonetizationEnabled', value: true },
@@ -58,7 +53,7 @@ describe('Subscribe', () => {
     });
 
     it('Should unsubsribe user', () => {
-        cy.request('GET', '/test/reset');
+        cy.request('POST', '/test/reset', { defaultSettings: { isMonetizationEnabled: true } });
         cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd', isSubscribed: true }] });
         cy.request('POST', '/test/settings', { settings: [{ name: 'isMonetizationEnabled', value: true }] });
 
@@ -71,7 +66,7 @@ describe('Subscribe', () => {
     });
 
     it('Should disabled subscribe form if monetization is disabled', () => {
-        cy.request('GET', '/test/reset');
+        cy.request('POST', '/test/reset');
         cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd', isSubscribed: false }] });
         cy.request('POST', '/test/settings', { settings: [{ name: 'isMonetizationEnabled', value: false }] });
 
@@ -81,7 +76,7 @@ describe('Subscribe', () => {
     });
 
     it('Should display error if bad publishable key', () => {
-        cy.request('GET', '/test/reset');
+        cy.request('POST', '/test/reset');
         cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd', isSubscribed: false }] });
         cy.request('POST', '/test/settings', { settings: [
             { name: 'isMonetizationEnabled', value: true },

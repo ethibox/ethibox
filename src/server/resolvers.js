@@ -4,7 +4,8 @@ import isEmail from 'validator/lib/isEmail';
 import bcrypt from 'bcrypt';
 import url from 'url';
 import { sequelize, Package, User, Settings, Application } from './models';
-import { secret, checkDnsRecord, synchronizeStore, checkOrchestratorConnection, STATES, ACTIONS } from './utils';
+import { secret, checkDnsRecord, synchronizeStore, STATES, ACTIONS } from './utils';
+import { initOrchestrator, checkOrchestratorConnection } from './connector';
 
 const tokenExpiration = '7d';
 
@@ -209,6 +210,9 @@ export const updateAdminSettingsMutation = async (_, { settings }, context) => {
             settings.isOrchestratorOnline = true;
         } else {
             settings.isOrchestratorOnline = await checkOrchestratorConnection(orchestratorEndpoint, orchestratorToken);
+            if (settings.isOrchestratorOnline) {
+                await initOrchestrator(orchestratorEndpoint, orchestratorToken);
+            }
         }
 
         if (!settings.isOrchestratorOnline) {

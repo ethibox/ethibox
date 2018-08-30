@@ -61,5 +61,5 @@ typings/
 # build
 public
 
-# charts
-!charts/packages/*.tgz
+# data
+data
