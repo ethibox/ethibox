@@ -18,7 +18,7 @@ export default () => {
                 <Route path="/store" render={() => (isConnect() ? (<Layout><PackageList /></Layout>) : (<Redirect to="/login" />))} exact />
                 <Route path="/subscribe" render={() => (isConnect() ? (<Layout><Subscribe /></Layout>) : (<Redirect to="/login" />))} exact />
                 <Route path="/settings" render={() => (isConnect() ? (<Layout><Settings /></Layout>) : (<Redirect to="/login" />))} exact />
-                <Route path="/logout" component={() => { localStorage.clear(); return <Redirect to="/login" />; }} exact />
+                <Route path="/logout" component={() => { localStorage.clear(); window.location.replace('/login'); return <div>Logout...</div>; }} exact />
                 <Route path="/register" component={Register} />
                 <Route path="/login" component={Login} />
                 <Route component={() => <div>Not found</div>} />

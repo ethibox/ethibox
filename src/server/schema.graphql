@@ -10,10 +10,6 @@ type Package {
     name: String
     icon: String
     category: String
-    description: String
-    version: String
-    image: String
-    repositoryUrl: String
 }
 
 type Application {
@@ -28,7 +24,24 @@ type Application {
     error: String
 }
 
+input SettingsInput {
+    orchestratorName: String
+    orchestratorEndpoint: String
+    orchestratorToken: String
+    isDemoEnabled: Boolean
+    isMonetizationEnabled: Boolean
+    stripePublishableKey: String
+    stripeSecretKey: String
+    stripePlanName: String
+    storeRepositoryUrl: String
+}
+
 type Settings {
+    orchestratorName: String
+    orchestratorEndpoint: String
+    orchestratorToken: String
+    isOrchestratorOnline: Boolean
+    isOrchestratorConfigMissing: Boolean
     isDemoEnabled: Boolean
     isMonetizationEnabled: Boolean
     isAdmin: Boolean
@@ -44,6 +57,7 @@ type Query {
     packages: [Package]
     settings: Settings
     user: User
+    isFirstAccount: Boolean
 }
 
 type Mutation {
@@ -55,5 +69,5 @@ type Mutation {
     updatePassword(password: String!): User
     subscribe(stripeToken: String!): User
     unsubscribe: User
-    updateAdminSettings(storeRepositoryUrl: String, isMonetizationEnabled: Boolean, stripeSecretKey: String, stripePublishableKey: String, stripePlanName: String): Settings
+    updateAdminSettings(settings: SettingsInput!): Settings
 }

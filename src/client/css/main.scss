@@ -77,3 +77,9 @@ a:hover {
 .ui.toggle.checkbox input:focus:checked~label:before {
     background-color: teal !important
 }
+
+// Alerts
+
+.ui-alerts {
+    z-index: 1000;
+}
