@@ -1,0 +1,160 @@
+/* Mobile */
+
+.github-corner {
+    z-index: 5;
+}
+
+.gitter-open-chat-button {
+    background-color: #00B0B0;
+}
+
+.gitter-open-chat-button:hover {
+    background-color: #00B0B0;
+    opacity: 0.8;
+}
+
+.ready:not(.sticky) nav.app-nav > ul > li {
+    color: white;
+}
+
+nav.app-nav a {
+    color: black;
+}
+
+section.cover {
+    padding-top: 80px;
+    height: auto;
+}
+
+section.cover h1 {
+    font-family: Lato,Helvetica Neue,Arial,Helvetica,sans-serif;
+    font-size: 3.4rem;
+    color: white;
+}
+
+section.cover h1 img {
+    position: relative;
+    top: 8px;
+    margin-right: 15px;
+    width: 50px;
+}
+
+section.cover h1 .anchor span {
+    color: white;
+}
+
+section.cover blockquote p {
+    margin: 0px;
+    margin-bottom: 30px;
+}
+
+section.cover blockquote {
+    font-size: 1.2rem;
+    font-family: Roboto;
+    color: white;
+}
+
+section.cover h1, section.cover blockquote {
+    margin: 0px;
+}
+
+section.cover .cover-main {
+    color: white;
+}
+
+section.cover .cover-main > p:last-child a {
+    color: white;
+    background-color: transparent;
+    border: 2px solid white;
+    margin: .5rem 0.3rem;
+}
+
+section.cover .cover-main > p:last-child a:last-child {
+    background-color: white;
+    color: #0D7478;
+    border: 2px solid white;
+}
+
+section.cover .cover-main > p:last-child a, section.cover .cover-main > p:last-child a:last-child {
+    border-radius: 0.3rem;
+    font-family: Lato,Helvetica Neue,Arial,Helvetica,sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 1rem;
+    letter-spacing: normal;
+    width: 100%;
+}
+
+section.cover .cover-main > p:last-child a:hover, section.cover .cover-main > p:last-child a:last-child:hover {
+    background-color: white;
+    color: #0D7478;
+}
+
+section.cover ul {
+    font-size: 1.25rem;
+    line-height: 2rem;
+    display: grid;
+    text-align: left;
+    grid-column-gap: 16px;
+    grid-row-gap: 20px;
+    list-style: none;
+    max-width: unset;
+    margin: 1.5em 0;
+}
+
+section.cover ul {
+    grid-template-columns: 100%;
+    padding: 0;
+}
+
+section.cover ul li {
+    text-align: center;
+    white-space: normal;
+}
+
+/* Desktop */
+
+@media only screen and (min-width: 768px) {
+    section.cover {
+        height: inherit;
+        padding-top: 0px;
+    }
+
+    section.cover h1 {
+        font-size: 6.4rem;
+    }
+
+    section.cover h1 img {
+        width: 80px;
+    }
+
+    section.cover blockquote {
+        font-size: 2.5rem;
+    }
+
+    section.cover .cover-main > p:last-child a, section.cover .cover-main > p:last-child a:last-child {
+        font-size: 1.5rem;
+    }
+
+    section.cover .cover-main {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin: 0;
+        padding: 32px 16px 0;
+    }
+
+    section.cover .cover-main > p:last-child a, section.cover .cover-main > p:last-child a:last-child {
+        width: inherit;
+    }
+
+    section.cover ul {
+        grid-template-columns: repeat(2, 55%);
+    }
+
+    section.cover ul li {
+        white-space: nowrap;
+        text-align: inherit;
+    }
+}
