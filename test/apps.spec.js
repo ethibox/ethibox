@@ -35,7 +35,6 @@ describe('Applications Page', () => {
         cy.get('.cards .card').should('have.length', 2);
         cy.get('.cards .card').should('not.have.length', 3);
         cy.get('.modal').should('not.exist');
-        // TODO: http://react.semantic-ui.com/modules/popup/#usage-click
     });
 
     it("Should edit application's domain", () => {
@@ -82,6 +81,10 @@ describe('Applications Page', () => {
     });
 
     it.skip('Should allow to force application uninstallation if app has an error', () => {
+        // TODO
+    });
+
+    it.skip('Should check DNS when domain editing', () => {
         // TODO
     });
 

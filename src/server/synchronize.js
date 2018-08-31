@@ -1,4 +1,5 @@
 import 'isomorphic-fetch';
+import { Op } from 'sequelize';
 import { Package, Application, Settings } from './models';
 import { getSettings, checkUrl, checkDnsRecord, ACTIONS, STATES } from './utils';
 import { checkOrchestratorConnection, synchronizeEthibox, synchronizeOrchestrator, listOrchestratorApps } from './connector';
@@ -6,13 +7,16 @@ import { checkOrchestratorConnection, synchronizeEthibox, synchronizeOrchestrato
 export const trackStuckActions = async () => {
     const secondsToWaitAction = process.env.NODE_ENV === 'production' ? 15 : 5;
     const currentTime = new Date().getTime();
-    const apps = await Application.findAll({ where: { action: [ACTIONS.INSTALL, ACTIONS.UNINSTALL, ACTIONS.EDIT] } });
+    const apps = await Application.findAll({ where: { [Op.or]: [
+        { action: [ACTIONS.INSTALL, ACTIONS.UNINSTALL, ACTIONS.EDIT] },
+        { state: [STATES.INSTALLING, STATES.EDITING, STATES.UNINSTALLING] },
+    ] } });
 
     apps.forEach((app) => {
         const lastModified = new Date(app.updatedAt).getTime();
 
         if (currentTime - lastModified > (secondsToWaitAction * 1000)) {
-            // app.update({ error: 'Application stuck' });
+            app.update({ error: 'Application stuck' });
         }
     });
 };

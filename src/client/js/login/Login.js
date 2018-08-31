@@ -6,25 +6,34 @@ import { Container, Segment, Message, Grid, Button, Form } from 'semantic-ui-rea
 import { SemanticToastContainer, toast } from 'react-semantic-toasts';
 import { Link } from 'react-router-dom';
 import { login } from './LoginActions';
-import { getParameterByName, history } from '../utils';
+import { getParameterByName, history, checkStatus } from '../utils';
 import Loader from '../loader/Loader';
 import Header from '../app/Header';
 import Footer from '../app/Footer';
 import Fork from '../app/Fork';
 
-setTimeout(() => {
-    if (getParameterByName('expired')) {
-        toast({ type: 'warning', icon: 'warning circle', title: 'Warning', description: 'Your Session has expired!', time: 10000 });
-        history.push('/login');
-    }
-    if (getParameterByName('unauthorized')) {
-        toast({ type: 'error', icon: 'cancel', title: 'Error', description: 'Not authorized!', time: 10000 });
-        history.push('/login');
-    }
-});
-
 class Login extends React.Component {
     state = { email: '', password: '', errors: [] };
+
+    componentDidMount() {
+        if (getParameterByName('expired')) {
+            toast({ type: 'warning', icon: 'warning circle', title: 'Warning', description: 'Your Session has expired!', time: 10000 });
+            history.push('/login');
+        }
+        if (getParameterByName('unauthorized')) {
+            toast({ type: 'error', icon: 'cancel', title: 'Error', description: 'Not authorized!', time: 10000 });
+            history.push('/login');
+        }
+
+        fetch('/graphql', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: '{ isFirstAccount }' }),
+        })
+            .then(checkStatus)
+            .then(({ data }) => (data.isFirstAccount && history.push('/register?first=true')));
+    }
+
     handleChange = e => this.setState({ [e.target.name]: e.target.value, errors: [] });
 
     handleSubmit = () => {

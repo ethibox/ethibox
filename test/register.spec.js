@@ -3,10 +3,11 @@ describe('Register Page', () => {
         cy.request('POST', '/test/reset');
     });
 
-    it('Should register the first account as admin', () => {
+    it('Should register the first account as admin and redirect him to settings page', () => {
         cy.visit('/register');
         cy.get('input[name="email"]').type('admin@ethibox.fr');
         cy.get('input[name="password"]').type('myp@ssw0rd{enter}');
+        cy.url().should('contain', '/settings');
         cy.request('GET', '/test/users').then((response) => {
             expect(response.body[0]).to.have.property('isAdmin', true);
         });

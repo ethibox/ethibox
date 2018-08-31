@@ -57,6 +57,7 @@ type Query {
     packages: [Package]
     settings: Settings
     user: User
+    isFirstAccount: Boolean
 }
 
 type Mutation {
