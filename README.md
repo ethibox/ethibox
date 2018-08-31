@@ -10,7 +10,7 @@
 
 Simple UI to search, install, update, configure, backup, check, rollback, secure, expose, scale, monetize & uninstall your free softwares.
 
-##### [Website](https://ethibox.io) | [Docs](https://ethibox.io) | [Demo](https://demo.ethibox.fr) | [FAQ](https://ethibox.fr/faq) | [Contributing](https://github.com/ethibox/ethibox/blob/master/.github/CONTRIBUTING.md)
+##### [Docs](https://ethibox.io) | [Demo](https://demo.ethibox.fr) | [FAQ](https://ethibox.fr/faq) | [Contributing](https://github.com/ethibox/ethibox/blob/master/.github/CONTRIBUTING.md)
 
 ![screenshot](docs/images/screenshot.png)
 
@@ -51,7 +51,7 @@ COMING SOON!
 Ethibox allows you to search, install, update, configure, backup, check, rollback, scale, monetize & uninstall applications.
 **NOTE: To use Ethibox you need an orchestrator like Kubernetes or Docker Swarm**.
 
-[![Workflow](docs/images/workflow.png)](https://www.draw.io/#ethibox/ethibox/master/docs/images/workflow.png)
+[![Workflow](docs/images/workflow.png)](https://www.draw.io/#Hethibox/ethibox/master/docs/images/workflow.png)
 
 ## How to create application ?
 
