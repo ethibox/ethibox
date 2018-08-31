@@ -16,7 +16,7 @@
     "build:server": "NODE_ENV=production babel --minified --no-comments --compact true -d public/ src/server",
     "build:client": "NODE_ENV=production webpack -p --progress --colors",
     "test": "npm run test:unit && npm run test:e2e",
-    "test:unit": "jest src/**/*.spec.js",
+    "test:unit": "jest -i src/**/*.spec.js",
     "test:e2e": "cypress run",
     "test:ci": "server-test start:test 4444",
     "docker:start": "docker run --name ethibox -it --rm -p 3000:3000 -p 4444:4444 -v $PWD/:/app ethibox/dev",
