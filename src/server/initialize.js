@@ -34,7 +34,7 @@ export const initializeSettings = async (defaultSettings = {}) => {
         { name: 'isMonetizationEnabled', value: (defaultSettings.isMonetizationEnabled || false) },
         { name: 'isDemoEnabled', value: (defaultSettings.isDemoEnabled || false) },
         { name: 'monthlyPrice', value: (defaultSettings.monthlyPrice || '$0') },
-        { name: 'storeRepositoryUrl', value: (defaultSettings.storeRepositoryUrl || 'https://charts.ethibox.fr/apps.json') },
+        { name: 'storeRepositoryUrl', value: (defaultSettings.storeRepositoryUrl || 'https://store.ethibox.io/apps.json') },
         { name: 'disableOrchestratorCheck', value: (defaultSettings.disableOrchestratorCheck || false) },
         { name: 'disableOrchestratorSync', value: (defaultSettings.disableOrchestratorSync || false) },
     ];
