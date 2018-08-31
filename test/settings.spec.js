@@ -2,8 +2,7 @@ import jwt from 'jsonwebtoken';
 
 describe('Settings page', () => {
     before(() => {
-        const defaultSettings = { disableOrchestratorCheck: true };
-        cy.request('POST', '/test/reset', { defaultSettings });
+        cy.request('POST', '/test/reset', { defaultSettings: { disableOrchestratorCheck: true } });
         cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd', isAdmin: true }] });
     });
 
@@ -46,6 +45,7 @@ describe('Settings page', () => {
     });
 
     it('Should import store packages with apps.json file', () => {
+        cy.request('DELETE', '/test/packages');
         const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
         cy.visit('/settings', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
         cy.get('input[name="storeRepositoryUrl"]').type('{selectall}{del}http://localhost:4444/test/apps.json');
