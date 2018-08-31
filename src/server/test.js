@@ -80,16 +80,16 @@ app.get('/apps.json', async (req, res) => {
     const appsFile = [
         {
             name: 'wordpress',
-            icon: 'https://charts.ethibox.fr/charts/wordpress/icon.png',
+            icon: 'https://store.ethibox.io/charts/wordpress/icon.png',
             category: 'Blog',
-            stackFileUrl: 'https://charts.ethibox.fr/packages/wordpress-0.1.0.tgz',
+            stackFileUrl: 'https://store.ethibox.io/packages/wordpress-0.1.0.tgz',
             orchestrator: 'kubernetes',
         },
         {
             name: 'etherpad',
-            icon: 'https://charts.ethibox.fr/charts/etherpad/icon.png',
+            icon: 'https://store.ethibox.io/charts/etherpad/icon.png',
             category: 'Editor',
-            stackFileUrl: 'https://charts.ethibox.fr/packages/etherpad-0.1.0.tgz',
+            stackFileUrl: 'https://store.ethibox.io/packages/etherpad-0.1.0.tgz',
             orchestrator: 'kubernetes',
         },
     ];
