@@ -6,7 +6,7 @@ RUN curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | 
 
 RUN chmod +x /usr/local/bin/helm /usr/local/bin/kubectl
 
-VOLUME ["/app", "/app/data"]
+VOLUME ["/app"]
 
 WORKDIR /app
 

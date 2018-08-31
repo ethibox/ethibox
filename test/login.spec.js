@@ -6,6 +6,10 @@ describe('Login Page', () => {
         cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd' }] });
     });
 
+    it('Should redirect the first user to register page', () => {
+        // TODO
+    });
+
     it('Should not sign in an user with bad logins', () => {
         cy.visit('/login');
         cy.get('input[name="email"]').type('contact@ethibox.fr');

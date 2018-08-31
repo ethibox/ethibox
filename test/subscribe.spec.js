@@ -87,8 +87,4 @@ describe('Subscribe', () => {
         cy.visit('/subscribe', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
         cy.get('.message').contains('Bad stripe publishable key');
     });
-
-    after(() => {
-        cy.request('GET', '/test/reset');
-    });
 });

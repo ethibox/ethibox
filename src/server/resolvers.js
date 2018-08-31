@@ -56,6 +56,11 @@ export const packagesQuery = async () => {
     return packages;
 };
 
+export const isFirstAccountQuery = async () => {
+    const users = await User.count();
+    return !users;
+};
+
 export const installApplicationMutation = async (_, { name, releaseName }, context) => {
     const { isMonetizationEnabled, isOrchestratorOnline } = context.req.settings;
 
