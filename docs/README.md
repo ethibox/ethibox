@@ -10,7 +10,7 @@
 
 Simple UI to search, install, update, configure, backup, check, rollback, secure, expose, scale, monetize & uninstall your free softwares.
 
-##### [Website](https://ethibox.fr) | [Docs](https://ethibox.io) | [Demo](https://demo.ethibox.fr) | [FAQ](https://ethibox.fr/faq) | [Contributing](https://github.com/ethibox/ethibox/blob/master/.github/CONTRIBUTING.md)
+##### [Website](https://ethibox.io) | [Docs](https://ethibox.io) | [Demo](https://demo.ethibox.fr) | [FAQ](https://ethibox.fr/faq) | [Contributing](https://github.com/ethibox/ethibox/blob/master/.github/CONTRIBUTING.md)
 
 ![screenshot](docs/images/screenshot.png)
 
@@ -39,7 +39,7 @@ kubectl run ethibox --image=ethibox/ethibox --port=4444 --expose
 ### Deploy with helm (Kubernetes)
 
 ```bash
-helm install --name ethibox --namespace ethibox-system https://store.ethibox.fr/packages/ethibox-0.1.0.tgz
+helm install --name ethibox --namespace ethibox-system https://store.ethibox.io/packages/ethibox-0.1.0.tgz
 ```
 
 ### Deploy with Terraform
