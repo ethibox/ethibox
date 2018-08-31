@@ -5,19 +5,21 @@ import { Label, Header, Responsive, Segment, Button, Sidebar, Menu, Icon, Contai
 import { NavLink } from 'react-router-dom';
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import { faStoreAlt } from '@fortawesome/fontawesome-free-solid';
+import { SemanticToastContainer } from 'react-semantic-toasts';
 import { history } from '../utils';
 import logo from '../../images/logo.svg';
 import whiteLogo from '../../images/logo-white.svg';
 import Footer from './Footer';
 import Modal from '../modal/Modal';
 import Loader from '../loader/Loader';
-import { synchronizeInterval } from '../synchronize/SynchronizeActions';
+import { synchronize, synchronizeInterval } from '../synchronize/SynchronizeActions';
 
 class Layout extends Component {
     state = { visible: false };
 
     componentWillMount() {
         const interval = process.env.NODE_ENV === 'production' ? 5000 : 2000;
+        this.props.synchronize();
         this.props.synchronizeInterval({ interval });
     }
 
@@ -58,6 +60,7 @@ class Layout extends Component {
                     <Footer />
                     <Modal />
                     <Loader />
+                    <SemanticToastContainer position="bottom-right" />
                 </Container>
             </Sidebar.Pusher>,
         ];
@@ -65,6 +68,6 @@ class Layout extends Component {
 }
 
 const mapStateToProps = state => ({ ...state.SettingsReducer, ...state.SynchronizeReducer });
-const mapDispatchToProps = dispatch => bindActionCreators({ synchronizeInterval }, dispatch);
+const mapDispatchToProps = dispatch => bindActionCreators({ synchronize, synchronizeInterval }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Layout);

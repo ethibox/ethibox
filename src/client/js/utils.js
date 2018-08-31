@@ -2,7 +2,11 @@ import createHistory from 'history/createBrowserHistory';
 import jwtDecode from 'jwt-decode';
 
 export const checkStatus = response => new Promise((resolve, reject) => {
-    response.json().then((res) => {
+    if (response.status !== 200) {
+        return reject(new Error(response.statusText));
+    }
+
+    return response.json().then((res) => {
         if (res.errors) {
             reject(new Error(res.errors[0]));
         }
@@ -33,6 +37,21 @@ export const isConnect = () => {
 };
 
 export const history = createHistory();
+
+export const isToastNotExist = (message) => {
+    const selector = '.ui-alerts .pulse:last-child .message .content p';
+
+    if (document.querySelector(selector) && document.querySelector(selector).innerText === message) {
+        return false;
+    }
+
+    return true;
+};
+
+export const getParameterByName = (name) => {
+    const match = RegExp(`[?&]${name}=([^&]*)`).exec(window.location.search);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+};
 
 export const STATES = {
     RUNNING: 'running',

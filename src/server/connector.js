@@ -1,187 +1,112 @@
-import fs from 'fs';
-import yaml from 'yamljs';
-import fetch from 'node-fetch';
+import { exec } from 'shelljs';
 import https from 'https';
-import winston from 'winston';
-import { checkStatus, findVal, publicIp, ACTIONS, STATES } from './utils';
-import { sequelize, Package, Application } from './models';
+import { Op } from 'sequelize';
+import { timeout, STATES, ACTIONS } from './utils';
+import { User, Application, Package } from './models';
 
-const TOKEN_PATH = `${process.env.TELEPRESENCE_ROOT || ''}/var/run/secrets/kubernetes.io/serviceaccount/token`;
-const TOKEN = fs.existsSync(TOKEN_PATH) ? fs.readFileSync(TOKEN_PATH, 'utf8') : process.env.TOKEN;
-const KUBE_APISERVER_IP = process.env.KUBERNETES_SERVICE_HOST || process.env.KUBE_APISERVER_IP;
-const KUBE_APISERVER_ENDPOINT = process.env.KUBERNETES_SERVICE_HOST ? `https://${process.env.KUBERNETES_SERVICE_HOST}` : `https://${KUBE_APISERVER_IP}:8443`;
-const SWIFT_ENDPOINT = `${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/ethibox-system/services/http:swift-ethibox:9855/proxy`;
-const CHART_REPOSITORY = process.env.CHART_REPOSITORY || 'https://charts.ethibox.fr/packages/';
-const ETHIBOX_NAMESPACE = 'ethibox';
-
-const agent = new https.Agent({ rejectUnauthorized: false });
-
-const stateApplications = async () => {
-    const apps = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/${ETHIBOX_NAMESPACE}/pods/`, { headers: { Authorization: `Bearer ${TOKEN}` }, agent })
-        .then(checkStatus)
-        .then(({ items }) => {
-            if (!items.length) return [];
-
-            return items.filter(item => !['mysql', 'mariadb', 'mongodb'].includes(item.metadata.labels.app)).map(item => ({
-                releaseName: item.metadata.labels.release,
-                containersRunning: item.status.hasOwnProperty('containerStatuses') && item.status.containerStatuses.every(container => container.ready), // eslint-disable-line
-                message: findVal(item, 'message'),
-                reason: findVal(item.status.containerStatuses, 'reason'),
-                ready: findVal(item, 'ready'),
-            }));
-        })
-        .catch(message => winston.log('error', message));
-
-    return apps.map((app) => {
-        let state = STATES.LOADING;
-        let error = null;
-        if (app.containersRunning) state = STATES.RUNNING;
-        if (app.message && new RegExp('unready').test(app.message)) state = STATES.LOADING;
-        if (app.reason && app.reason === 'ContainerCreating') state = STATES.LOADING;
-        if (app.message && new RegExp('DiskPressure').test(app.message)) error = 'Disk Pressure';
-        if (app.message && new RegExp('Insufficient memory').test(app.message)) error = 'Insufficient memory';
-        if (app.reason && ['CrashLoopBackOff', 'ImagePullBackOff', 'InvalidImageName'].includes(app.reason)) error = app.reason;
-        if (app.reason && app.reason === 'Error') error = 'Unknown error';
-        if (app.ready) state = STATES.RUNNING;
-        return { releaseName: app.releaseName, state, error };
-    });
+export const initOrchestrator = (endpoint, token) => {
+    exec(`kubectl config set-cluster kubernetes --insecure-skip-tls-verify=true --server=${endpoint}`, { silent: false });
+    exec('kubectl config set-context kubernetes --cluster=kubernetes --user=kubernetes --namespace=default', { silent: false });
+    exec(`kubectl config set-credentials kubernetes --token=${token}`, { silent: false });
+    exec('kubectl config use-context kubernetes', { silent: false });
+    exec('helm init', { silent: false });
 };
 
-const listApplications = async () => {
-    const apps = await fetch(`${KUBE_APISERVER_ENDPOINT}/api/v1/namespaces/${ETHIBOX_NAMESPACE}/services/?labelSelector=heritage=Tiller`, {
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
-        agent,
-    })
-        .then(checkStatus)
-        .then((data) => {
-            if (!data.items.length) return [];
-            return data.items.filter(item => !['mysql', 'mariadb', 'mongodb'].includes(item.metadata.labels.app)).map(item => ({
-                name: item.metadata.labels.app,
-                releaseName: item.metadata.labels.release,
-                port: item.spec.ports[0].nodePort,
-                domain: item.metadata.labels.domain,
-            }));
-        })
-        .catch(message => winston.log('error', message));
-
-    const stateApps = await stateApplications();
-    return apps.map((app) => {
-        const index = stateApps.findIndex(item => item.releaseName === app.releaseName);
-        const { state, error } = stateApps[index];
-        return { ...app, error, state: state || 'loading' };
-    });
+export const checkOrchestratorConnection = async (endpoint, token) => {
+    try {
+        const agent = new https.Agent({ rejectUnauthorized: false });
+        const { status } = await timeout(10000, fetch(`${endpoint}/healthz`, { headers: { Authorization: `Bearer ${token}` }, agent }));
+        return (status === 200);
+    } catch (e) {
+        return false;
+    }
 };
 
-const installApplication = async (name, userId, releaseName) => {
-    const chartUrl = `${CHART_REPOSITORY}/${name}-0.1.0.tgz`;
-    await fetch(`${SWIFT_ENDPOINT}/tiller/v2/releases/${releaseName}-${userId}/json`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
-        body: JSON.stringify({
-            chart_url: chartUrl,
-            namespace: ETHIBOX_NAMESPACE,
-            values: { raw: JSON.stringify({ serviceType: 'NodePort' }) },
-        }),
-        agent,
-    })
-        .then(checkStatus)
-        .catch(message => winston.log('error', message));
+export const installApplication = async (releaseName, stackFileUrl) => {
+    exec(`helm install --name ${releaseName} ${stackFileUrl}`, { silent: true });
 };
 
-const uninstallApplication = (releaseName, userId) => {
-    fetch(`${SWIFT_ENDPOINT}/tiller/v2/releases/${releaseName}-${userId}/json?purge=true`, {
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
-        method: 'DELETE',
-        agent,
-    })
-        .then(checkStatus)
-        .catch(message => winston.log('error', message));
+export const uninstallApplication = (releaseName) => {
+    exec(`helm delete --purge ${releaseName}`, { silent: true });
 };
 
-const editApplication = async (name, userId, releaseName, domainName, version = '0.1.0') => {
-    const chartUrl = `${CHART_REPOSITORY}/${name}-${version}.tgz`;
-    await fetch(`${SWIFT_ENDPOINT}/tiller/v2/releases/${releaseName}-${userId}/json`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
-        body: JSON.stringify({
-            chart_url: chartUrl,
-            reuse_values: true,
-            values: { raw: JSON.stringify({ serviceType: 'NodePort', ingress: { enabled: !!domainName, hosts: [domainName] } }) },
-        }),
-        agent,
-    })
-        .then(checkStatus)
-        .catch(message => winston.log('error', message));
+export const editApplication = async (releaseName, domainName, stackFileUrl) => {
+    if (domainName) {
+        exec(`helm upgrade ${releaseName} --set ingress.enabled=true,ingress.hosts[0]=${domainName} ${stackFileUrl}`, { silent: true });
+    } else {
+        exec(`helm upgrade ${releaseName} --set ingress.enabled=false ${stackFileUrl}`, { silent: true });
+    }
 };
 
-const synchronize = async () => {
-    const k8sApps = await listApplications();
-    process.env.PUBLIC_IP = process.env.PUBLIC_IP || await publicIp();
-    const ip = process.env.TELEPRESENCE_ROOT ? '192.168.99.100' : (process.env.KUBE_APISERVER_IP || process.env.PUBLIC_IP);
+export const listOrchestratorApps = async (namespace = 'default') => {
+    const services = JSON.parse(exec(`kubectl get svc -n ${namespace} -o json -l heritage=Tiller`, { silent: true }).stdout);
 
-    k8sApps.forEach((app) => {
-        const { port, state, error } = app;
-        const userId = (app.releaseName.match(/[0-9]+$/) && app.releaseName.match(/[0-9]+$/)[0]) || 0;
-        const releaseName = app.releaseName.replace(/-[0-9]+$/, '');
-        Application.update({ ip, port, state, error }, { where: { releaseName, userId } });
+    let apps = services.items.map(svc => ({
+        name: svc.metadata.labels.app,
+        releaseName: svc.metadata.labels.release,
+        port: svc.spec.ports[0].nodePort || null,
+        domainName: svc.metadata.labels.domain || null,
+    }));
+
+    apps = apps.map((app) => {
+        app.userId = (app.releaseName.match(/[0-9]+$/)) ? Number(app.releaseName.match(/[0-9]+$/)[0]) : null;
+        app.releaseName = app.releaseName.replace(/-[0-9]+$/, '');
+        return app;
     });
 
-    const applications = await sequelize.query(`SELECT releaseName, domainName, state, port, error, name, category, applications.ip as ip, userId, action
-       FROM applications
-       LEFT JOIN packages AS package ON applications.packageId = package.id
-       INNER JOIN users AS user ON applications.userId = user.id`, { type: sequelize.QueryTypes.SELECT });
+    apps = apps.filter(app => app.userId && app.port);
 
-    applications.forEach(async (app) => {
-        const { name, userId, action, releaseName, domainName } = app;
+    return apps;
+};
+
+export const synchronizeOrchestrator = async (ethiboxApps) => {
+    await Promise.all(ethiboxApps.map(async (app) => {
+        const { action, releaseName, domainName, userId } = app;
+        const { stackFileUrl } = app.package;
+        const helmReleaseName = `${releaseName}-${userId}`;
 
         switch (action) {
             case ACTIONS.INSTALL:
-                await installApplication(name, userId, releaseName);
+                await installApplication(helmReleaseName, stackFileUrl);
+                await app.update({ action: null });
                 break;
             case ACTIONS.UNINSTALL:
-                await uninstallApplication(releaseName, userId);
-                Application.destroy({ where: { releaseName } });
+                await uninstallApplication(helmReleaseName);
+                await app.update({ action: null });
                 break;
             case ACTIONS.EDIT:
-                await editApplication(name, userId, releaseName, domainName);
+                await editApplication(helmReleaseName, domainName, stackFileUrl);
+                await app.update({ action: null });
                 break;
             default:
                 break;
         }
-
-        Application.update({ action: null }, { where: { releaseName } });
-    });
+    }));
 };
 
-const listPackages = async () => {
-    const index = await fetch(`${CHART_REPOSITORY}/index.yaml`).then(res => res.text());
-    const packages = await yaml.parse(index).entries;
+export const synchronizeEthibox = async (orchestratorApps) => {
+    await Promise.all(orchestratorApps.map(async (app) => {
+        const { name, releaseName, userId } = app;
+        const ethiboxApp = await Application.findOne({ where: { releaseName, userId } });
+        if (!ethiboxApp) {
+            const pkg = await Package.findOne({ where: { name } });
+            const user = await User.findOne({ where: { id: userId } });
 
-    return Object.values(packages)
-        .filter(([pkg]) => !pkg.name.match('ethibox|custom'))
-        .map(([pkg]) => ({ ...pkg, category: pkg.keywords ? pkg.keywords[0] : 'Unknow' }));
+            const application = Application.build({ ...app, state: STATES.INSTALLING });
+            application.setPackage(pkg, { save: false });
+            application.setUser(user, { save: false });
+            application.save();
+        } else {
+            await ethiboxApp.update(app);
+        }
+    }));
+
+    const orchestratorAppsName = orchestratorApps.map(app => (app.releaseName));
+    const ethiboxApps = await Application.findAll({ where: { [Op.not]: { state: STATES.INSTALLING } }, raw: true });
+    const ethiboxAppsName = ethiboxApps.map(app => (app.releaseName));
+    const deletedOrchestratorApps = ethiboxAppsName.filter(name => !orchestratorAppsName.includes(name));
+
+    if (deletedOrchestratorApps) {
+        Application.destroy({ where: { releaseName: [...deletedOrchestratorApps] } });
+    }
 };
-
-(async () => {
-    const packages = await listPackages();
-    packages.forEach(async ({ name, icon, category }) => {
-        if (!await Package.findOne({ where: { name }, raw: true })) {
-            Package.create({ name, icon, category });
-        }
-        Package.update({ name, icon, category }, { where: { name } });
-    });
-})();
-
-if (TOKEN && KUBE_APISERVER_IP) {
-    let isSynchronizationRunning;
-    setInterval(async () => {
-        if (!isSynchronizationRunning) {
-            isSynchronizationRunning = true;
-            await synchronize();
-            isSynchronizationRunning = false;
-        }
-    }, 5000);
-} else {
-    winston.log('error', 'Kubernetes configuration missing!');
-    winston.log('error', 'Add KUBE_APISERVER_IP and TOKEN environment variables');
-}
