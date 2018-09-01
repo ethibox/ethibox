@@ -52,7 +52,7 @@ export const settingsQuery = (_, __, context) => {
 };
 
 export const packagesQuery = async () => {
-    const packages = await Package.findAll({ order: [['name', 'ASC']] });
+    const packages = await Package.findAll({ order: [['enabled', 'DESC'], ['name', 'ASC']] });
     return packages;
 };
 
