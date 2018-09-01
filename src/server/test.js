@@ -43,7 +43,7 @@ app.post('/users', async (req, res) => {
 app.post('/reset', async (req, res) => {
     const { defaultSettings } = req.body;
     await reset();
-    const { storeRepositoryUrl } = await initializeSettings({ ...defaultSettings, disableOrchestratorSync: true });
+    const { storeRepositoryUrl } = await initializeSettings({ ...defaultSettings, disableOrchestratorSync: true, storeRepositoryUrl: 'http://localhost:4444/test/apps.json' });
     await synchronizeStore(storeRepositoryUrl);
     return res.send('ok');
 });

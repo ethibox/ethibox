@@ -38,6 +38,7 @@ export const Package = sequelize.define('package', {
     icon: { type: Sequelize.STRING },
     category: { type: Sequelize.STRING },
     stackFileUrl: { type: Sequelize.STRING },
+    enabled: { type: Sequelize.BOOLEAN, defaultValue: true },
 });
 
 Application.User = Application.belongsTo(User);

@@ -53,7 +53,11 @@ export const initializeSettings = async (defaultSettings = {}) => {
 };
 
 (async () => {
-    const { orchestratorEndpoint, orchestratorToken, orchestratorIp } = await autoConfig();
-    const { storeRepositoryUrl } = await initializeSettings({ orchestratorEndpoint, orchestratorToken, orchestratorIp });
+    const config = await autoConfig();
+    const { storeRepositoryUrl, orchestratorEndpoint, orchestratorToken } = await initializeSettings(config);
     await synchronizeStore(storeRepositoryUrl);
+
+    if (await checkOrchestratorConnection(orchestratorEndpoint, orchestratorToken)) {
+        await initOrchestrator(orchestratorEndpoint, orchestratorToken);
+    }
 })();
