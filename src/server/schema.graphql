@@ -10,6 +10,7 @@ type Package {
     name: String
     icon: String
     category: String
+    enabled: Boolean
 }
 
 type Application {

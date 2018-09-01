@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 describe('Applications Page', () => {
     before(() => {
         const defaultSettings = {
-            storeRepositoryUrl: 'http://localhost:4444/test/apps.json',
             orchestratorIp: '192.168.99.100',
             isOrchestratorOnline: true,
         };
