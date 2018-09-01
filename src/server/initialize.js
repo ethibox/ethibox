@@ -9,7 +9,7 @@ export const autoConfig = async () => {
     let orchestratorEndpoint;
     let orchestratorIp;
 
-    const tokenPath = '/var/run/secrets/kubernetes.io/serviceaccount/token';
+    const tokenPath = `${process.env.TELEPRESENCE_ROOT || ''}/var/run/secrets/kubernetes.io/serviceaccount/token`;
 
     if (fs.existsSync(tokenPath)) {
         orchestratorToken = fs.readFileSync(tokenPath, 'utf8');
@@ -18,7 +18,7 @@ export const autoConfig = async () => {
 
     if (await checkOrchestratorConnection(orchestratorEndpoint, orchestratorToken)) {
         await initOrchestrator(orchestratorEndpoint, orchestratorToken);
-        orchestratorIp = exec('kubectl -n kube-system get pods -l component=kube-apiserver -o json | jq -r ".items[0].spec.containers[0].livenessProbe.httpGet.host"', { silent: true });
+        orchestratorIp = exec('kubectl -n kube-system get pods -l component=kube-apiserver -o json | jq -r ".items[0].spec.containers[0].livenessProbe.httpGet.host"', { silent: true }).stdout.trim();
     }
 
     return { orchestratorToken, orchestratorEndpoint, orchestratorIp };
