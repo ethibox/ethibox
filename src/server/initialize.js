@@ -40,6 +40,7 @@ export const initializeSettings = async (defaultSettings = {}) => {
         { name: 'storeRepositoryUrl', value: (defaultSettings.storeRepositoryUrl || 'https://store.ethibox.io/apps.json') },
         { name: 'disableOrchestratorCheck', value: (defaultSettings.disableOrchestratorCheck || false) },
         { name: 'disableOrchestratorSync', value: (defaultSettings.disableOrchestratorSync || false) },
+        { name: 'checkDnsEnabled', value: (defaultSettings.checkDnsEnabled || false) },
     ];
 
     await Promise.all(settings.map(async ({ name, value }) => {
