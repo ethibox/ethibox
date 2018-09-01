@@ -10,8 +10,8 @@ export default () => {
                 <span> - Version { process.env.VERSION }</span>
             </p>
             <p style={{ margin: 0 }}>
-                <a href="https://github.com/ston3o/ethibox" target="_blank" rel="noopener noreferrer">Source code</a> |&nbsp;
-                <a href="https://github.com/ston3o/ethibox/issues" target="_blank" rel="noopener noreferrer">Issue tracker</a> |&nbsp;
+                <a href="https://github.com/ethibox/ethibox" target="_blank" rel="noopener noreferrer">Source code</a> |&nbsp;
+                <a href="https://github.com/ethibox/ethibox/issues" target="_blank" rel="noopener noreferrer">Issue tracker</a> |&nbsp;
                 <a href="https://liberapay.com/ston3o/donate" target="_blank" rel="noopener noreferrer">Support</a>
             </p>
         </Segment>

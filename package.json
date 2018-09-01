@@ -3,7 +3,7 @@
   "homepage": "https://ethibox.fr",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ston3o/ethibox.git"
+    "url": "git+https://github.com/ethibox/ethibox.git"
   },
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
