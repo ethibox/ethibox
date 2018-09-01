@@ -20,9 +20,7 @@ const Empty = () => {
     );
 };
 
-const PackageList = (props) => {
-    const packages = props.packages.sort((a, b) => a.enabled < b.enabled);
-
+const PackageList = ({ packages }) => {
     if (!packages.length) {
         return <Empty />;
     }
