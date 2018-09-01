@@ -5,11 +5,11 @@ import { timeout, STATES, ACTIONS } from './utils';
 import { User, Application, Package } from './models';
 
 export const initOrchestrator = (endpoint, token) => {
-    exec(`kubectl config set-cluster kubernetes --insecure-skip-tls-verify=true --server=${endpoint}`, { silent: false });
-    exec('kubectl config set-context kubernetes --cluster=kubernetes --user=kubernetes --namespace=default', { silent: false });
-    exec(`kubectl config set-credentials kubernetes --token=${token}`, { silent: false });
-    exec('kubectl config use-context kubernetes', { silent: false });
-    exec('helm init', { silent: false });
+    exec(`kubectl config set-cluster kubernetes --insecure-skip-tls-verify=true --server=${endpoint}`, { silent: true });
+    exec('kubectl config set-context kubernetes --cluster=kubernetes --user=kubernetes --namespace=default', { silent: true });
+    exec(`kubectl config set-credentials kubernetes --token=${token}`, { silent: true });
+    exec('kubectl config use-context kubernetes', { silent: true });
+    exec('helm init', { silent: true });
 };
 
 export const checkOrchestratorConnection = async (endpoint, token) => {
