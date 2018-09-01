@@ -14,7 +14,7 @@ export const applicationsQuery = async (_, __, context) => {
     const { id } = context.req.user;
     const { orchestratorIp } = context.req.settings;
 
-    const apps = await sequelize.query(`SELECT releaseName, domainName, state, port, error, name, category, package.icon icon
+    const apps = await sequelize.query(`SELECT releaseName, domainName, state, port, error, name, category, package.icon icon, package.enabled enabled
        FROM applications
        LEFT JOIN packages AS package ON applications.packageId = package.id
        INNER JOIN users AS user ON applications.userId = user.id AND user.id = ?`, { replacements: [id], type: sequelize.QueryTypes.SELECT });
@@ -52,7 +52,7 @@ export const settingsQuery = (_, __, context) => {
 };
 
 export const packagesQuery = async () => {
-    const packages = await Package.findAll();
+    const packages = await Package.findAll({ order: [['name', 'ASC']] });
     return packages;
 };
 

@@ -21,7 +21,7 @@ const Empty = () => {
 };
 
 const PackageList = (props) => {
-    const packages = props.packages.sort((a, b) => a.name.localeCompare(b.name));
+    const packages = props.packages.sort((a, b) => a.enabled < b.enabled);
 
     if (!packages.length) {
         return <Empty />;
