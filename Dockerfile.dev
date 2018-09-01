@@ -1,6 +1,6 @@
 FROM node:8.11.4
 
-RUN apt-get update && apt-get install -y jq
+RUN apt-get update && apt-get install -y jq sqlite3
 
 RUN wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.11.2/bin/linux/amd64/kubectl
 
