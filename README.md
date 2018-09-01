@@ -10,7 +10,7 @@
 
 Simple UI to search, install, update, configure, backup, check, rollback, secure, expose, scale, monetize & uninstall your free softwares.
 
-##### [Docs](https://ethibox.io) | [Demo](https://demo.ethibox.fr) | [FAQ](https://ethibox.fr/faq) | [Contributing](https://github.com/ethibox/ethibox/blob/master/.github/CONTRIBUTING.md)
+##### [Demo](https://demo.ethibox.fr) | [Docs](https://ethibox.io) | [FAQ](https://ethibox.fr/faq) | [Contributing](https://github.com/ethibox/ethibox/blob/master/.github/CONTRIBUTING.md)
 
 ![screenshot](docs/images/screenshot.png)
 
@@ -19,7 +19,7 @@ Simple UI to search, install, update, configure, backup, check, rollback, secure
 * [x] Host and manage your applications effortlessly
 * [x] Monetize your infrastructure with Stripe
 * [x] Kubernetes Support
-* [ ] +50 free softwares to install in one click
+* [ ] [+50 free softwares](https://github.com/ethibox/store) to install in one click
 * [ ] Docker Swarm Support
 
 ## Deployment
@@ -108,6 +108,8 @@ npm install
 
 # Run the app
 npm run docker:start
+
+# Go to http://localhost:4444
 ```
 
 ### Running the tests
