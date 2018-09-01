@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { exec } from 'shelljs';
 import { synchronizeStore, getSettings } from './utils';
 import { Settings } from './models';
 import { checkOrchestratorConnection, initOrchestrator } from './connector';
@@ -6,6 +7,7 @@ import { checkOrchestratorConnection, initOrchestrator } from './connector';
 export const autoConfig = async () => {
     let orchestratorToken;
     let orchestratorEndpoint;
+    let orchestratorIp;
 
     const tokenPath = '/var/run/secrets/kubernetes.io/serviceaccount/token';
 
@@ -16,9 +18,10 @@ export const autoConfig = async () => {
 
     if (await checkOrchestratorConnection(orchestratorEndpoint, orchestratorToken)) {
         await initOrchestrator(orchestratorEndpoint, orchestratorToken);
+        orchestratorIp = exec('kubectl -n kube-system get pods -l component=kube-apiserver -o json | jq -r ".items[0].spec.containers[0].livenessProbe.httpGet.host"', { silent: true });
     }
 
-    return { orchestratorToken, orchestratorEndpoint };
+    return { orchestratorToken, orchestratorEndpoint, orchestratorIp };
 };
 
 export const initializeSettings = async (defaultSettings = {}) => {
@@ -50,7 +53,7 @@ export const initializeSettings = async (defaultSettings = {}) => {
 };
 
 (async () => {
-    const { orchestratorEndpoint, orchestratorToken } = await autoConfig();
-    const { storeRepositoryUrl } = await initializeSettings({ orchestratorEndpoint, orchestratorToken });
+    const { orchestratorEndpoint, orchestratorToken, orchestratorIp } = await autoConfig();
+    const { storeRepositoryUrl } = await initializeSettings({ orchestratorEndpoint, orchestratorToken, orchestratorIp });
     await synchronizeStore(storeRepositoryUrl);
 })();

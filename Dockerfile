@@ -24,7 +24,7 @@ RUN cp package.json public && cd public && npm i --prod && npm rebuild bcrypt --
 
 FROM node:8.11.4-alpine
 
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl jq
 
 COPY --from=build /usr/local/bin/helm /usr/local/bin/helm
 
