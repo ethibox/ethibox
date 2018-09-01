@@ -31,7 +31,7 @@ export const synchronize = ({ singleSync } = { singleSync: true }) => async (dis
                 storeRepositoryUrl
             }
             applications { name releaseName domainName category icon state ip port error }
-            packages { name category icon }
+            packages { name category icon enabled }
             user { isAdmin isSubscribed }
         }` }),
     })

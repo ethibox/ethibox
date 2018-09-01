@@ -31,6 +31,14 @@ class Package extends React.Component {
     renderButtons = () => {
         const { action, releaseName, error, errorMessage } = this.state;
 
+        if (!this.props.enabled) {
+            return (
+                <Button.Group widths={2}>
+                    <Button color="grey" disabled>Coming Soon!</Button>
+                </Button.Group>
+            );
+        }
+
         if (action === 'editReleaseName') {
             return (
                 <Form.Field>
