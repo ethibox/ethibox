@@ -21,7 +21,7 @@
     "test:ci": "server-test start:test 4444",
     "docker:start": "docker run --name ethibox -it --rm -p 3000:3000 -p 4444:4444 -v $PWD/:/app ethibox/dev",
     "docker:build": "docker build -t ethibox/ethibox .",
-    "docker:enter": "docker exec -e COLUMNS=$COLUMNS -e LINES=$LINES -e TERM=$TERM -it ethibox sh"
+    "docker:enter": "docker exec -e COLUMNS=$COLUMNS -e LINES=$LINES -e TERM=$TERM -it ethibox bash"
   },
   "engines": {
     "node": "8.11.4",
