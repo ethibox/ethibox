@@ -23,7 +23,7 @@ export const checkOrchestratorConnection = async (endpoint, token) => {
 };
 
 export const installApplication = async (releaseName, stackFileUrl) => {
-    exec(`helm install --name ${releaseName} ${stackFileUrl}`, { silent: true });
+    exec(`helm install --name ${releaseName} --set service.type=NodePort,persistence.enabled=true ${stackFileUrl}`, { silent: true });
 };
 
 export const uninstallApplication = (releaseName) => {
@@ -32,9 +32,9 @@ export const uninstallApplication = (releaseName) => {
 
 export const editApplication = async (releaseName, domainName, stackFileUrl) => {
     if (domainName) {
-        exec(`helm upgrade ${releaseName} --set ingress.enabled=true,ingress.hosts[0]=${domainName} ${stackFileUrl}`, { silent: true });
+        exec(`helm upgrade ${releaseName} --set ingress.enabled=true,ingress.hosts[0]=${domainName} --reuse-values ${stackFileUrl}`, { silent: true });
     } else {
-        exec(`helm upgrade ${releaseName} --set ingress.enabled=false ${stackFileUrl}`, { silent: true });
+        exec(`helm upgrade ${releaseName} --set ingress.enabled=false --reuse-values ${stackFileUrl}`, { silent: true });
     }
 };
 
