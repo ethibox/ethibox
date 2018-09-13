@@ -39,7 +39,7 @@ kubectl run ethibox --image=ethibox/ethibox --port=4444 --expose
 ### Deploy with helm (Kubernetes)
 
 ```bash
-helm install --name ethibox https://store.ethibox.io/packages/ethibox-0.1.0.tgz
+helm install --name ethibox https://store.ethibox.io/kubernetes/packages/ethibox-0.1.0.tgz
 ```
 
 ### Deploy with Terraform
