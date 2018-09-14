@@ -29,6 +29,7 @@ export const synchronize = ({ singleSync } = { singleSync: true }) => async (dis
                 monthlyPrice
                 stripePlanName
                 storeRepositoryUrl
+                isPersistenceEnabled
             }
             applications { name releaseName domainName category icon state ip port error }
             packages { name category icon enabled }
