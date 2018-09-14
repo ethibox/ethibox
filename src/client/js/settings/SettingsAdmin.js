@@ -15,6 +15,7 @@ class SettingsAdmin extends Component {
             orchestratorName: this.props.settings.orchestratorName || '',
             orchestratorToken: this.props.settings.orchestratorToken || '',
             orchestratorEndpoint: this.props.settings.orchestratorEndpoint || '',
+            isPersistenceEnabled: this.props.settings.isPersistenceEnabled || false,
         });
     }
 
@@ -22,6 +23,10 @@ class SettingsAdmin extends Component {
 
     toggleMonetization = (e, { checked }) => {
         this.setState({ isMonetizationEnabled: checked });
+    }
+
+    togglePersistence = (e, { checked }) => {
+        this.setState({ isPersistenceEnabled: checked });
     }
 
     handleSubmit = (e) => {
@@ -78,7 +83,7 @@ class SettingsAdmin extends Component {
     }
 
     orchestratorForm = () => {
-        const { storeRepositoryUrl, orchestratorName, orchestratorToken, orchestratorEndpoint } = this.state;
+        const { storeRepositoryUrl, orchestratorName, orchestratorToken, orchestratorEndpoint, isPersistenceEnabled } = this.state;
         const orchestrators = [{ text: 'Kubernetes', value: 'kubernetes' }, { text: 'Docker Swarm', value: 'swarm' }];
 
         return [
@@ -119,6 +124,14 @@ class SettingsAdmin extends Component {
                 value={orchestratorToken}
                 onChange={this.handleChange}
                 required
+            />,
+            orchestratorName === 'kubernetes' && <Form.Field
+                label="Enable Data Persistence"
+                onClick={this.togglePersistence}
+                control={Radio}
+                checked={isPersistenceEnabled}
+                key="persistence"
+                toggle
             />,
             <Form.Field
                 control={Input}

@@ -11,7 +11,19 @@ export const loadSettings = () => async (dispatch) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-access-token': localStorage.getItem('token') },
         body: JSON.stringify({ query: `{ 
-            settings { orchestratorName orchestratorEndpoint orchestratorToken storeRepositoryUrl isDemoEnabled isMonetizationEnabled stripePublishableKey stripeSecretKey monthlyPrice stripePlanName }
+            settings {
+                orchestratorName
+                orchestratorEndpoint
+                orchestratorToken
+                storeRepositoryUrl
+                isDemoEnabled
+                isMonetizationEnabled
+                stripePublishableKey
+                stripeSecretKey
+                monthlyPrice
+                stripePlanName
+                isPersistenceEnabled
+            }
             user { isAdmin isSubscribed }
         }` }),
     })
@@ -66,6 +78,7 @@ export const updateAdminSettings = settings => async (dispatch) => {
                     stripeSecretKey: "${settings.stripeSecretKey}",
                     stripePublishableKey: "${settings.stripePublishableKey}"
                     stripePlanName: "${settings.stripePlanName}"
+                    isPersistenceEnabled: ${settings.isPersistenceEnabled}
                 }) { isMonetizationEnabled }
         }` }),
     })
