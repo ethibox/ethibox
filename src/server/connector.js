@@ -24,7 +24,7 @@ export const checkOrchestratorConnection = async (endpoint, token) => {
 
 export const installApplication = async (releaseName, stackFileUrl) => {
     const { isPersistenceEnabled } = await getSettings();
-    exec(`helm install --name ${releaseName} --set service.type=NodePort,persistence.enabled=${isPersistenceEnabled} ${stackFileUrl}`, { silent: true });
+    exec(`helm install --name ${releaseName} --set service.type=NodePort,global.persistence.enabled=${isPersistenceEnabled} ${stackFileUrl}`, { silent: true });
 };
 
 export const uninstallApplication = (releaseName) => {
