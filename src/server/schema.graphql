@@ -35,6 +35,7 @@ input SettingsInput {
     stripeSecretKey: String
     stripePlanName: String
     storeRepositoryUrl: String
+    isPersistenceEnabled: Boolean
 }
 
 type Settings {
@@ -51,6 +52,7 @@ type Settings {
     stripePlanName: String
     monthlyPrice: String
     storeRepositoryUrl: String
+    isPersistenceEnabled: Boolean
 }
 
 type Query {
