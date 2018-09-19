@@ -187,7 +187,7 @@ export const updateAdminSettingsMutation = async (_, { settings }, context) => {
     if (!context.req.user.isAdmin) throw new Error('Not authorized');
 
     const { disableOrchestratorCheck } = context.req.settings;
-    const { isMonetizationEnabled, orchestratorEndpoint, orchestratorToken, storeRepositoryUrl } = settings;
+    const { isMonetizationEnabled, orchestratorEndpoint, orchestratorToken, storeRepositoryUrl, isPersistenceEnabled } = settings;
 
     if (isMonetizationEnabled) {
         if (!new RegExp(/^sk_/).test(settings.stripeSecretKey)) {
@@ -210,6 +210,7 @@ export const updateAdminSettingsMutation = async (_, { settings }, context) => {
 
     if (orchestratorEndpoint && orchestratorToken) {
         settings.orchestratorIp = url.parse(orchestratorEndpoint).hostname;
+        settings.isPersistenceEnabled = isPersistenceEnabled;
 
         if (disableOrchestratorCheck) {
             settings.isOrchestratorOnline = true;

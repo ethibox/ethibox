@@ -41,6 +41,7 @@ export const initializeSettings = async (defaultSettings = {}) => {
         { name: 'disableOrchestratorCheck', value: (defaultSettings.disableOrchestratorCheck || false) },
         { name: 'disableOrchestratorSync', value: (defaultSettings.disableOrchestratorSync || false) },
         { name: 'checkDnsEnabled', value: (defaultSettings.checkDnsEnabled || false) },
+        { name: 'isPersistenceEnabled', value: (defaultSettings.isPersistenceEnabled || false) },
     ];
 
     await Promise.all(settings.map(async ({ name, value }) => {

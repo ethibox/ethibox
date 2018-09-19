@@ -1,7 +1,7 @@
 import { exec } from 'shelljs';
 import https from 'https';
 import { Op } from 'sequelize';
-import { timeout, STATES, ACTIONS } from './utils';
+import { timeout, getSettings, STATES, ACTIONS } from './utils';
 import { User, Application, Package } from './models';
 
 export const initOrchestrator = (endpoint, token) => {
@@ -23,7 +23,8 @@ export const checkOrchestratorConnection = async (endpoint, token) => {
 };
 
 export const installApplication = async (releaseName, stackFileUrl) => {
-    exec(`helm install --name ${releaseName} --set service.type=NodePort,persistence.enabled=true ${stackFileUrl}`, { silent: true });
+    const { isPersistenceEnabled } = await getSettings();
+    exec(`helm install --name ${releaseName} --set service.type=NodePort,global.persistence.enabled=${isPersistenceEnabled} ${stackFileUrl}`, { silent: true });
 };
 
 export const uninstallApplication = (releaseName) => {
