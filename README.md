@@ -17,10 +17,11 @@ Simple UI to search, install, update, configure, backup, check, rollback, secure
 ## Features
 
 * [x] Host and manage your applications effortlessly
-* [x] Monetize your infrastructure with Stripe
+* [x] Become indie hoster by monetizing your infrastructure with Stripe
 * [x] Kubernetes Support
 * [ ] [+50 free softwares](https://github.com/ethibox/store) to install in one click
 * [ ] Docker Swarm Support
+* [ ] Raspberry PI Support
 
 ## Deployment
 
@@ -109,7 +110,7 @@ npm install
 # Run the app
 npm run docker:start
 
-# Go to http://localhost:4444
+# Go to http://localhost:3000
 ```
 
 ### Running the tests
