@@ -10,7 +10,7 @@
 
 Simple UI to search, install, update, configure, backup, check, rollback, secure, expose, scale, monetize & uninstall your free softwares.
 
-##### [Demo](https://demo.ethibox.fr) | [Docs](https://ethibox.io) | [FAQ](https://ethibox.fr/faq) | [Contributing](https://github.com/ethibox/ethibox/blob/master/.github/CONTRIBUTING.md)
+##### [Docs](https://ethibox.io) | [FAQ](https://ethibox.fr/faq) | [Contributing](https://github.com/ethibox/ethibox/blob/master/.github/CONTRIBUTING.md)
 
 ![screenshot](docs/images/screenshot.png)
 

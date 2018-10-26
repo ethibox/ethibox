@@ -8,7 +8,6 @@
 * 🛒 +50 free softwares to install in one click
 * :package: Kubernetes & Docker Swarm support
 
-[Live Demo](https://demo.ethibox.fr)
 [Get Started](#deployment)
 
 ![color](linear-gradient(to bottom, #0D7478 0%, #12CEC3 100%))
