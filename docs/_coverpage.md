@@ -3,10 +3,10 @@
 > Host your websites effortlessly
 
 <!-- Benefits -->
-* :ok_hand: Host and manage your applications effortlessly
-* :dollar: Monetize your infrastructure with Stripe
+* 👌 Host and manage your applications effortlessly
+* 💵 Monetize your infrastructure with Stripe
 * 🛒 +50 free softwares to install in one click
-* :package: Kubernetes & Docker Swarm support
+* 📦 Kubernetes & Docker Swarm support
 
 [Get Started](#deployment)
 
