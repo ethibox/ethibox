@@ -10,7 +10,7 @@ before_script:
   - sh -e /etc/init.d/xvfb start
 script:
   - npm run build
-  - npm run test:ci
+  # - npm run test:ci
 cache: false
 branches:
   only:
