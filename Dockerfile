@@ -1,38 +1,48 @@
 # Build
 
-FROM node:8.11.4-alpine AS build
+FROM node:12.20 AS build
 
-RUN apk add --no-cache openssl libressl curl git make gcc g++ python
-
-RUN wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.11.2/bin/linux/amd64/kubectl
-
-RUN curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | sh
-
-RUN chmod +x /usr/local/bin/helm /usr/local/bin/kubectl
+ENV GATSBY_TELEMETRY_DISABLED 1
 
 WORKDIR /app
 
 COPY . /app
 
-RUN npm install && npm rebuild node-sass
+ARG PREFIX_PATHS
+
+ARG MATOMO_ENABLED
+
+ARG MATOMO_URL
+
+ARG MATOMO_SITEID
+
+ARG POSTHOG_ENABLED
+
+ARG POSTHOG_URL
+
+ARG POSTHOG_APIKEY
+
+RUN yarn install
 
 RUN npm run build
 
-RUN cp package.json public && cd public && npm i --prod && npm rebuild bcrypt --build-from-source
+RUN npm install -g node-pre-gyp
+
+RUN yarn install --prod --modules-folder public/node_modules
 
 # Production
 
-FROM node:8.11.4-alpine
+FROM node:12.20-buster-slim
 
-RUN apk add --no-cache curl jq
+COPY --from=build /app/public /app/package.json /app/
 
-COPY --from=build /usr/local/bin/helm /usr/local/bin/helm
+COPY --from=build /app/prisma /app/prisma
 
-COPY --from=build /usr/local/bin/kubectl /usr/local/bin/kubectl
+COPY --from=build /app/prisma/schema.prisma /app/schema.prisma
 
-COPY --from=build /app/public /app
+COPY docker-entrypoint.sh /usr/local/bin/
 
-VOLUME ["/app/data"]
+RUN apt-get -qy update && apt-get -qy install openssl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -40,4 +50,6 @@ ENV NODE_ENV=production
 
 CMD ["node", "index.js"]
 
-EXPOSE 4444
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+EXPOSE 3000 5555

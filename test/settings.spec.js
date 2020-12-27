@@ -1,80 +1,109 @@
 import jwt from 'jsonwebtoken';
 
-describe('Settings page', () => {
+const user = { email: 'user@ethibox.fr', password: 'myp@ssw0rd' };
+
+describe('Settings Page', () => {
     before(() => {
-        cy.request('POST', '/test/reset', { defaultSettings: { disableOrchestratorCheck: true } });
-        cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd', isAdmin: true }] });
+        cy.request('POST', 'http://localhost:3000/test/reset');
+        cy.request('POST', 'http://localhost:3000/test/settings', { settings: [
+            { name: 'stripeEnabled', value: 'true' },
+            { name: 'stripePublishableKey', value: Cypress.env('STRIPE_PUBLISHABLE_KEY') },
+            { name: 'stripeSecretKey', value: Cypress.env('STRIPE_SECRET_KEY') },
+        ] });
+        cy.request('POST', 'http://localhost:3000/test/users', { users: [user] });
+        cy.request({
+            method: 'POST',
+            url: 'http://localhost:3000/graphql',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: `mutation {
+                login(email: "${user.email}", password: "${user.password}") { token }
+            }` }),
+        })
+            .its('body')
+            .then(({ data }) => { user.id = jwt.decode(data.login.token).id; });
     });
 
-    it('Should change user password', () => {
-        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/settings', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('input[name="password"]').type('mynewp@ass0rd');
-        cy.get('input[name="confirmPassword"]').type('mynewp@ass0rd');
-        cy.get('button[name="password"]').click();
-        cy.contains('.modal', 'Password updated!');
+    beforeEach(() => {
+        cy.setLocalStorage('token', jwt.sign(user, 'mys3cr3t', { expiresIn: '1d' }));
     });
 
-    it('Should display an error if passwords do not match', () => {
-        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/settings', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('input[name="password"]').type('mynewp@ass0rd');
-        cy.get('input[name="confirmPassword"]').type('mynewbadp@ass0rd');
-        cy.get('button[name="password"]').click();
-        cy.contains('.error', 'Passwords doesn\'t match');
-    });
+    it('Should add & remove payment card if stripe is enabled', () => {
+        const token = jwt.sign(user, 'mys3cr3t', { expiresIn: '1d' });
 
-    it('Should display an error if passwords is too short', () => {
-        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/settings', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('input[name="password"]').type('new');
-        cy.get('input[name="confirmPassword"]').type('new');
-        cy.get('button[name="password"]').click();
-        cy.contains('.error', 'Your password must be at least 6 characters');
-    });
-
-    it('Should setup orchestrator settings', () => {
-        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/settings', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('.dropdown[name="orchestratorName"]').click();
-        cy.get('.dropdown[name="orchestratorName"] .item').contains('Kubernetes').click();
-        cy.get('input[name="orchestratorEndpoint"]').type('https://192.168.99.100:8443');
-        cy.get('input[name="orchestratorToken"]').type('eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlca');
-        cy.get('button[name="save"]').click();
-        cy.contains('.modal', 'Configuration updated!');
-    });
-
-    it('Should import store packages with apps.json file', () => {
-        cy.request('DELETE', '/test/packages');
-        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/settings', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('input[name="storeRepositoryUrl"]').type('{selectall}{del}http://localhost:4444/test/apps.json');
-        cy.get('button[name="save"]').click();
-        cy.contains('.modal', 'Configuration updated!');
-        cy.request('GET', '/test/packages').then((response) => {
-            expect(response.body).to.have.lengthOf(2);
+        cy.request({
+            method: 'POST',
+            url: 'http://localhost:3000/graphql',
+            headers: { 'Content-Type': 'application/json', 'x-access-token': token },
+            body: JSON.stringify({ query: 'mutation { removePaymentMethod }' }),
         });
+
+        cy.visit('/settings');
+
+        cy.get('#first_name').clear().type('Marty');
+        cy.get('#last_name').clear().type('Mcfly');
+
+        cy.getWithinIframe('[name="cardnumber"]').type('4242424242424242');
+        cy.getWithinIframe('[name="exp-date"]').type('1232');
+        cy.getWithinIframe('[name="cvc"]').type('987');
+        cy.getWithinIframe('[name="postal"]').type('12345');
+
+        cy.get('main > div:nth-child(2) button:last').click();
+        cy.contains('.notification', 'Account informations saved successfully');
+
+        cy.get('#change_card').click();
+        cy.get('#confirm').click();
     });
 
-    it('Should no import bad apps.json file', () => {
-        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/settings', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('input[name="storeRepositoryUrl"]').type('{selectall}{del}http://bad-url.com/apps.json');
-        cy.get('button[name="save"]').click();
-        cy.contains('.modal', 'Invalid store repository URL');
+    it('Should display error if payment card is bad', () => {
+        const token = jwt.sign(user, 'mys3cr3t', { expiresIn: '1d' });
+
+        cy.request('POST', 'http://localhost:3000/test/settings', { settings: [
+            { name: 'stripeEnabled', value: 'true' },
+            { name: 'stripePublishableKey', value: Cypress.env('STRIPE_PUBLISHABLE_KEY') },
+            { name: 'stripeSecretKey', value: Cypress.env('STRIPE_SECRET_KEY') },
+        ] });
+
+        cy.request({
+            method: 'POST',
+            url: 'http://localhost:3000/graphql',
+            headers: { 'Content-Type': 'application/json', 'x-access-token': token },
+            body: JSON.stringify({ query: 'mutation { removePaymentMethod }' }),
+        });
+
+        cy.visit('/settings');
+
+        cy.get('#first_name').clear().type('Marty');
+        cy.get('#last_name').clear().type('Mcfly');
+
+        cy.getWithinIframe('[name="cardnumber"]').type('4000000000000069');
+        cy.getWithinIframe('[name="exp-date"]').type('1232');
+        cy.getWithinIframe('[name="cvc"]').type('987');
+        cy.getWithinIframe('[name="postal"]').type('12345');
+
+        cy.get('main > div:nth-child(2) button:last').click();
+        cy.contains('.notification', 'Your card has expired');
     });
 
-    it('Should enable monetization', () => {
-        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/settings', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('.monetization .checkbox').click();
-        cy.get('input[name="stripeSecretKey"]').type(Cypress.env('STRIPE_SECRET_KEY'));
-        cy.get('input[name="stripePublishableKey"]').type(Cypress.env('STRIPE_PUBLISHABLE_KEY'));
-        cy.get('input[name="stripePlanName"]').type(Cypress.env('STRIPE_PLAN_NAME'));
-        cy.get('button[name="save"]').click();
-        cy.contains('.modal', 'Configuration updated!');
-        cy.get('.modal button').click();
-        cy.get('.subscribe .checkbox').click();
-        cy.get('.message').not('Bad stripe publishable key');
+    it('Should not show payment method if stripe disabled', () => {
+        cy.request('POST', 'http://localhost:3000/test/settings', { settings: [{ name: 'stripeEnabled', value: 'false' }] });
+        cy.visit('/settings');
+        cy.get('main').should('not.contain', 'Card number');
+    });
+
+    it('Should delete account', () => {
+        cy.visit('/settings');
+        cy.get('.mt-8 > .flex > [type="button"]').click();
+        cy.get('button.bg-red-700').click();
+        cy.url().should('contain', '/login');
+    });
+
+    it('Should set first and last name', () => {
+        cy.request('POST', 'http://localhost:3000/test/reset');
+        cy.request('POST', 'http://localhost:3000/test/users', { users: [user] });
+        cy.visit('/settings');
+        cy.get('#first_name').type('Marty');
+        cy.get('#last_name').type('Mcfly');
+        cy.get('main > div:nth-child(2) button:last').click();
+        cy.contains('.notification', 'Account informations saved successfully');
     });
 });

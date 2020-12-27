@@ -1,0 +1,78 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./data.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  firstName    String?
+  lastName     String?
+  password     String
+  applications Application[]
+  isAdmin      Boolean       @default(false)
+  enabled      Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Webhook {
+  id            Int     @id @default(autoincrement())
+  event         String
+  targetUrl     String
+}
+
+model Template {
+  id            Int     @id @default(autoincrement())
+  name          String  @unique
+  description   String?
+  category      String?
+  logo          String?
+  trial         Int?    @default(0)
+  website       String?
+  price         Int     @default(0)
+  stackFile     String
+  repositoryUrl String
+  adminPath     String?
+  auto          Boolean @default(false)
+  envs          String?
+  enabled       Boolean @default(true)
+}
+
+model Application {
+  id            Int       @id @default(autoincrement())
+  releaseName   String    @unique
+  domain        String    @unique
+  error         String?
+  price         Int       @default(0)
+  envs          Env[]
+  state         String    @default("installing")
+  task          String?   @default("install")
+  lastTaskDate  DateTime? @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  user          User      @relation(fields: [userId], references: [id])
+  userId        Int
+  template      Template  @relation(fields: [templateId], references: [id])
+  templateId    Int
+  responseTime  Int       @default(0)
+}
+
+model Env {
+  id            Int          @id @default(autoincrement())
+  name          String
+  value         String?
+  global        Boolean      @default(false)
+  application   Application? @relation(fields: [applicationId], references: [id])
+  applicationId Int?
+}
+
+model Setting {
+  id            Int     @id @default(autoincrement())
+  name          String  @unique
+  value         String
+}
