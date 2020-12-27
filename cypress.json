@@ -1,10 +1,16 @@
 {
-    "fixturesFolder": false,
-    "pluginsFile": false,
-    "supportFile": "test/support.js",
-    "video": false,
-    "defaultCommandTimeout": 10000,
-    "requestTimeout": 10000,
-    "integrationFolder": "test",
-    "baseUrl": "http://localhost:4444"
+  "fixturesFolder": "test/cypress/fixtures/",
+  "pluginsFile": "test/cypress/plugins.js",
+  "video": false,
+  "screenshotsFolder": ".cache/cypress/screenshots",
+  "integrationFolder": "test",
+  "supportFile": "test/cypress/support.js",
+  "defaultCommandTimeout": 10000,
+  "requestTimeout": 10000,
+  "baseUrl": "http://localhost:8080",
+  "chromeWebSecurity": false,
+  "retries": {
+      "runMode": 2,
+      "openMode": 0
+  }
 }

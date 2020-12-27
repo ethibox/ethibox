@@ -1,93 +1,96 @@
 import jwt from 'jsonwebtoken';
 
+const user = { email: 'user@ethibox.fr', password: 'myp@ssw0rd' };
+
 describe('Applications Page', () => {
     before(() => {
-        const defaultSettings = {
-            orchestratorIp: '192.168.99.100',
-            isOrchestratorOnline: true,
-        };
-        cy.request('POST', '/test/reset', { defaultSettings });
-        cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd' }] });
-        cy.request('POST', '/test/applications', { applications: [
-            { releaseName: 'myapp', port: 30346, state: 'running', user: 1, pkg: 1 },
-            { releaseName: 'myapp2', port: 30347, state: 'running', user: 1, pkg: 1 },
-            { releaseName: 'myapp3', port: 30348, state: 'running', domainName: 'test.fr', user: 1, pkg: 2 },
-        ] });
+        cy.request('POST', 'http://localhost:3000/test/reset');
+        cy.request('POST', 'http://localhost:3000/test/import');
+        cy.request('POST', 'http://localhost:3000/test/users', { users: [user] });
+
+        cy.request({
+            method: 'POST',
+            url: 'http://localhost:3000/graphql',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: `mutation {
+                login(email: "${user.email}", password: "${user.password}") { token }
+            }` }),
+        })
+            .its('body')
+            .then(({ data }) => {
+                user.id = jwt.decode(data.login.token).id;
+
+                cy.request('POST', 'http://localhost:3000/test/apps', {
+                    apps: [
+                        { templateId: 1, userId: user.id, state: 'running' },
+                        { templateId: 1, userId: user.id, state: 'running' },
+                        { templateId: 1, userId: user.id, state: 'running' },
+                    ],
+                });
+            });
+    });
+
+    beforeEach(() => {
+        cy.setLocalStorage('token', jwt.sign(user, 'mys3cr3t', { expiresIn: '1d' }));
     });
 
     it('Should display applications', () => {
-        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('.cards .card:first-child .header').contains('myapp');
-        cy.get('.cards .card:first-child .meta').contains('Blog');
-        cy.get('.cards .card:first-child .meta').contains('http://192.168.99.100:30346');
+        cy.visit('/apps');
+        cy.get('.grid > div').should('have.length', 3);
     });
 
-    it('Should uninstall an application', () => {
-        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('.cards .card:nth-child(2) .header').contains('myapp');
-        cy.get('.cards .card:nth-child(2) .buttons .button:first-child').click();
-        cy.get('.modal .button:nth-child(2)').click();
-        cy.request('DELETE', '/test/applications/myapp2');
-        cy.wait(3000);
-        cy.get('.cards .card').should('have.length', 2);
-        cy.get('.cards .card').should('not.have.length', 3);
-        cy.get('.modal').should('not.exist');
+    it('Should uninstall application', () => {
+        cy.visit('/apps');
+        cy.get('.grid > div:first-child button:last').click({ force: true });
+        cy.get('.grid > div:first-child button:last').click();
+        cy.get('#confirm').click();
+        cy.get('.grid > div:first-child').should('contain', 'Uninstalling...');
     });
 
-    it("Should edit application's domain", () => {
-        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('.cards .card:first-child .buttons .button.dropdown').click();
-        cy.get('.cards .card:first-child .menu .item').click();
-        cy.get('.cards .card:first-child input').type('domain.fr{enter}');
-        cy.wait(2000);
-        cy.request('PUT', '/test/applications/myapp', { state: 'running' });
-        cy.contains('.cards .card:first-child', 'http://domain.fr');
+    it('Should hide deleted applications', () => {
+        cy.request('DELETE', 'http://localhost:3000/test/apps/wordpress2');
+        cy.visit('/apps');
+        cy.get('.grid > div').should('have.length', 2);
     });
 
-    it("Should delete application's domain", () => {
-        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.contains('.cards .card:last-child .meta', 'http://test.fr');
-        cy.get('.cards .card:last-child .buttons .button.dropdown').click();
-        cy.get('.cards .card:last-child .menu .item:last-child').click();
-        cy.request('PUT', '/test/applications/myapp3', { state: 'running', action: null });
-        cy.wait(3000);
-        cy.contains('.cards .card:last-child .meta', 'http://192.168.99.100:30348');
+    it('Should display error if a task failed', () => {
+        cy.request('POST', 'http://localhost:3000/test/apps', { apps: [{ templateId: 1, userId: user.id, error: 'Application stuck' }] });
+        cy.visit('/apps');
+        cy.get('.grid > div:last-child').should('contain', 'Error: Application stuck');
+        cy.get('.grid > div:last-child').should('not.contain', 'Installing');
     });
 
-    it('Should block actions if orchestrator is offline', () => {
-        cy.request('POST', '/test/settings', { settings: [
-            { name: 'isOrchestratorOnline', value: false },
+    it('Should display app detail modal', () => {
+        cy.request('POST', 'http://localhost:3000/test/apps', { apps: [{ templateId: 2, userId: user.id, state: 'running' }] });
+        cy.request('POST', 'http://localhost:3000/test/apps', { apps: [{ templateId: 3, userId: user.id, state: 'running' }] });
+        cy.visit('/apps');
+        cy.get('.grid > div:first-child button:first').click();
+        cy.get('div[role="dialog"]');
+    });
+
+    it('Should display progress bar', () => {
+        cy.request('POST', 'http://localhost:3000/test/apps', { apps: [{ templateId: 1, userId: user.id }] });
+        cy.visit('/apps');
+        cy.get('.grid > div:last-child').should('contain', 'Installing');
+        cy.get('.grid > div:last-child').should('contain', '10%');
+    });
+
+    it('Should display password field', () => {
+        cy.request('POST', 'http://localhost:3000/test/reset');
+        cy.request('POST', 'http://localhost:3000/test/import');
+        cy.request('POST', 'http://localhost:3000/test/users', { users: [{ email: 'user@ethibox.fr', password: 'myp@ssw0rd' }] });
+        cy.request('POST', 'http://localhost:3000/test/settings', { settings: [
+            { name: 'stripeEnabled', value: 'false' },
         ] });
 
-        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('.cards .card:first-child .header').contains('myapp');
-        cy.get('.cards .card:first-child .buttons .button:first-child').click();
-        cy.get('.modal .button:nth-child(2)').click();
-        cy.contains('.modal', 'Orchestrator connection failed!');
-    });
+        cy.visit('/');
+        cy.get('.grid > div:nth-child(2) button').click();
 
-    it.skip('Should display alert notification when an action stuck', () => {
-        // TODO
-    });
+        cy.wait(500);
+        cy.request('PUT', 'http://localhost:3000/test/apps/flarum1', { state: 'running' });
+        cy.wait(500);
 
-    it.skip('Should display alert notification when editing or installing app stuck', () => {
-        // TODO
-    });
-
-    it.skip('Should allow to force application uninstallation if app has an error', () => {
-        // TODO
-    });
-
-    it.skip('Should check DNS when domain editing', () => {
-        // TODO
-    });
-
-    after(() => {
-        cy.request('POST', '/test/reset');
+        cy.get('.grid > div:first-child button:first').click();
+        cy.get('input[type=password] + div button').click();
     });
 });

@@ -1,37 +1,54 @@
 import jwt from 'jsonwebtoken';
 
-describe('Logout', () => {
+const user = { email: 'user@ethibox.fr', password: 'myp@ssw0rd' };
+
+describe('Logout Page', () => {
     before(() => {
-        cy.request('POST', '/test/reset');
-        cy.request('POST', '/test/users', { users: [{ email: 'contact@ethibox.fr', password: 'myp@ssw0rd' }] });
+        cy.request('POST', 'http://localhost:3000/test/reset');
+        cy.request('POST', 'http://localhost:3000/test/users', { users: [user] });
+        cy.request({
+            method: 'POST',
+            url: 'http://localhost:3000/graphql',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: `mutation {
+                login(email: "${user.email}", password: "${user.password}") { token }
+            }` }),
+        })
+            .its('body')
+            .then(({ data }) => {
+                const { token } = data.login;
+                const { id } = jwt.decode(token);
+                user.id = id;
+            });
     });
 
     it('Should logout', () => {
-        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('.sidebar a:last-child').click({ force: true });
-        cy.get('.message').contains('New to us?');
+        cy.setLocalStorage('token', jwt.sign(user, 'mys3cr3t', { expiresIn: '1d' }));
+        cy.visit('/');
+        cy.get('#user-menu').click();
+        cy.get('a[href="/logout"]').click();
+        cy.url().should('contain', '/login');
     });
 
     it('Should logout user when expired session and display message', () => {
-        const token = jwt.sign({ userId: 1 }, 'mysecret', { expiresIn: 5 });
-        cy.visit('/', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
-        cy.get('.menu').contains('Logout');
-        cy.wait(3000);
+        cy.setLocalStorage('token', jwt.sign(user, 'mys3cr3t', { expiresIn: '5s' }));
+        cy.visit('/');
+        cy.get('div[role=menu]').contains('Sign out');
+        cy.wait(5000);
+        cy.visit('/');
         cy.url().should('contain', '/login');
-        cy.get('.message').contains('New to us?');
-        cy.contains('.ui-alerts', 'Your Session has expired!');
+        cy.get('.error').should('contain', 'Your session has expired');
     });
 
-    it('Should logout an unauthorized user', () => {
-        const token = jwt.sign({ userId: 2 }, 'mysecret', { expiresIn: '1d' });
-        cy.visit('/store', { onBeforeLoad: (win) => { win.localStorage.setItem('token', token); } });
+    it('Should redirect to login page if not connected', () => {
+        cy.visit('/');
         cy.url().should('contain', '/login');
-        cy.get('.message').contains('New to us?');
-        cy.contains('.ui-alerts', 'Not authorized!');
     });
 
-    it.skip('Should logout when unauthorized action and display message', () => {
-        // TODO
+    it('Should redirect a non-existing user to login page', () => {
+        cy.setLocalStorage('token', jwt.sign({ id: 2, email: 'user2@ethibox.fr' }, 'mys3cr3t', { expiresIn: '1d' }));
+        cy.on('uncaught:exception', () => false);
+        cy.visit('/');
+        cy.url().should('contain', '/login');
     });
 });

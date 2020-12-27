@@ -1,0 +1,32 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+env:
+  IMAGE: ethibox/ethibox
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '12.20'
+
+      - name: Install & Tests
+        env:
+          SECRET: mys3cr3t
+          STRIPE_ENABLED: true
+          STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          CYPRESS_STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+          CYPRESS_STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+        run: |
+          yarn
+          echo -e 'pcm.!default {\n type hw\n card 0\n}\n\nctl.!default {\n type hw\n card 0\n}' > ~/.asoundrc
+          npm run test:ci

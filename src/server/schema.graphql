@@ -1,76 +1,146 @@
+scalar Date
+
 type User {
     id: Int
     email: String
-    token: String
+    firstName: String
+    lastName: String
     isAdmin: Boolean
-    isSubscribed: Boolean
 }
 
-type Package {
+type Stripe {
+    stripeEnabled: String
+    stripePublishableKey: String
+    stripeClientSecret: String
+    stripeLast4: String
+}
+
+input VarInput {
     name: String
-    icon: String
+    value: String
+}
+
+type Vars {
+    id: Int
+    name: String
+    value: String
+}
+
+type Invoice {
+    url: String
+    status: String
+    total: Int
+    date: Date
+}
+
+type Template {
+    id: Int
+    name: String
+    fullName: String
+    description: String
+    screenshots: [String]
+    trial: Int
+    price: Int
     category: String
+    logo: String
+    website: String
     enabled: Boolean
 }
 
 type Application {
+    id: Int
     name: String
-    category: String
-    icon: String
+    description: String
+    price: Int
+    adminPath: String
     releaseName: String
-    domainName: String
+    domain: String
+    logo: String
+    category: String
+    task: String
     state: String
-    ip: String
-    port: Int
     error: String
+    lastTaskDate: Date
 }
 
-input SettingsInput {
-    orchestratorName: String
-    orchestratorEndpoint: String
-    orchestratorToken: String
-    isDemoEnabled: Boolean
-    isMonetizationEnabled: Boolean
-    stripePublishableKey: String
-    stripeSecretKey: String
-    stripePlanName: String
-    storeRepositoryUrl: String
-    isPersistenceEnabled: Boolean
+type Subscription {
+    id: Int
+    price: Int
 }
 
-type Settings {
-    orchestratorName: String
-    orchestratorEndpoint: String
-    orchestratorToken: String
-    isOrchestratorOnline: Boolean
-    isOrchestratorConfigMissing: Boolean
-    isDemoEnabled: Boolean
-    isMonetizationEnabled: Boolean
-    isAdmin: Boolean
-    stripePublishableKey: String
-    stripeSecretKey: String
-    stripePlanName: String
-    monthlyPrice: String
-    storeRepositoryUrl: String
-    isPersistenceEnabled: Boolean
+type UserSubscription {
+    updateUrl: String
+    cancelUrl: String
+}
+
+input WebhookInput {
+    event: String
+    targetUrl: String
+}
+
+type Webhook {
+    id: Int
+    event: String
+    targetUrl: String
+}
+
+type Select {
+    text: String
+    value: String
+}
+
+type Envs {
+    name: String
+    value: String
+    label: String
+    disabled: Boolean
+    type: String
+    select: [Select]
+}
+
+type Summary {
+    templates: [Template]
+    applications: Int
+    priceAvg: Int
+    total: Int
 }
 
 type Query {
-    applications: [Application]
-    packages: [Package]
-    settings: Settings
     user: User
-    isFirstAccount: Boolean
+    stripe: Stripe
+    summary: Summary
+    userSubscription: UserSubscription
+    subscription: Subscription
+    applicationEnvs(releaseName: String): [Envs]
+    applications: [Application]
+    application(releaseName: String): Application
+    templates: [Template]
+    invoices: [Invoice]
+    webhooks: [Webhook]
+    settings: [Vars]
+    globalEnvs: [Vars]
+}
+
+type LoginResponse {
+    token: String
+    user: User
 }
 
 type Mutation {
-    installApplication(name: String!, releaseName: String!): Application
-    uninstallApplication(releaseName: String!): Application
-    editDomainNameApplication(releaseName: String!, domainName: String!): Application
-    register(email: String!, password: String!): User
-    login(email: String!, password: String!): User
-    updatePassword(password: String!): User
-    subscribe(stripeToken: String!): User
-    unsubscribe: User
-    updateAdminSettings(settings: SettingsInput!): Settings
+    register(email: String!, password: String!): LoginResponse!
+    login(email: String!, password: String!, remember: Boolean): LoginResponse!
+    reset(email: String!): Boolean
+    resetpassword(token: String!, password: String!): Boolean
+    removePaymentMethod: Boolean
+    deleteAccount: Boolean
+    installApplication(templateId: Int): Boolean
+    uninstallApplication(releaseName: String!): Boolean
+    updateUser(firstName: String, lastName: String, email: String): Boolean
+    updateSettings(settings: [VarInput]): Boolean
+    updateGlobalEnvs(globalEnvs: [VarInput]): Boolean
+    updateDefaultPaymentMethod(paymentMethodId: String): Boolean
+    updateWebhooks(webhooks: [WebhookInput]): Boolean
+    upgradeStripeSubscription(appId: Int, price: Int): Boolean
+    downgradeStripeSubscription(appId: Int): Boolean
+    uploadTemplates(file: Upload!): Boolean
 }

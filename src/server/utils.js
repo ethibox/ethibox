@@ -1,56 +1,39 @@
 import 'isomorphic-fetch';
 import dns from 'dns';
 import jwt from 'jsonwebtoken';
-import { sequelize, Package, Application, User, Settings } from './models';
+import crypto from 'crypto';
 
-export const secret = process.env.SECRET || 'mysecret';
+export const secret = process.env.SECRET || crypto.randomBytes(32).toString('hex');
 
-export const checkStatus = response => new Promise((resolve, reject) => {
-    if (response.status >= 200 && response.status < 300) {
-        return response.json().then(resolve);
+export const tokenExpiration = process.env.TOKEN_EXPIRATION || '30d';
+
+export const checkStatus = (response) => new Promise((resolve, reject) => {
+    if (response.status !== 200) {
+        return reject(new Error(response.statusText));
     }
 
-    return response.json().then(reject);
-});
-
-export const isAuthenticate = (token) => {
-    try {
-        jwt.verify(token, secret);
-        return true;
-    } catch ({ message }) {
-        return false;
-    }
-};
-
-export const checkDnsRecord = (domainName, serverIp) => new Promise((resolve) => {
-    return dns.lookup(domainName, (error, address) => {
-        if (serverIp === address) {
-            resolve(true);
+    return response.json().then((res) => {
+        if (res.errors) {
+            reject(new Error(res.errors[0]));
         }
 
-        resolve(false);
+        resolve(res);
     });
 });
 
-export const synchronizeStore = async (storeRepositoryUrl) => {
+export const isAuth = (token) => {
     try {
-        const res = await fetch(storeRepositoryUrl);
-        const packages = (await res.json());
-        packages.forEach(async (pkg) => {
-            if (!await Package.findOne({ where: { name: pkg.name }, raw: true })) {
-                await Package.create(pkg);
-            }
-            await Package.update(pkg, { where: { name: pkg.name } });
-        });
-    } catch (e) {
-        throw new Error('Invalid store repository URL');
-    }
-};
+        const { exp } = jwt.decode(token);
+        const now = Math.floor(Date.now() / 1000);
 
-export const getSettings = async () => {
-    let settings = await Settings.findAll({ raw: true });
-    settings = Object.assign({}, ...(settings.map(item => ({ [item.name]: (['0', '1'].includes(item.value)) ? (item.value == true) : item.value })))); // eslint-disable-line
-    return settings;
+        if (now < exp) {
+            return true;
+        }
+
+        return false;
+    } catch (e) {
+        return false;
+    }
 };
 
 export const timeout = (ms, promise) => new Promise((resolve, reject) => {
@@ -66,32 +49,190 @@ export const timeout = (ms, promise) => new Promise((resolve, reject) => {
     });
 });
 
-export const checkUrl = async (url) => {
+export const checkUrl = (url) => new Promise((resolve, reject) => {
+    timeout(10000, fetch(url, { redirect: 'follow' })).then(({ status }) => {
+        if (status === 200) {
+            resolve(true);
+        } else {
+            reject(new Error('Status code error'));
+        }
+    }).catch((e) => {
+        if (e.code === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE') {
+            reject(new Error('Certificate error'));
+        }
+
+        reject(new Error('Error'));
+    });
+});
+
+export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const isValidToken = (token) => {
     try {
-        const { status } = await timeout(10000, fetch(url));
-        return (status === 200);
-    } catch (e) {
+        if (token) {
+            return jwt.verify(token, secret);
+        }
+
+        return false;
+    } catch (err) {
         return false;
     }
 };
 
-export const reset = async () => {
-    User.sync();
-    Application.sync();
-    Package.sync();
-    Settings.sync();
+export const decodeToken = (token) => jwt.decode(token);
 
-    await User.destroy({ force: true, truncate: true, cascade: true });
-    await sequelize.query('DELETE FROM sqlite_sequence WHERE name="users";');
+export const isNumber = (value) => !Number.isNaN(Number(value));
 
-    await Application.destroy({ force: true, truncate: true, cascade: true });
-    await sequelize.query('DELETE FROM sqlite_sequence WHERE name="applications";');
+export const getSettings = async (name, prisma) => {
+    const settings = await prisma.setting.findMany();
 
-    await Package.destroy({ force: true, truncate: true, cascade: true });
-    await sequelize.query('DELETE FROM sqlite_sequence WHERE name="packages";');
+    if (name) {
+        const setting = settings.find((s) => s.name === name);
+        return setting ? setting.value : '';
+    }
 
-    await Settings.destroy({ force: true, truncate: true, cascade: true });
-    await sequelize.query('DELETE FROM sqlite_sequence WHERE name="settings";');
+    const data = {};
+
+    settings.forEach((setting) => {
+        if (isNumber(setting.value)) setting.value = Number(setting.value);
+        if (setting.value === 'true') setting.value = true;
+        if (setting.value === 'false') setting.value = false;
+
+        data[setting.name] = setting.value;
+    });
+
+    return data;
+};
+
+export const checkDnsRecord = (domain, ip) => new Promise((resolve) => dns.lookup(domain, (error, address) => {
+    if (ip === address) {
+        resolve(true);
+    }
+
+    resolve(false);
+}));
+
+export const getIp = (domain) => new Promise((resolve) => dns.lookup(domain, (error, ip) => {
+    if (error) {
+        resolve(false);
+    }
+
+    resolve(ip);
+}));
+
+export const asyncForEach = async (array, callback) => {
+    for (let index = 0; index < array.length; index += 1) {
+        await callback(array[index], index, array);
+    }
+};
+
+export const initSettings = async (prisma) => {
+    const settings = await prisma.setting.findMany();
+
+    if (!settings.length) {
+        const defaultSettings = [
+            { name: 'rootDomain', value: 'local.ethibox.fr' },
+            { name: 'checkDomain', value: 'false' },
+            { name: 'appsUserLimit', value: '10' },
+            { name: 'stripeEnabled', value: process.env.STRIPE_ENABLED || 'false' },
+            { name: 'stripePublishableKey', value: process.env.STRIPE_PUBLISHABLE_KEY || '' },
+            { name: 'stripeSecretKey', value: process.env.STRIPE_SECRET_KEY || '' },
+        ];
+
+        await asyncForEach(defaultSettings, async ({ name, value }) => {
+            await prisma.setting.upsert({
+                where: { name },
+                create: { name, value },
+                update: { name, value },
+            }).then(true);
+        });
+    }
+};
+
+export const checkPortainer = async (endpoint, username, password) => {
+    if (!endpoint) {
+        console.error('No portainer endpoint');
+        process.exit(1);
+    }
+
+    await fetch(`${endpoint}/api/auth`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+    })
+        .then(checkStatus)
+        .catch(() => {
+            console.error('Bad portainer logins');
+            process.exit(1);
+        });
+};
+
+export const init = (prisma) => {
+    (async () => {
+        const { PORTAINER_ENDPOINT: endpoint, PORTAINER_USERNAME: username, PORTAINER_PASSWORD: password } = process.env;
+
+        if (!process.env.CI) {
+            await checkPortainer(endpoint, username, password);
+        }
+
+        await initSettings(prisma);
+    })();
+};
+
+export const generateReleaseName = async (appName, prisma, number = 1) => {
+    const releaseName = `${appName}${number}`.toLowerCase();
+    const application = await prisma.application.findOne({ where: { releaseName } });
+
+    if (application) {
+        number += 1;
+        const newReleaseName = await generateReleaseName(appName, prisma, number);
+        return newReleaseName;
+    }
+
+    return releaseName;
+};
+
+export const validStripe = async (publishableKey, stripeSecretKey) => new Promise((resolve) => {
+    const authorization = Buffer.from(`${publishableKey}:`).toString('base64');
+
+    if (!new RegExp(/^sk_/).test(stripeSecretKey)) {
+        resolve(false);
+    }
+
+    fetch('https://api.stripe.com/v1/tokens', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', Authorization: `Basic ${authorization}` },
+        body: 'card[number]=4242424242424242&card[exp_month]=12&card[exp_year]=2017&card[cvc]=123',
+    }).then(checkStatus).catch(({ message }) => {
+        if (message === 'Payment Required') {
+            resolve(true);
+        } else {
+            resolve(false);
+        }
+    });
+});
+
+export const fileToJson = async (createReadStream) => {
+    const result = await new Promise((resolve) => {
+        const stream = createReadStream();
+        stream.setEncoding('utf8');
+
+        let data = '';
+
+        stream.on('data', (chunk) => { data += chunk; });
+
+        stream.on('end', () => {
+            const json = JSON.parse(data);
+
+            if (!Array.isArray(json)) {
+                resolve([]);
+            }
+
+            resolve(json);
+        });
+    });
+
+    return result;
 };
 
 export const STATES = {
@@ -99,10 +240,18 @@ export const STATES = {
     UNINSTALLING: 'uninstalling',
     EDITING: 'editing',
     RUNNING: 'running',
+    DELETED: 'deleted',
 };
 
-export const ACTIONS = {
+export const TASKS = {
     INSTALL: 'install',
     UNINSTALL: 'uninstall',
     EDIT: 'edit',
+};
+
+export const EVENTS = {
+    REGISTER: 'register',
+    UNSUBSCRIBE: 'unsubscribe',
+    INSTALL: 'install',
+    UNINSTALL: 'uninstall',
 };
