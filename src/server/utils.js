@@ -57,7 +57,7 @@ export const checkUrl = (url) => new Promise((resolve, reject) => {
             reject(new Error('Status code error'));
         }
     }).catch((e) => {
-        if (e.code === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE') {
+        if (e.code === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' || e.code === 'DEPTH_ZERO_SELF_SIGNED_CERT') {
             reject(new Error('Certificate error'));
         }
 
