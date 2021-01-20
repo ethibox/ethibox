@@ -35,6 +35,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - uses: Klemensas/action-autotag@stable
+        with:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Get the version
         id: get_version

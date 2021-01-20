@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/github/v/tag/ethibox/ethibox.svg?colorA=181C31&colorB=212839&label=version&sort=semver&style=flat-square)](https://github.com/ethibox/ethibox/releases)
 [![License](https://img.shields.io/badge/license-GPL%20v3%2B-yellow.svg?style=flat-square&colorA=181C31&colorB=212839)](https://raw.githubusercontent.com/ethibox/ethibox/master/LICENSE.txt)
-[![Github Workflow](https://img.shields.io/github/workflow/status/ethibox/ethibox/Docker%20Image%20CI?style=flat-square&colorA=181C31&colorB=212839)](https://github.com/ethibox/ethibox/actions)
+[![Github Workflow](https://img.shields.io/github/workflow/status/ethibox/ethibox/Build%20and%20deploy?style=flat-square&colorA=181C31&colorB=212839)](https://github.com/ethibox/ethibox/actions)
 [![Code Climate](https://img.shields.io/codeclimate/maintainability/ethibox/ethibox.svg?style=flat-square&colorA=181C31&colorB=212839)](https://codeclimate.com/github/ethibox/ethibox)
 
 Ethibox is an open-source web apps hoster, a simple UI to install & update open-source web apps.
