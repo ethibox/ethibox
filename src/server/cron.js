@@ -28,7 +28,7 @@ export const installApplications = async (prisma) => {
 
     await asyncForEach(installingApplications, async (app) => {
         const { id, template, releaseName, domain, user } = app;
-        const token = jwt.sign({ email: user.email }, secret, { expiresIn: `${template.trial}d` });
+        const token = jwt.sign({ email: user.email }, secret, { expiresIn: `${template.trial + 1}d` });
         const stackFile = template.auto ? template.stackFile : 'waiting.yml';
 
         const envs = app.envs.concat(globalEnvs);
