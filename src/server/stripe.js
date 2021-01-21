@@ -34,7 +34,7 @@ export const upsertCustomer = async (stripe, userId, email, name) => {
     let customer = customers.find((c) => c.id === `${userId}`);
 
     if (!customer) {
-        customer = await stripe.customers.create({ id: userId, email, metadata: { application: 'ethibox' } });
+        customer = await stripe.customers.create({ id: userId, email, metadata: { application: 'ethibox' }, preferred_locales: ['fr'] });
     }
 
     if (name) {
@@ -93,9 +93,18 @@ export const downgradeSubscription = async (stripe, userId, appId) => {
     const { data: subscriptions } = await stripe.subscriptions.list({ customer: userId, limit: 1 });
     const subscription = subscriptions[0];
 
+    if (!subscriptions.length) {
+        throw new Error('There is no subscription');
+    }
+
     const { data: subscriptionItems } = await stripe.subscriptionItems.list({ subscription: subscription.id });
 
     const subscriptionItem = subscriptionItems.find((si) => si.metadata.app_id === appId.toString());
+
+    if (!subscriptionItem) {
+        throw new Error('There is no subscription item');
+    }
+
     const { id: subscriptionItemId, quantity } = subscriptionItem;
 
     if (quantity === 1) {
