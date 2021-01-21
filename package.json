@@ -63,7 +63,7 @@
     "gatsby-source-filesystem": "^2.8.0",
     "gatsby-transformer-sharp": "^2.9.0",
     "graphql-hooks": "^4.5.0",
-    "immer": "^7.0.15",
+    "immer": "^8.0.1",
     "jest": "^26.6.3",
     "node-sass": "^4.14.1",
     "nodemon": "^2.0.6",
