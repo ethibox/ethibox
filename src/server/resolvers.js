@@ -157,9 +157,10 @@ export const installApplicationMutation = async (_, { templateId }, ctx) => {
 
     if (stripeEnabled) {
         const stripe = Stripe(stripeSecretKey);
-        const paymentMethods = await stripe.paymentMethods.list({ customer: ctx.user.id, type: 'card' });
+        const cardMethod = await stripe.paymentMethods.list({ customer: ctx.user.id, type: 'card' }).catch(() => false);
+        const ibanMethod = await stripe.paymentMethods.list({ customer: ctx.user.id, type: 'sepa_debit' }).catch(() => false);
 
-        if (!paymentMethods.data.length) {
+        if (!cardMethod.data.length && !ibanMethod.data.length) {
             throw new Error('Method of payment required');
         }
     }
@@ -299,9 +300,18 @@ export const removePaymentMethodMutation = async (_, __, ctx) => {
     const { stripeSecretKey } = await getSettings(null, ctx.prisma);
     const stripe = Stripe(stripeSecretKey);
 
-    const { data: paymentMethods } = await stripe.paymentMethods.list({ customer: ctx.user.id, type: 'card' });
-    const paymentMethodId = paymentMethods[0].id;
-    await stripe.paymentMethods.detach(paymentMethodId);
+    const cardMethod = await stripe.paymentMethods.list({ customer: ctx.user.id, type: 'card' }).catch(() => false);
+    const ibanMethod = await stripe.paymentMethods.list({ customer: ctx.user.id, type: 'sepa_debit' }).catch(() => false);
+
+    if (cardMethod && cardMethod.data.length) {
+        const paymentMethodId = cardMethod.data[0].id;
+        await stripe.paymentMethods.detach(paymentMethodId);
+    }
+
+    if (ibanMethod && ibanMethod.data.length) {
+        const paymentMethodId = ibanMethod.data[0].id;
+        await stripe.paymentMethods.detach(paymentMethodId);
+    }
 
     return true;
 };
@@ -326,17 +336,25 @@ export const stripeQuery = async (_, __, ctx) => {
     if (stripeEnabled) {
         const stripe = Stripe(stripeSecretKey);
 
-        const paymentMethods = await stripe.paymentMethods.list({ customer: ctx.user.id, type: 'card' }).catch(() => false);
+        const cardMethod = await stripe.paymentMethods.list({ customer: ctx.user.id, type: 'card' }).catch(() => false);
+        const ibanMethod = await stripe.paymentMethods.list({ customer: ctx.user.id, type: 'sepa_debit' }).catch(() => false);
 
-        if (paymentMethods && paymentMethods.data.length) {
-            const { last4 } = paymentMethods.data[0].card;
-            return { ...data, stripeLast4: last4 };
+        if (cardMethod || ibanMethod) {
+            if (cardMethod.data.length) {
+                const { last4 } = cardMethod.data[0].card;
+                return { ...data, stripeLast4: last4, stripePaymentMethod: 'card' };
+            }
+
+            if (ibanMethod.data.length) {
+                const { last4 } = ibanMethod.data[0].sepa_debit;
+                return { ...data, stripeLast4: last4, stripePaymentMethod: 'iban' };
+            }
         }
 
-        const intent = await stripe.setupIntents.create({ customer: ctx.user.id }).catch(() => false);
+        const intent = await stripe.setupIntents.create({ customer: ctx.user.id, payment_method_types: ['card', 'sepa_debit'] }).catch(() => false);
         const stripeClientSecret = intent.client_secret;
 
-        data = { ...data, stripeClientSecret, stripeLast4: '' };
+        data = { ...data, stripeClientSecret, stripeLast4: '', stripePaymentMethod: '' };
     }
 
     return data;

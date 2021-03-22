@@ -7,7 +7,7 @@ const loadStripe = async () => fetch(withPrefix('/graphql'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-access-token': getToken() },
     body: JSON.stringify({ query: `{
-        stripe { stripeEnabled, stripePublishableKey, stripeClientSecret, stripeLast4 }
+        stripe { stripeEnabled, stripePublishableKey, stripeClientSecret, stripeLast4, stripePaymentMethod }
     }` }),
 })
     .then(checkStatus)

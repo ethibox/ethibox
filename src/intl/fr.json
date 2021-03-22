@@ -115,9 +115,11 @@
     "Account informations": "Informations de mon compte",
     "Change your name, email & payment method": "Modifiez votre e-mail, nom, prénom et votre méthode de paiement",
     "Card number": "Méthode de paiement",
+    "Iban number": "Méthode de paiement",
     "Your card has expired.": "Votre carte a expiré",
     "Start my free trial": "Essayer gratuitement",
     "Change card": "Changer de carte",
+    "Change iban": "Changer d'IBAN",
     "View details": "Voir les détails",
     "Edit domain name": "Éditer le nom de domaine",
     "Back": "Retour",
@@ -137,5 +139,7 @@
     "Year": "Année",
     "Status": "Statut",
     "Total": "Total",
-    "View invoice": "Voir la facture"
+    "View invoice": "Voir la facture",
+    "Enable SEPA": "Activer les virements SEPA",
+    "Check this case to enable SEPA Direct Debit payments": "Cochez cette case pour activer les paiements par prélèvement SEPA"
 }
