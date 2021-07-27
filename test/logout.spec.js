@@ -25,15 +25,14 @@ describe('Logout Page', () => {
     it('Should logout', () => {
         cy.setLocalStorage('token', jwt.sign(user, 'mys3cr3t', { expiresIn: '1d' }));
         cy.visit('/');
-        cy.get('#user-menu').click();
-        cy.get('a[href="/logout"]').click();
+        cy.get('a[href="/logout"]').click({ multiple: true, force: true });
         cy.url().should('contain', '/login');
     });
 
     it('Should logout user when expired session and display message', () => {
         cy.setLocalStorage('token', jwt.sign(user, 'mys3cr3t', { expiresIn: '5s' }));
         cy.visit('/');
-        cy.get('div[role=menu]').contains('Sign out');
+        cy.get('a[href="/logout"]').contains('Sign out');
         cy.wait(5000);
         cy.visit('/');
         cy.url().should('contain', '/login');
