@@ -9,6 +9,8 @@ import { ApolloServer } from 'apollo-server-express';
 import { PrismaClient } from '@prisma/client';
 import typeDefs from './schema.graphql';
 import { init, isValidToken, decodeToken } from './utils';
+import metrics from './metrics';
+import './cron';
 import {
     userQuery,
     stripeQuery,
@@ -52,6 +54,8 @@ app.use(`${prefixPath}/`, express.static(path.join(__dirname, publicPath)));
 app.use(compression());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.use(`${prefixPath}/metrics`, metrics);
 
 if (process.env.NODE_ENV !== 'production' || process.env.CI) {
     import('./test/test').then((test) => {
