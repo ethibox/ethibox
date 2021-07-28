@@ -1,7 +1,7 @@
 import React from 'react';
 import { useIntl } from 'gatsby-plugin-intl';
 import { useRecoilValue } from 'recoil';
-import InvoiceIcon from '../images/file-invoice.svg';
+import InvoiceIcon from '../images/invoice.svg';
 import { invoicesState } from '../atoms';
 import { months } from '../utils';
 

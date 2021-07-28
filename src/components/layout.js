@@ -2,19 +2,17 @@ import React, { useState } from 'react';
 import { Link, withPrefix } from 'gatsby';
 import { Helmet } from 'react-helmet';
 import { useIntl } from 'gatsby-plugin-intl';
-import Menu from './menu';
 
 import { isLoggedIn, clear, getItem, setItem, navigate } from '../utils';
 
 import CloseIcon from '../images/close.svg';
 import HomeIcon from '../images/home.svg';
-import InvoiceIcon from '../images/file-invoice.svg';
-import QuestionIcon from '../images/question-circle.svg';
-import SaveIcon from '../images/save.svg';
+import DocumentIcon from '../images/document.svg';
+import QuestionIcon from '../images/question.svg';
 import SearchIcon from '../images/search.svg';
-import GiftIcon from '../images/gift.svg';
-import ExchangeIcon from '../images/exchange.svg';
-import CubesIcon from '../images/cubes.svg';
+import SettingsIcon from '../images/settings.svg';
+import GridIcon from '../images/grid.svg';
+import LogoutIcon from '../images/logout.svg';
 
 export default (props) => {
     const intl = useIntl();
@@ -28,11 +26,10 @@ export default (props) => {
 
     const SidebarMenu = [
         { name: 'Home', link: '/', icon: <HomeIcon className="mr-4 h-6 w-6" fill="none" />, position: 1 },
-        { name: 'Applications', link: '/apps', icon: <CubesIcon className="w-6 h-6 mr-4" fill="#D2D6DC" />, position: 2 },
-        { name: 'Invoices', link: '/invoices', icon: <InvoiceIcon className="w-4 h-6 ml-1 mr-5" fill="#D2D6DC" />, position: 3 },
-        { name: 'Backups', link: '/backups', icon: <SaveIcon className="w-6 h-6 mr-4" fill="#D2D6DC" />, position: 4, label: 'Bientot' },
-        { name: 'Transferts', link: '/transferts', icon: <ExchangeIcon className="w-4 h-6 ml-1 mr-5" fill="#D2D6DC" />, position: 5, label: 'Bientot' },
-        { name: 'Affiliation', link: '/affiliate', icon: <GiftIcon className="w-5 h-6 mr-5" fill="#D2D6DC" />, position: 6, label: 'Bientot' },
+        { name: 'Applications', link: '/apps', icon: <GridIcon className="mr-4 w-6 h-6" fill="none" />, position: 2 },
+        { name: 'Invoices', link: '/invoices', icon: <DocumentIcon className="mr-4 w-6 h-6" fill="none" />, position: 3 },
+        { name: 'Settings', link: '/settings', icon: <SettingsIcon className="mr-4 w-6 h-6" fill="none" />, position: 4 },
+        { name: 'Support', link: 'https://ethibox.fr/support', icon: <QuestionIcon className="mr-4 w-6 h-6" fill="none" />, position: 5 },
     ];
 
     if (!isLoggedIn()) {
@@ -84,10 +81,10 @@ export default (props) => {
                             </div>
                             <div className="flex-shrink-0 overflow-y-auto">
                                 <nav className="px-2">
-                                    <a href="https://ethibox.fr/support" target="_blank" className="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150" activeclassname="active text-white bg-gray-900">
-                                        <QuestionIcon />
-                                        {intl.formatMessage({ id: 'Support' })}
-                                    </a>
+                                    <Link to="/logout" className="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150" activeclassname="active text-white bg-gray-900">
+                                        <LogoutIcon className="mr-4 h-6 w-6" />
+                                        {intl.formatMessage({ id: 'Sign out' })}
+                                    </Link>
                                 </nav>
                             </div>
                         </div>
@@ -115,10 +112,10 @@ export default (props) => {
                         </div>
                         <div className="flex-shrink-0 bg-gray-800">
                             <nav className="p-2">
-                                <a href="https://ethibox.fr/support" target="_blank" className="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150" activeclassname="active text-white bg-gray-900">
-                                    <QuestionIcon />
-                                    {intl.formatMessage({ id: 'Support' })}
-                                </a>
+                                <Link to="/logout" className="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150" activeclassname="active text-white bg-gray-900">
+                                    <LogoutIcon className="mr-4 h-6 w-6" />
+                                    {intl.formatMessage({ id: 'Sign out' })}
+                                </Link>
                             </nav>
                         </div>
                     </div>
@@ -153,11 +150,6 @@ export default (props) => {
                                         </div>
                                     </div>
                                 ) }
-                            </div>
-                            <div className="ml-4 flex items-center md:ml-6">
-                                <React.Suspense fallback={<div>Loading</div>}>
-                                    <Menu />
-                                </React.Suspense>
                             </div>
                         </div>
                     </div>
