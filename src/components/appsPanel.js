@@ -6,7 +6,7 @@ import { useIntl } from 'gatsby-plugin-intl';
 import { withNotifier } from '../context/NotificationContext';
 import { STATES, checkStatus, getToken, remainingTimePercentage } from '../utils';
 import { applicationsState } from '../atoms';
-import CubesIcon from '../images/cubes.svg';
+import GridIcon from '../images/grid.svg';
 import ViewModal from './viewModal';
 import DomainModal from './domainModal';
 import AppDropdown from './appDropdown';
@@ -73,7 +73,7 @@ export default withNotifier(({ notify }) => {
         return (
             <div className="min-h-full flex items-center justify-center">
                 <div className="flex flex-col justify-center">
-                    <CubesIcon className="w-24 m-auto" fill="gray" />
+                    <GridIcon className="w-24 m-auto text-gray-600" />
                     <h4 className="text-center text-2xl">{intl.formatMessage({ id: 'You have no applications' })}</h4>
                     <span className="rounded-md shadow-sm m-auto mt-3">
                         <Link
