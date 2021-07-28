@@ -65,7 +65,7 @@ const config = {
         'gatsby-plugin-react-helmet',
     ],
     developMiddleware: (app) => {
-        app.use(['/graphql', '/ethibox.js'], proxy({ target: 'http://localhost:3000' }));
+        app.use(['/graphql', '/metrics', '/ethibox.js'], proxy({ target: 'http://localhost:3000' }));
     },
     flags: {
         QUERY_ON_DEMAND: false,
