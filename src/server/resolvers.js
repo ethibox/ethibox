@@ -7,7 +7,21 @@ import bcrypt from 'bcrypt';
 import { generate } from 'generate-password';
 import MatomoTracker from 'matomo-tracker';
 import { invoiceList, upgradeSubscription, downgradeSubscription, upsertCustomer } from './stripe';
-import { TASKS, STATES, validStripe, secret, tokenExpiration, asyncForEach, getSettings, generateReleaseName, fileToJson } from './utils';
+import {
+    validStripe,
+    secret,
+    tokenExpiration,
+    asyncForEach,
+    getSettings,
+    generateReleaseName,
+    checkDnsRecord,
+    fileToJson,
+    getIp,
+    sendWebhooks,
+    TASKS,
+    STATES,
+    EVENTS,
+} from './utils';
 
 export const registerMutation = async (_, { email, password }, ctx) => {
     if (!isEmail(email) || password.length < 6) {
@@ -526,6 +540,41 @@ export const uploadTemplatesMutation = async (_, { file }, ctx) => {
     });
 
     return true;
+};
+
+export const updateAppDomainMutation = async (_, { releaseName, domain }, ctx) => {
+    if (!ctx.user) throw new Error('Not authorized');
+
+    const application = await ctx.prisma.application.findOne({ where: { releaseName } });
+    const rootDomain = (await getSettings('rootDomain', ctx.prisma)) || 'local.ethibox.fr';
+    const ip = await getIp(rootDomain);
+
+    if (!application || application.userId !== ctx.user.id) {
+        throw new Error('Not authorized');
+    }
+
+    if (await ctx.prisma.application.count({ where: { domain } })) {
+        throw new Error('Domain already exist');
+    }
+
+    if (!(await checkDnsRecord(domain, ip))) {
+        class DNSError extends Error {
+            constructor(message) {
+                super(message);
+                this.name = 'DNSError';
+                this.ip = ip;
+            }
+        }
+
+        throw new DNSError('Please setup a correct DNS zone of type A for your domain {domain} with the ip {ip} on your registrar (ex: Gandi, OVH, Online, 1&1)');
+    }
+
+    await sendWebhooks(EVENTS.UPDATE_DOMAIN, { releaseName, domain }, ctx.prisma);
+
+    await ctx.prisma.application.update({
+        where: { releaseName },
+        data: { domain },
+    });
 };
 
 export const applicationQuery = async (_, { releaseName }, ctx) => {

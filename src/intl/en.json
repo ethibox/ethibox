@@ -41,6 +41,7 @@
     "Confirm": "Confirm",
     "Back": "Back",
     "Save": "Save",
+    "Please setup a correct DNS zone of type A for your domain {domain} with the ip {ip} on your registrar (ex: Gandi, OVH, Online, 1&1)": "Please setup a correct DNS zone of type A for your domain {domain} with the ip {ip} on your registrar (ex: Gandi, OVH, Online, 1&1)",
     "Personal Information": "Personal Information",
     "Invoices": "Invoices",
     "Backups": "Backups",

@@ -22,6 +22,7 @@ export default () => {
         EVENTS.UNINSTALL,
         EVENTS.REGISTER,
         EVENTS.UNSUBSCRIBE,
+        EVENTS.UPDATE_DOMAIN,
     ];
 
     return (
@@ -59,7 +60,7 @@ export default () => {
                                     style={{ WebkitAppearance: 'none' }}
                                 >
                                     { events.map((event) => (
-                                        <option key={Math.random()} value={event}>{capitalize(event)}</option>
+                                        <option key={Math.random()} value={event}>{capitalize(event).replace('_', ' ')}</option>
                                     )) }
                                 </select>
                             </div>

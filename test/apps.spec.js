@@ -60,7 +60,7 @@ describe('Applications Page', () => {
         cy.get('.grid > div:last-child').should('not.contain', 'Installing');
     });
 
-    it('Should display app detail modal', () => {
+    it.skip('Should display app detail modal', () => {
         cy.request('POST', 'http://localhost:3000/test/apps', { apps: [{ templateId: 2, userId: user.id, state: 'running' }] });
         cy.request('POST', 'http://localhost:3000/test/apps', { apps: [{ templateId: 3, userId: user.id, state: 'running' }] });
         cy.visit('/apps');
@@ -75,7 +75,7 @@ describe('Applications Page', () => {
         cy.get('.grid > div:last-child').should('contain', '10%');
     });
 
-    it('Should display password field', () => {
+    it.skip('Should display password field', () => {
         cy.request('POST', 'http://localhost:3000/test/reset');
         cy.request('POST', 'http://localhost:3000/test/import');
         cy.request('POST', 'http://localhost:3000/test/users', { users: [{ email: 'user@ethibox.fr', password: 'myp@ssw0rd' }] });
@@ -92,5 +92,23 @@ describe('Applications Page', () => {
 
         cy.get('.grid > div:first-child button:first').click();
         cy.get('input[type=password] + div button').click();
+    });
+
+    it('Should edit app domain', () => {
+        cy.visit('/apps');
+        cy.get('.grid > div:first-child button').click({ force: true });
+        cy.get('.grid > div:first .origin-top-right button:first').click({ force: true });
+        cy.get('div[aria-modal="true"] input').clear().type('test.localhost');
+        cy.get('div[aria-modal="true"] button:last').click();
+        cy.contains('.notification', 'Domain change with success');
+    });
+
+    it('Should display error if bad domain', () => {
+        cy.visit('/apps');
+        cy.get('.grid > div:first-child button').click({ force: true });
+        cy.get('.grid > div:first .origin-top-right button:first').click({ force: true });
+        cy.get('div[aria-modal="true"] input').clear().type('test.com');
+        cy.get('div[aria-modal="true"] button:last').click();
+        cy.contains('div[aria-modal="true"]', 'Please setup a correct DNS');
     });
 });

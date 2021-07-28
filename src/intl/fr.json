@@ -39,6 +39,7 @@
     "Last name": "Nom",
     "Cancel": "Retour",
     "Save": "Sauvegarder",
+    "Please setup a correct DNS zone of type A for your domain {domain} with the ip {ip} on your registrar (ex: Gandi, OVH, Online, 1&1)": "Veuillez configurer une zone DNS de type A pour votre domaine {domain} avec l'ip {ip} depuis votre registrar (ex : Gandi, OVH, Online, 1&1)",
     "Personal Information": "Informations personnelles",
     "Invoices": "Factures",
     "Backups": "Sauvegardes",

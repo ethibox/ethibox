@@ -235,6 +235,32 @@ export const fileToJson = async (createReadStream) => {
     return result;
 };
 
+export const webhookRequest = async (targetUrl, body, retry = 1) => {
+    const res = await fetch(targetUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    }).catch(() => {
+        throw new Error('Webhook endpoint error');
+    });
+
+    if (retry >= 3) {
+        throw new Error('Webhook endpoint error');
+    }
+
+    if (res.status !== 200) {
+        await webhookRequest(targetUrl, body, retry + 1);
+    }
+};
+
+export const sendWebhooks = async (event, data, prisma) => {
+    const webhooks = await prisma.webhook.findMany({ where: { event } });
+
+    for (const { targetUrl } of webhooks) {
+        await webhookRequest(targetUrl, data);
+    }
+};
+
 export const STATES = {
     INSTALLING: 'installing',
     UNINSTALLING: 'uninstalling',
@@ -254,4 +280,5 @@ export const EVENTS = {
     UNSUBSCRIBE: 'unsubscribe',
     INSTALL: 'install',
     UNINSTALL: 'uninstall',
+    UPDATE_DOMAIN: 'update_domain',
 };

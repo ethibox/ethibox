@@ -136,6 +136,7 @@ export const EVENTS = {
     UNSUBSCRIBE: 'unsubscribe',
     INSTALL: 'install',
     UNINSTALL: 'uninstall',
+    UPDATE_DOMAIN: 'update_domain',
 };
 
 export const gravatar = (email, size = 80) => `https://www.gravatar.com/avatar/${md5(email)}.jpg?s=${size}&d=mp`;

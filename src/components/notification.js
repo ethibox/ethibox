@@ -5,7 +5,7 @@ export default ({ title, type, message, onConfirm, onClose }) => {
     const intl = useIntl();
 
     return (
-        <div className="fixed inset-0 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-start sm:justify-end transform ease-out duration-300 transition z-30 mt-15 notification">
+        <div className="fixed inset-0 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-start sm:justify-end transform ease-out duration-300 transition z-50 mt-15 notification">
             <div className="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto">
                 <div className="rounded-lg shadow-xs overflow-hidden">
                     <div className="p-4">
