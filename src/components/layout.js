@@ -8,7 +8,6 @@ import { isLoggedIn, clear, getItem, setItem, navigate } from '../utils';
 import CloseIcon from '../images/close.svg';
 import HomeIcon from '../images/home.svg';
 import DocumentIcon from '../images/document.svg';
-import QuestionIcon from '../images/question.svg';
 import SearchIcon from '../images/search.svg';
 import SettingsIcon from '../images/settings.svg';
 import GridIcon from '../images/grid.svg';
@@ -29,7 +28,6 @@ export default (props) => {
         { name: 'Applications', link: '/apps', icon: <GridIcon className="mr-4 w-6 h-6" fill="none" />, position: 2 },
         { name: 'Invoices', link: '/invoices', icon: <DocumentIcon className="mr-4 w-6 h-6" fill="none" />, position: 3 },
         { name: 'Settings', link: '/settings', icon: <SettingsIcon className="mr-4 w-6 h-6" fill="none" />, position: 4 },
-        { name: 'Support', link: 'https://ethibox.fr/support', icon: <QuestionIcon className="mr-4 w-6 h-6" fill="none" />, position: 5 },
     ];
 
     if (!isLoggedIn()) {

@@ -34,7 +34,7 @@ describe('Store Page', () => {
         cy.request('POST', 'http://localhost:3000/test/users', { users: [{ email: 'user@ethibox.fr', password: 'myp@ssw0rd' }] });
         cy.visit('/');
         cy.get('a[href="/"]').click({ force: true, multiple: true });
-        cy.contains('main', 'Store is empty');
+        cy.contains('main', 'You have no templates');
     });
 
     it('Should install an application', () => {

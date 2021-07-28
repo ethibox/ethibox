@@ -1,9 +1,11 @@
 import React from 'react';
+import { Link } from 'gatsby';
 import { useIntl } from 'gatsby-plugin-intl';
 import { useRecoilValue } from 'recoil';
-import InvoiceIcon from '../images/invoice.svg';
+
 import { invoicesState } from '../atoms';
 import { months } from '../utils';
+import DocumentIcon from '../images/document.svg';
 
 export default () => {
     const intl = useIntl();
@@ -14,8 +16,16 @@ export default () => {
         return (
             <div className="min-h-full flex items-center justify-center">
                 <div className="flex flex-col justify-center">
-                    <InvoiceIcon className="w-16 m-auto" fill="gray" />
+                    <DocumentIcon className="w-20 m-auto text-gray-600" fill="none" />
                     <h4 className="text-center text-2xl">{intl.formatMessage({ id: 'You have no invoices' })}</h4>
+                    <span className="rounded-md shadow-sm m-auto mt-3">
+                        <Link
+                            to="/"
+                            className="inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-gray-600 hover:bg-gray-500 focus:outline-none focus:border-gray-700 focus:shadow-outline-gray active:bg-gray-700 transition duration-150 ease-in-out"
+                        >
+                            {intl.formatMessage({ id: 'Go to the store' })}
+                        </Link>
+                    </span>
                 </div>
             </div>
         );
