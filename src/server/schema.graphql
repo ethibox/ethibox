@@ -141,6 +141,7 @@ type Mutation {
     updateGlobalEnvs(globalEnvs: [VarInput]): Boolean
     updateDefaultPaymentMethod(paymentMethodId: String): Boolean
     updateWebhooks(webhooks: [WebhookInput]): Boolean
+    updateAppDomain(releaseName: String, domain: String): Boolean
     upgradeStripeSubscription(appId: Int, price: Int): Boolean
     downgradeStripeSubscription(appId: Int): Boolean
     uploadTemplates(file: Upload!): Boolean

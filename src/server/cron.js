@@ -4,15 +4,7 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { CronJob } from 'cron';
 import { installApplication, uninstallApplication } from './portainer';
-import { TASKS, STATES, EVENTS, secret, checkUrl, asyncForEach, checkDnsRecord, getSettings, getIp } from './utils';
-
-const webhookRequest = async (targetUrl, body) => {
-    await fetch(targetUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-    });
-};
+import { TASKS, STATES, EVENTS, secret, checkUrl, asyncForEach, checkDnsRecord, getSettings, getIp, webhookRequest } from './utils';
 
 const sendWebhooks = async (event, data, prisma) => {
     const rootDomain = (await getSettings('rootDomain', prisma)) || 'local.ethibox.fr';
