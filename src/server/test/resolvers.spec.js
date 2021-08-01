@@ -13,6 +13,7 @@ import {
     invoicesQuery,
     deleteAccountMutation,
     updateUserMutation,
+    updateAppMutation,
 } from '../resolvers';
 
 const prisma = new PrismaClient();
@@ -258,6 +259,20 @@ test('Should return invoice list', async () => {
     const invoices = await invoicesQuery(null, null, ctx);
 
     expect(invoices).toEqual([]);
+});
+
+test('Should update application', async () => {
+    await reset(prisma);
+    const user = await addUser({ email: 'user@ethibox.fr', password: 'myp@ssw0rd', isAdmin: false }, prisma);
+    await importTemplates(prisma);
+    await addApps([{ templateId: 1, userId: user.id, state: STATES.RUNNING }], prisma);
+
+    const { releaseName, domain } = await prisma.application.findOne({ where: { id: 1 } });
+
+    const envs = [{ name: 'MAIL_PORT', value: '25' }];
+
+    const ctx = { user, prisma };
+    expect(await updateAppMutation(null, { releaseName, envs, domain }, ctx)).toEqual(true);
 });
 
 test.skip('Should not install application if there is already a trial period in progress', async () => {

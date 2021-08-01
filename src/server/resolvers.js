@@ -406,12 +406,14 @@ export const applicationEnvsQuery = async (_, { releaseName }, ctx) => {
     }
 
     const applicationEnvs = application.envs;
+
     const templateEnvs = application.template.envs ? JSON.parse(application.template.envs) : [];
 
     const envs = templateEnvs.filter((e) => e.preset !== true).map((env) => {
         const existingEnv = applicationEnvs.find((e) => e.name === env.name);
 
         if (existingEnv) {
+            env.id = existingEnv.id;
             env.value = existingEnv.value;
         }
 
@@ -542,7 +544,7 @@ export const uploadTemplatesMutation = async (_, { file }, ctx) => {
     return true;
 };
 
-export const updateAppDomainMutation = async (_, { releaseName, domain }, ctx) => {
+export const updateAppMutation = async (_, { releaseName, domain, envs }, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 
     const application = await ctx.prisma.application.findOne({ where: { releaseName } });
@@ -554,7 +556,9 @@ export const updateAppDomainMutation = async (_, { releaseName, domain }, ctx) =
     }
 
     if (await ctx.prisma.application.count({ where: { domain } })) {
-        throw new Error('Domain already exist');
+        if (domain !== application.domain) {
+            throw new Error('Domain already exist');
+        }
     }
 
     if (!(await checkDnsRecord(domain, ip))) {
@@ -569,12 +573,22 @@ export const updateAppDomainMutation = async (_, { releaseName, domain }, ctx) =
         throw new DNSError('Please setup a correct DNS zone of type A for your domain {domain} with the ip {ip} on your registrar (ex: Gandi, OVH, Online, 1&1)');
     }
 
-    await sendWebhooks(EVENTS.UPDATE_DOMAIN, { releaseName, domain }, ctx.prisma);
+    await sendWebhooks(EVENTS.UPDATE, { releaseName, domain, envs }, ctx.prisma);
 
     await ctx.prisma.application.update({
         where: { releaseName },
         data: { domain },
     });
+
+    for (const { id, name, value } of envs) {
+        await ctx.prisma.env.upsert({
+            where: { id: id || 0 },
+            create: { name, value },
+            update: { name, value },
+        });
+    }
+
+    return true;
 };
 
 export const applicationQuery = async (_, { releaseName }, ctx) => {

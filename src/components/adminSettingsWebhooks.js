@@ -22,7 +22,7 @@ export default () => {
         EVENTS.UNINSTALL,
         EVENTS.REGISTER,
         EVENTS.UNSUBSCRIBE,
-        EVENTS.UPDATE_DOMAIN,
+        EVENTS.UPDATE,
     ];
 
     return (

@@ -36,14 +36,15 @@ export default ({ actions }) => {
                     <div className="origin-top-right absolute right-0 mt-2 -mr-1 w-56 rounded-md shadow-lg z-10">
                         <div className="rounded-md bg-white shadow-xs">
                             <div className="py-1">
-                                { actions.slice(1).map(({ text, action }) => {
+                                { actions.slice(1).map(({ icon, text, action }) => {
                                     return (
                                         <button
                                             type="button"
                                             onClick={action}
-                                            className="block w-full text-left px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                                            className="flex items-center w-full text-left px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
                                         >
-                                            {intl.formatMessage({ id: text })}
+                                            {icon}
+                                            <span>{intl.formatMessage({ id: text })}</span>
                                         </button>
                                     );
                                 }) }
