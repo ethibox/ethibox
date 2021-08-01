@@ -17,6 +17,7 @@ type Stripe {
 }
 
 input VarInput {
+    id: Int
     name: String
     value: String
 }
@@ -91,6 +92,7 @@ type Select {
 }
 
 type Envs {
+    id: Int
     name: String
     value: String
     label: String
@@ -141,7 +143,7 @@ type Mutation {
     updateGlobalEnvs(globalEnvs: [VarInput]): Boolean
     updateDefaultPaymentMethod(paymentMethodId: String): Boolean
     updateWebhooks(webhooks: [WebhookInput]): Boolean
-    updateAppDomain(releaseName: String, domain: String): Boolean
+    updateApp(releaseName: String, domain: String, envs: [VarInput]): Boolean
     upgradeStripeSubscription(appId: Int, price: Int): Boolean
     downgradeStripeSubscription(appId: Int): Boolean
     uploadTemplates(file: Upload!): Boolean

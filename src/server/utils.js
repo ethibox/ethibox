@@ -280,5 +280,5 @@ export const EVENTS = {
     UNSUBSCRIBE: 'unsubscribe',
     INSTALL: 'install',
     UNINSTALL: 'uninstall',
-    UPDATE_DOMAIN: 'update_domain',
+    UPDATE: 'update',
 };

@@ -100,7 +100,7 @@ describe('Applications Page', () => {
         cy.get('.grid > div:first .origin-top-right button:first').click({ force: true });
         cy.get('div[aria-modal="true"] input').clear().type('test.localhost');
         cy.get('div[aria-modal="true"] button:last').click();
-        cy.contains('.notification', 'Domain change with success');
+        cy.contains('.notification', 'Configuration edited with success');
     });
 
     it('Should display error if bad domain', () => {

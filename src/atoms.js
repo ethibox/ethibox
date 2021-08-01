@@ -87,7 +87,7 @@ const loadApplicationEnvs = async (releaseName) => fetch(withPrefix('/graphql'),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-access-token': getToken() },
     body: JSON.stringify({ query: `{
-        applicationEnvs(releaseName: "${releaseName}") { name, value, label, disabled, type, select { text, value } }
+        applicationEnvs(releaseName: "${releaseName}") { id, name, value, label, disabled, type, select { text, value } }
     }` }),
 })
     .then(checkStatus)
@@ -96,11 +96,19 @@ const loadApplicationEnvs = async (releaseName) => fetch(withPrefix('/graphql'),
         throw new Error(message);
     });
 
+export const applicationEnvsState = atom({
+    key: 'applicationEnvsStater',
+    default: [],
+});
+
 export const applicationEnvsSelector = selectorFamily({
     key: 'applicationEnvsSelector',
-    get: (releaseName) => async () => {
-        const applicationEnvs = await loadApplicationEnvs(releaseName);
+    get: (releaseName) => async ({ get }) => {
+        const applicationEnvs = get(applicationEnvsState).length ? get(applicationEnvsState) : await loadApplicationEnvs(releaseName);
         return applicationEnvs;
+    },
+    set: () => ({ set }, newValue) => {
+        set(applicationEnvsState, newValue);
     },
 });
 

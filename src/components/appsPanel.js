@@ -7,8 +7,9 @@ import { withNotifier } from '../context/NotificationContext';
 import { STATES, checkStatus, getToken, remainingTimePercentage } from '../utils';
 import { applicationsState } from '../atoms';
 import GridIcon from '../images/grid.svg';
-import ViewModal from './viewModal';
-import DomainModal from './domainModal';
+import DeleteIcon from '../images/delete.svg';
+import EditIcon from '../images/edit.svg';
+import EditModal from './editModal';
 import AppDropdown from './appDropdown';
 
 const INTERVAL = process.env.NODE_ENV === 'production' ? 5000 : 2000;
@@ -16,25 +17,17 @@ const INTERVAL = process.env.NODE_ENV === 'production' ? 5000 : 2000;
 export default withNotifier(({ notify }) => {
     const intl = useIntl();
 
-    const [viewModal, updateViewModal] = useState(false);
-    const [domainModal, updateDomainModal] = useState(false);
+    const [editModal, updateEditModal] = useState(false);
     const applications = useRecoilValue(applicationsState);
     const [selectedApplication, selectApplication] = useState();
     const updateApplications = useSetRecoilState(applicationsState);
 
-    const openViewModal = (app) => {
+    const openEditModal = (app) => {
         selectApplication(app);
-        updateViewModal(true);
+        updateEditModal(true);
     };
 
-    const openDomainModal = (app) => {
-        selectApplication(app);
-        updateDomainModal(true);
-    };
-
-    const closeViewModal = () => updateViewModal(false);
-
-    const closeDomainModal = () => updateDomainModal(false);
+    const closeEditModal = () => updateEditModal(false);
 
     const loadData = () => {
         fetch(withPrefix('/graphql'), {
@@ -97,8 +90,7 @@ export default withNotifier(({ notify }) => {
 
     return (
         <>
-            { viewModal && <ViewModal application={selectedApplication} onClose={closeViewModal} /> }
-            { domainModal && <DomainModal application={selectedApplication} onClose={closeDomainModal} /> }
+            { editModal && <EditModal application={selectedApplication} onClose={closeEditModal} /> }
             <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                 <h1 className="text-2xl font-semibold text-gray-900">{intl.formatMessage({ id: 'Applications' })}</h1>
                 <p className="mt-1 text-sm text-gray-500">{intl.formatMessage({ id: 'Manage your applications easily' })}.</p>
@@ -156,9 +148,9 @@ export default withNotifier(({ notify }) => {
                                 <div className="relative inline-flex w-full mt-4 border-t border-gray-200 pt-5">
                                     <AppDropdown
                                         actions={[
-                                            { text: intl.formatMessage({ id: 'Settings' }), action: () => openViewModal(app) },
-                                            { text: intl.formatMessage({ id: 'Edit domain name' }), action: () => openDomainModal(app) },
-                                            { text: intl.formatMessage({ id: 'Uninstall application' }), action: () => notify({ type: 'confirm', title: 'Confirmation', message: intl.formatMessage({ id: 'Are you sure ?' }), onConfirm: () => uninstallApplication(app.releaseName) }) },
+                                            { text: intl.formatMessage({ id: 'Settings' }) },
+                                            { text: intl.formatMessage({ id: 'Edit configuration' }), icon: <EditIcon className="w-5 h-5 mr-3 text-gray-500" fill="none" />, action: () => openEditModal(app) },
+                                            { text: intl.formatMessage({ id: 'Uninstall application' }), action: () => notify({ type: 'confirm', title: 'Confirmation', message: intl.formatMessage({ id: 'Are you sure ?' }), onConfirm: () => uninstallApplication(app.releaseName) }), icon: <DeleteIcon className="w-5 h-5 mr-3 text-gray-500" /> },
                                         ]}
                                     />
                                 </div>
