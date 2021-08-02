@@ -49,19 +49,19 @@ export const timeout = (ms, promise) => new Promise((resolve, reject) => {
     });
 });
 
-export const checkUrl = (url) => new Promise((resolve, reject) => {
+export const checkUrl = (url) => new Promise((resolve) => {
     timeout(10000, fetch(url, { redirect: 'follow' })).then(({ status }) => {
         if (status === 200) {
             resolve(true);
         } else {
-            reject(new Error('Status code error'));
+            resolve(false);
         }
     }).catch((e) => {
         if (e.code === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' || e.code === 'DEPTH_ZERO_SELF_SIGNED_CERT') {
-            reject(new Error('Certificate error'));
+            resolve(false);
         }
 
-        reject(new Error('Error'));
+        resolve(false);
     });
 });
 
@@ -126,14 +126,12 @@ export const asyncForEach = async (array, callback) => {
     }
 };
 
-export const initSettings = async (prisma) => {
+export const init = async (prisma) => {
     const settings = await prisma.setting.findMany();
 
     if (!settings.length) {
         const defaultSettings = [
-            { name: 'rootDomain', value: 'local.ethibox.fr' },
-            { name: 'checkDomain', value: 'false' },
-            { name: 'appsUserLimit', value: '10' },
+            { name: 'rootDomain', value: 'localhost' },
             { name: 'stripeEnabled', value: process.env.STRIPE_ENABLED || 'false' },
             { name: 'stripePublishableKey', value: process.env.STRIPE_PUBLISHABLE_KEY || '' },
             { name: 'stripeSecretKey', value: process.env.STRIPE_SECRET_KEY || '' },
@@ -147,36 +145,6 @@ export const initSettings = async (prisma) => {
             }).then(true);
         });
     }
-};
-
-export const checkPortainer = async (endpoint, username, password) => {
-    if (!endpoint) {
-        console.error('No portainer endpoint');
-        process.exit(1);
-    }
-
-    await fetch(`${endpoint}/api/auth`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-    })
-        .then(checkStatus)
-        .catch(() => {
-            console.error('Bad portainer logins');
-            process.exit(1);
-        });
-};
-
-export const init = (prisma) => {
-    (async () => {
-        const { PORTAINER_ENDPOINT: endpoint, PORTAINER_USERNAME: username, PORTAINER_PASSWORD: password } = process.env;
-
-        if (!process.env.CI) {
-            await checkPortainer(endpoint, username, password);
-        }
-
-        await initSettings(prisma);
-    })();
 };
 
 export const generateReleaseName = async (appName, prisma, number = 1) => {
@@ -262,17 +230,10 @@ export const sendWebhooks = async (event, data, prisma) => {
 };
 
 export const STATES = {
-    INSTALLING: 'installing',
-    UNINSTALLING: 'uninstalling',
-    EDITING: 'editing',
-    RUNNING: 'running',
+    ONLINE: 'online',
+    STANDBY: 'standby',
+    OFFLINE: 'offline',
     DELETED: 'deleted',
-};
-
-export const TASKS = {
-    INSTALL: 'install',
-    UNINSTALL: 'uninstall',
-    EDIT: 'edit',
 };
 
 export const EVENTS = {

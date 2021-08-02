@@ -10,9 +10,7 @@ describe('Admin Page', () => {
             { email: 'user@ethibox.fr', password: 'myp@ssw0rd' },
         ] });
         cy.request('POST', 'http://localhost:3000/test/settings', { settings: [
-            { name: 'rootDomain', value: 'local.ethibox.fr' },
-            { name: 'checkDomain', value: 'false' },
-            { name: 'appsUserLimit', value: '10' },
+            { name: 'rootDomain', value: 'localhost' },
             { name: 'stripeEnabled', value: 'false' },
             { name: 'stripePublishableKey', value: '' },
             { name: 'stripeSecretKey', value: '' },
@@ -42,7 +40,6 @@ describe('Admin Page', () => {
     it('Should update admin settings', () => {
         cy.visit('/admin');
         cy.get('#root_domain').clear().type('new.ethibox.fr');
-        cy.get('#apps_user_limit').clear().type('10');
         cy.get('main > div span:last-child button').click();
         cy.contains('.notification', 'Settings save');
     });

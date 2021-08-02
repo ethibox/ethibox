@@ -14,9 +14,7 @@ beforeEach(async () => {
     await reset(prisma);
 
     const settings = [
-        { name: 'rootDomain', value: 'local.ethibox.fr' },
-        { name: 'checkDomain', value: 'false' },
-        { name: 'appsUserLimit', value: '10' },
+        { name: 'rootDomain', value: 'localhost' },
     ];
 
     await addSettings(settings, prisma);
@@ -25,16 +23,12 @@ beforeEach(async () => {
 test('Should get settings', async () => {
     const settings = await getSettings(null, prisma);
     const rootDomain = await getSettings('rootDomain', prisma);
-    const { checkDomain } = settings;
 
     expect(settings).toEqual({
-        rootDomain: 'local.ethibox.fr',
-        checkDomain: false,
-        appsUserLimit: 10,
+        rootDomain: 'localhost',
     });
 
-    expect(rootDomain).toEqual('local.ethibox.fr');
-    expect(checkDomain).toEqual(false);
+    expect(rootDomain).toEqual('localhost');
 });
 
 test('Should generate new release name', async () => {
@@ -48,7 +42,7 @@ test('Should generate new release name', async () => {
 });
 
 test('Should return DNS ip', async () => {
-    const ip = await getIp('local.ethibox.fr');
+    const ip = await getIp('localhost');
     expect(ip).toEqual('127.0.0.1');
 
     const ip2 = await getIp('unknowdomain.com');

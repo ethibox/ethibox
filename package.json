@@ -35,7 +35,6 @@
     "@prisma/cli": "~2.11.0",
     "@tailwindcss/ui": "^0.7.2",
     "babel-plugin-import-graphql": "^2.7.0",
-    "blueimp-md5": "^2.18.0",
     "cypress": "^5.6.0",
     "cypress-dotenv": "^1.2.2",
     "cypress-file-upload": "^4.1.1",

@@ -47,11 +47,9 @@ model Application {
   id            Int       @id @default(autoincrement())
   releaseName   String    @unique
   domain        String    @unique
-  error         String?
   price         Int       @default(0)
   envs          Env[]
-  state         String    @default("installing")
-  task          String?   @default("install")
+  state         String    @default("standby")
   lastTaskDate  DateTime? @default(now())
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

@@ -18,7 +18,6 @@ import {
     fileToJson,
     getIp,
     sendWebhooks,
-    TASKS,
     STATES,
     EVENTS,
 } from './utils';
@@ -159,14 +158,6 @@ export const installApplicationMutation = async (_, { templateId }, ctx) => {
 
     if (!template) throw new Error('Not existing application');
 
-    const appsUserLimit = await getSettings('appsUserLimit', ctx.prisma);
-
-    const userApps = await ctx.prisma.application.count({ where: { userId: ctx.user.id, NOT: { state: STATES.DELETED } } });
-
-    if (appsUserLimit && userApps >= appsUserLimit) {
-        throw new Error('Your apps number limit is exceeded');
-    }
-
     const { stripeEnabled, stripeSecretKey } = await getSettings(null, ctx.prisma);
 
     if (stripeEnabled) {
@@ -179,7 +170,7 @@ export const installApplicationMutation = async (_, { templateId }, ctx) => {
         }
     }
 
-    const rootDomain = (await getSettings('rootDomain', ctx.prisma)) || 'local.ethibox.fr';
+    const rootDomain = (await getSettings('rootDomain', ctx.prisma)) || 'localhost';
 
     const releaseName = await generateReleaseName(template.name, ctx.prisma);
 
@@ -226,8 +217,7 @@ export const uninstallApplicationMutation = async (_, { releaseName }, ctx) => {
     await ctx.prisma.application.update({
         where: { releaseName },
         data: {
-            task: TASKS.UNINSTALL,
-            state: STATES.UNINSTALLING,
+            state: STATES.STANDBY,
             lastTaskDate: new Date(),
             user: { connect: { id: ctx.user.id } },
         },
@@ -379,13 +369,7 @@ export const settingsQuery = async (_, __, ctx) => {
 
     const settings = await ctx.prisma.setting.findMany();
 
-    return settings.filter(({ name }) => name !== 'portainerToken').map((setting) => {
-        if (setting.name === 'portainerPassword') {
-            return { ...setting, value: '************' };
-        }
-
-        return setting;
-    });
+    return settings;
 };
 
 export const globalEnvsQuery = async (_, __, ctx) => {
@@ -548,7 +532,7 @@ export const updateAppMutation = async (_, { releaseName, domain, envs }, ctx) =
     if (!ctx.user) throw new Error('Not authorized');
 
     const application = await ctx.prisma.application.findOne({ where: { releaseName } });
-    const rootDomain = (await getSettings('rootDomain', ctx.prisma)) || 'local.ethibox.fr';
+    const rootDomain = (await getSettings('rootDomain', ctx.prisma)) || 'localhost';
     const ip = await getIp(rootDomain);
 
     if (!application || application.userId !== ctx.user.id) {
@@ -629,8 +613,7 @@ export const deleteAccountMutation = async (_, __, ctx) => {
         await ctx.prisma.application.update({
             where: { id: application.id },
             data: {
-                task: TASKS.UNINSTALL,
-                state: STATES.UNINSTALLING,
+                state: STATES.STANDBY,
                 lastTaskDate: new Date(),
             },
         });

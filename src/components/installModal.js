@@ -248,10 +248,10 @@ export default withNotifier((props) => {
                             <CardElement id="card" className="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
                         )}
 
-                        { /* <p className="text-xs mt-2">
-                            <span role="img" aria-label="lock">🔒</span> Secure payment with Stripe.
-                        </p> */ }
-                        <p className="text-xs mt-2">{intl.formatMessage({ id: 'Your credit card will not be charged until your trial period ends. We\'ll remind you before your trial ends' })}.</p>
+                        <p className="text-xs mt-2">
+                            <span role="img" aria-label="lock" className="mr-1">🔒</span>
+                            <span>{intl.formatMessage({ id: 'Secure payment with Stripe. Your credit card will not be charged until your trial period ends. We\'ll remind you before your trial ends' })}.</span>
+                        </p>
                     </div>
                 </div>
                 <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">

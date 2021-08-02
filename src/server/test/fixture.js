@@ -36,7 +36,7 @@ export const addUsers = async (users, prisma) => {
 };
 
 export const addApps = async (apps, prisma) => {
-    const rootDomain = 'local.ethibox.fr';
+    const rootDomain = 'localhost';
 
     for await (const app of apps) {
         const { templateId, userId, task, state, error, domain, lastTaskDate } = app;

@@ -52,7 +52,7 @@ describe('Store Page', () => {
 
             expect(app.name).to.equal('Wordpress');
 
-            cy.get('.grid > div:first-child').contains('Installing...');
+            cy.get('.grid > div:first-child').contains('Action in progress');
         });
     });
 
@@ -101,7 +101,7 @@ describe('Store Page', () => {
 
             expect(app.name).to.equal('Wordpress');
 
-            cy.get('.grid > div:first-child').contains('Installing...');
+            cy.get('.grid > div:first-child').contains('Action in progress');
         });
     });
 
