@@ -10,18 +10,6 @@ COPY . /app
 
 ARG PREFIX_PATHS
 
-ARG MATOMO_ENABLED
-
-ARG MATOMO_URL
-
-ARG MATOMO_SITEID
-
-ARG POSTHOG_ENABLED
-
-ARG POSTHOG_URL
-
-ARG POSTHOG_APIKEY
-
 RUN yarn install
 
 RUN npm run build
@@ -52,4 +40,4 @@ CMD ["node", "index.js"]
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-EXPOSE 3000 5555
+EXPOSE 3000

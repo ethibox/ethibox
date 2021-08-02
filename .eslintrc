@@ -16,6 +16,7 @@
         "react/jsx-no-target-blank": [0],
         "react/jsx-one-expression-per-line": [0],
         "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"] }],
+        "react/no-unescaped-entities": [0],
         "import/no-extraneous-dependencies": [0],
         "react/no-danger": [0],
         "quotes": ["error", "single"],
@@ -33,5 +34,12 @@
     },
     "env": {
         "browser": true
-    }
+    },
+    "overrides": [
+        {
+            "files": ["*.graphql"],
+            "parser": "@graphql-eslint/eslint-plugin",
+            "plugins": ["@graphql-eslint"]
+        }
+    ]
 }

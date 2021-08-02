@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Link, withPrefix } from 'gatsby';
+import { withPrefix } from 'gatsby';
 import { Helmet } from 'react-helmet';
-import { useIntl } from 'gatsby-plugin-intl';
+import { Link, useIntl } from 'gatsby-plugin-intl';
 
 import { isLoggedIn, clear, getItem, setItem, navigate } from '../utils';
+import SEO from './seo';
 
 import CloseIcon from '../images/close.svg';
 import HomeIcon from '../images/home.svg';
@@ -21,13 +22,13 @@ export default (props) => {
         updateSidebar(!isSidebarOpened);
     };
 
-    const { children, search } = props;
+    const { children, search, title } = props;
 
     const SidebarMenu = [
-        { name: 'Home', link: '/', icon: <HomeIcon className="mr-4 h-6 w-6" fill="none" />, position: 1 },
-        { name: 'Applications', link: '/apps', icon: <GridIcon className="mr-4 w-6 h-6" fill="none" />, position: 2 },
-        { name: 'Invoices', link: '/invoices', icon: <DocumentIcon className="mr-4 w-6 h-6" fill="none" />, position: 3 },
-        { name: 'Settings', link: '/settings', icon: <SettingsIcon className="mr-4 w-6 h-6" fill="none" />, position: 4 },
+        { name: 'Home', link: '/', icon: <HomeIcon className="mr-4 h-6 w-6" fill="none" /> },
+        { name: 'Applications', link: '/apps', icon: <GridIcon className="mr-4 w-6 h-6" fill="none" /> },
+        { name: 'Invoices', link: '/invoices', icon: <DocumentIcon className="mr-4 w-6 h-6" fill="none" /> },
+        { name: 'Settings', link: '/settings', icon: <SettingsIcon className="mr-4 w-6 h-6" fill="none" /> },
     ];
 
     if (!isLoggedIn()) {
@@ -46,6 +47,7 @@ export default (props) => {
             <Helmet>
                 <script type="text/javascript" src={`${withPrefix('/ethibox.js')}`} />
             </Helmet>
+            <SEO title={title || 'Ethibox'} />
             <div className="h-screen flex overflow-hidden bg-gray-100">
                 <div className={`md:hidden ${isSidebarOpened ? 'block' : 'hidden'}`}>
                     <div className={`fixed inset-0 z-30 transition-opacity ease-linear duration-300 opacity-0 ${isSidebarOpened ? 'opacity-100 block' : 'opacity-0 hidden'}`}>
@@ -69,8 +71,8 @@ export default (props) => {
                             </div>
                             <div className="mt-5 flex-1 h-0 overflow-y-auto">
                                 <nav className="px-2">
-                                    { SidebarMenu.sort((a, b) => (a.position - b.position)).map((m) => (
-                                        <Link to={m.link} key={m.name} className="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150" activeclassname="active text-white bg-gray-900">
+                                    { SidebarMenu.map((m) => (
+                                        <Link to={m.link} key={m.name} className="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150" activeClassName="active text-white bg-gray-900">
                                             {m.icon}
                                             {intl.formatMessage({ id: m.name })}
                                         </Link>
@@ -79,7 +81,7 @@ export default (props) => {
                             </div>
                             <div className="flex-shrink-0 overflow-y-auto">
                                 <nav className="px-2">
-                                    <Link to="/logout" className="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150" activeclassname="active text-white bg-gray-900">
+                                    <Link to="/logout" className="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150" activeClassName="active text-white bg-gray-900">
                                         <LogoutIcon className="mr-4 h-6 w-6" />
                                         {intl.formatMessage({ id: 'Sign out' })}
                                     </Link>
@@ -98,7 +100,7 @@ export default (props) => {
                         <div className="h-0 flex-1 flex flex-col overflow-y-auto">
                             <nav className="flex-1 px-2 py-4 bg-gray-800">
                                 { SidebarMenu.map((m) => (
-                                    <Link to={m.link} key={m.name} className="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150" activeclassname="active text-white bg-gray-900">
+                                    <Link to={m.link} key={m.name} className="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150" activeClassName="active text-white bg-gray-900">
                                         {m.icon}
                                         <span className="truncate">{intl.formatMessage({ id: m.name })}</span>
                                         { m.label ? (
@@ -110,7 +112,7 @@ export default (props) => {
                         </div>
                         <div className="flex-shrink-0 bg-gray-800">
                             <nav className="p-2">
-                                <Link to="/logout" className="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150" activeclassname="active text-white bg-gray-900">
+                                <Link to="/logout" className="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150" activeClassName="active text-white bg-gray-900">
                                     <LogoutIcon className="mr-4 h-6 w-6" />
                                     {intl.formatMessage({ id: 'Sign out' })}
                                 </Link>

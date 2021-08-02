@@ -132,11 +132,12 @@ type LoginResponse {
 type Mutation {
     register(email: String!, password: String!): LoginResponse!
     login(email: String!, password: String!, remember: Boolean): LoginResponse!
-    reset(email: String!): Boolean
+    reset(baseUrl: String!, email: String!): Boolean
     resetpassword(token: String!, password: String!): Boolean
     removePaymentMethod: Boolean
     deleteAccount: Boolean
     installApplication(templateId: Int): Boolean
+    createSessionCheckout(templateId: Int, baseUrl: String): String
     uninstallApplication(releaseName: String!): Boolean
     updateUser(firstName: String, lastName: String, email: String): Boolean
     updateSettings(settings: [VarInput]): Boolean
@@ -144,7 +145,5 @@ type Mutation {
     updateDefaultPaymentMethod(paymentMethodId: String): Boolean
     updateWebhooks(webhooks: [WebhookInput]): Boolean
     updateApp(releaseName: String, domain: String, envs: [VarInput]): Boolean
-    upgradeStripeSubscription(appId: Int, price: Int): Boolean
-    downgradeStripeSubscription(appId: Int): Boolean
-    uploadTemplates(file: Upload!): Boolean
+    updateTemplates(templatesUrl: String): Boolean
 }

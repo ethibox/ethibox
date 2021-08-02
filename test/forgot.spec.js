@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const user = { email: 'user@ethibox.fr', password: 'myp@ssw0rd' };
+const user = { email: 'user@example.com', password: 'myp@ssw0rd' };
 
 describe('Forgot Page', () => {
     before(() => {
@@ -20,13 +20,13 @@ describe('Forgot Page', () => {
 
     it('Should display error if bad e-mail address', () => {
         cy.visit('/reset');
-        cy.get('input[name="email"]').type('userethibox.fr{enter}');
+        cy.get('input[name="email"]').type('bademail{enter}');
         cy.get('.error').should('contain', 'Please enter your e-mail');
     });
 
     it('Should display success message if good e-mail address', () => {
         cy.visit('/reset');
-        cy.get('input[name="email"]').type('user@ethibox.fr{enter}');
+        cy.get('input[name="email"]').type('user@example.com{enter}');
         cy.get('.success').should('contain', 'Check your inbox');
     });
 

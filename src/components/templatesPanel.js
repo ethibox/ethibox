@@ -1,7 +1,6 @@
 import React from 'react';
 import { useRecoilValue } from 'recoil';
-import { Link } from 'gatsby';
-import { useIntl } from 'gatsby-plugin-intl';
+import { Link, useIntl } from 'gatsby-plugin-intl';
 import TemplateIcon from '../images/template.svg';
 
 import Template from './template';

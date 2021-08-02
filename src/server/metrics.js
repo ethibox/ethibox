@@ -22,8 +22,8 @@ const gauge2 = new Prometheus.Gauge({
 const fetchDomains = async () => {
     const applications = await prisma.application.findMany({ where: { NOT: { state: STATES.DELETED } } });
     applications.forEach((app) => {
-        const { domain, responseTime, error } = app;
-        gauge1.set({ domain }, error ? 1 : 0);
+        const { domain, responseTime, state } = app;
+        gauge1.set({ domain }, state === STATES.ONLINE ? 0 : 1);
         gauge2.set({ domain }, responseTime);
     });
 };

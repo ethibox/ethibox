@@ -2,9 +2,8 @@ import 'babel-polyfill';
 import 'dotenv/config';
 import Stripe from 'stripe';
 import { PrismaClient } from '@prisma/client';
-import { reset, addUser, addSettings, addApps, importTemplates } from './fixture';
-import { invoiceList, upsertProduct, upsertPrice, upsertCustomer, upgradeSubscription, upsertPaymentMethod, downgradeSubscription } from '../stripe';
-import { upgradeStripeSubscriptionMutation } from '../resolvers';
+import { reset, addSettings } from './fixture';
+import { invoiceList, upsertProduct, upsertPrice, upsertCustomer } from '../stripe';
 
 const prisma = new PrismaClient();
 
@@ -46,7 +45,7 @@ test('Should upsert a price', async () => {
 test('Should upsert a customer', async () => {
     const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
-    const data = { id: USER_ID, email: 'admin@ethibox.fr' };
+    const data = { id: USER_ID, email: 'admin@example.com' };
 
     const customer = await upsertCustomer(stripe, data.id, data.email);
 
@@ -55,43 +54,7 @@ test('Should upsert a customer', async () => {
     );
 });
 
-test('Should upgrade a subscription', async () => {
-    const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-
-    const data = { userId: USER_ID, appName: 'Wordpress', appId: 1, price: 19 };
-
-    await upsertPaymentMethod(stripe, data.userId, { number: '4242424242424242', exp_month: 7, exp_year: 2025, cvc: '314' });
-    const subscription = await upgradeSubscription(stripe, data.userId, data.appName, data.price, data.appId);
-
-    expect(subscription).toEqual(
-        expect.objectContaining({ customer: `${data.userId}` }),
-    );
-});
-
-test('Should downgrade a subscription', async () => {
-    const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-
-    const data = { userId: USER_ID, appId: 1 };
-
-    await downgradeSubscription(stripe, data.userId, data.appId);
-});
-
-test('Should upgrade a subscription - resolver', async () => {
-    await importTemplates(prisma);
-    const user = await addUser({ email: 'admin@ethibox.fr', password: 'myp@ssw0rd' }, prisma);
-    await addApps([{ templateId: 1, userId: user.id }], prisma);
-
-    const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-
-    const ctx = { user, prisma };
-    const { id: userId } = await upsertCustomer(stripe, ctx.user.id, ctx.user.email);
-    await upsertPaymentMethod(stripe, ctx.user.id, { number: '4242424242424242', exp_month: 7, exp_year: 2025, cvc: '314' });
-
-    const data = { userId, appId: 1, price: 19 };
-    expect(await upgradeStripeSubscriptionMutation(null, data, ctx)).toEqual(true);
-});
-
-test('Should return invoice list', async () => {
+test.skip('Should return invoice list', async () => {
     const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
     const invoices = await invoiceList(stripe, USER_ID);

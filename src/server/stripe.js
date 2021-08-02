@@ -1,10 +1,15 @@
-export const upsertProduct = async (stripe, appName) => {
+export const upsertProduct = async (stripe, appName, description = '', images = []) => {
     const { data: products } = await stripe.products.list();
 
     let product = products.find((p) => p.name === appName);
 
     if (!product) {
-        product = await stripe.products.create({ name: appName, metadata: { application: 'ethibox' } });
+        product = await stripe.products.create({
+            name: appName,
+            images,
+            ...(description && { description }),
+            metadata: { application: 'ethibox' },
+        });
     }
 
     return product;

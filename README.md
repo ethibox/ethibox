@@ -5,15 +5,15 @@
 [![Github Workflow](https://img.shields.io/github/workflow/status/ethibox/ethibox/Build%20and%20deploy?style=flat-square&colorA=181C31&colorB=212839)](https://github.com/ethibox/ethibox/actions)
 [![Code Climate](https://img.shields.io/codeclimate/maintainability/ethibox/ethibox.svg?style=flat-square&colorA=181C31&colorB=212839)](https://codeclimate.com/github/ethibox/ethibox)
 
-Ethibox is an open-source web apps hoster, a simple UI to install & update open-source web apps.
-
-## Prerequisites
-
-- Docker Swarm
-- Portainer
-- Node.js
+Ethibox is an open-source web apps hoster. Host and share the most popular open-source web apps for your friends and/or your clients.
 
 ## Installation
+
+```bash
+docker run --name ethibox -p 3000:3000 ethibox/ethibox
+```
+
+## Development
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See [deployment](#Deployment) to deploy the project on a live system.
 
@@ -37,12 +37,8 @@ cp .env.dist .env
 
 # Run the app
 npm start
-```
 
-## Deployment
-
-```bash
-docker stack deploy -c ethibox.yml ethibox
+# Go to http://localhost:8080
 ```
 
 ## Running the tests

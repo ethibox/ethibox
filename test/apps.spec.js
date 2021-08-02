@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const user = { email: 'user@ethibox.fr', password: 'myp@ssw0rd' };
+const user = { email: 'user@example.com', password: 'myp@ssw0rd' };
 
 describe('Applications Page', () => {
     before(() => {
@@ -22,9 +22,9 @@ describe('Applications Page', () => {
 
                 cy.request('POST', 'http://localhost:3000/test/apps', {
                     apps: [
-                        { templateId: 1, userId: user.id, state: 'running' },
-                        { templateId: 1, userId: user.id, state: 'running' },
-                        { templateId: 1, userId: user.id, state: 'running' },
+                        { templateId: 1, userId: user.id, state: 'online' },
+                        { templateId: 1, userId: user.id, state: 'online' },
+                        { templateId: 1, userId: user.id, state: 'online' },
                     ],
                 });
             });
@@ -43,55 +43,20 @@ describe('Applications Page', () => {
         cy.visit('/apps');
         cy.get('.grid > div:first-child button:last').click({ force: true });
         cy.get('.grid > div:first-child button:last').click();
-        cy.get('#confirm').click();
-        cy.get('.grid > div:first-child').should('contain', 'Uninstalling...');
+        cy.get('div[aria-modal="true"] button:first').click();
+        cy.get('.grid > div').should('have.length', 2);
     });
 
     it('Should hide deleted applications', () => {
         cy.request('DELETE', 'http://localhost:3000/test/apps/wordpress2');
         cy.visit('/apps');
-        cy.get('.grid > div').should('have.length', 2);
+        cy.get('.grid > div').should('have.length', 1);
     });
 
-    it('Should display error if a task failed', () => {
-        cy.request('POST', 'http://localhost:3000/test/apps', { apps: [{ templateId: 1, userId: user.id, error: 'Application stuck' }] });
+    it('Should display label if application is offline', () => {
+        cy.request('POST', 'http://localhost:3000/test/apps', { apps: [{ templateId: 1, userId: user.id, state: 'offline' }] });
         cy.visit('/apps');
-        cy.get('.grid > div:last-child').should('contain', 'Error: Application stuck');
-        cy.get('.grid > div:last-child').should('not.contain', 'Installing');
-    });
-
-    it.skip('Should display app detail modal', () => {
-        cy.request('POST', 'http://localhost:3000/test/apps', { apps: [{ templateId: 2, userId: user.id, state: 'running' }] });
-        cy.request('POST', 'http://localhost:3000/test/apps', { apps: [{ templateId: 3, userId: user.id, state: 'running' }] });
-        cy.visit('/apps');
-        cy.get('.grid > div:first-child button:first').click();
-        cy.get('div[role="dialog"]');
-    });
-
-    it('Should display progress bar', () => {
-        cy.request('POST', 'http://localhost:3000/test/apps', { apps: [{ templateId: 1, userId: user.id }] });
-        cy.visit('/apps');
-        cy.get('.grid > div:last-child').should('contain', 'Installing');
-        cy.get('.grid > div:last-child').should('contain', '10%');
-    });
-
-    it.skip('Should display password field', () => {
-        cy.request('POST', 'http://localhost:3000/test/reset');
-        cy.request('POST', 'http://localhost:3000/test/import');
-        cy.request('POST', 'http://localhost:3000/test/users', { users: [{ email: 'user@ethibox.fr', password: 'myp@ssw0rd' }] });
-        cy.request('POST', 'http://localhost:3000/test/settings', { settings: [
-            { name: 'stripeEnabled', value: 'false' },
-        ] });
-
-        cy.visit('/');
-        cy.get('.grid > div:nth-child(2) button').click();
-
-        cy.wait(500);
-        cy.request('PUT', 'http://localhost:3000/test/apps/flarum1', { state: 'running' });
-        cy.wait(500);
-
-        cy.get('.grid > div:first-child button:first').click();
-        cy.get('input[type=password] + div button').click();
+        cy.get('.grid > div:last-child').should('contain', 'Offline');
     });
 
     it('Should edit app domain', () => {

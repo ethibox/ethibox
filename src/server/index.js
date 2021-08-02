@@ -29,6 +29,7 @@ import {
     resetPasswordMutation,
     removePaymentMethodMutation,
     uninstallApplicationMutation,
+    createSessionCheckoutMutation,
     updateDefaultPaymentMethodMutation,
     installApplicationMutation,
     updateAppMutation,
@@ -36,9 +37,7 @@ import {
     updateSettingsMutation,
     updateGlobalEnvsMutation,
     updateWebhooksMutation,
-    upgradeStripeSubscriptionMutation,
-    downgradeStripeSubscriptionMutation,
-    uploadTemplatesMutation,
+    updateTemplatesMutation,
     globalEnvsQuery,
 } from './resolvers';
 
@@ -90,6 +89,7 @@ const resolvers = {
         resetpassword: resetPasswordMutation,
         installApplication: installApplicationMutation,
         removePaymentMethod: removePaymentMethodMutation,
+        createSessionCheckout: createSessionCheckoutMutation,
         updateDefaultPaymentMethod: updateDefaultPaymentMethodMutation,
         uninstallApplication: uninstallApplicationMutation,
         updateApp: updateAppMutation,
@@ -97,9 +97,7 @@ const resolvers = {
         updateSettings: updateSettingsMutation,
         updateGlobalEnvs: updateGlobalEnvsMutation,
         updateWebhooks: updateWebhooksMutation,
-        upgradeStripeSubscription: upgradeStripeSubscriptionMutation,
-        downgradeStripeSubscription: downgradeStripeSubscriptionMutation,
-        uploadTemplates: uploadTemplatesMutation,
+        updateTemplates: updateTemplatesMutation,
     },
 };
 
@@ -113,7 +111,7 @@ const server = new ApolloServer({
         if (isValidToken(token)) {
             const data = decodeToken(token);
 
-            const user = await prisma.user.findOne({ where: { email: data.email } });
+            const user = await prisma.user.findUnique({ where: { email: data.email } });
 
             return { prisma, user };
         }

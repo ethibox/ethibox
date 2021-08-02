@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import md5 from 'blueimp-md5';
-import { navigate as navigateGatsby, withPrefix } from 'gatsby';
+import { withPrefix } from 'gatsby';
+import { navigate as navigateGatsby } from 'gatsby-plugin-intl';
 
 export const checkStatus = (response) => new Promise((resolve, reject) => {
     if (response.status !== 200) {
@@ -101,7 +101,7 @@ export const getParameterByName = (name) => {
     return false;
 };
 
-export const remainingTimePercentage = (startTime, endTime, bonus = 0) => {
+export const remainingTimePercentage = (startTime, endTime) => {
     const now = new Date().getTime();
 
     const totalTime = endTime - startTime;
@@ -112,31 +112,23 @@ export const remainingTimePercentage = (startTime, endTime, bonus = 0) => {
         return 100;
     }
 
-    return Math.round(percentage + bonus);
+    return Math.round(percentage);
 };
 
 export const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 export const STATES = {
-    INSTALLING: 'installing',
-    UNINSTALLING: 'uninstalling',
-    EDITING: 'editing',
-    RUNNING: 'running',
+    ONLINE: 'online',
+    STANDBY: 'standby',
+    OFFLINE: 'offline',
     DELETED: 'deleted',
-};
-
-export const TASKS = {
-    INSTALL: 'install',
-    UNINSTALL: 'uninstall',
-    EDIT: 'edit',
 };
 
 export const EVENTS = {
     REGISTER: 'register',
     UNSUBSCRIBE: 'unsubscribe',
-    INSTALL: 'install',
-    UNINSTALL: 'uninstall',
-    UPDATE: 'update',
+    INSTALL: 'install application',
+    UNINSTALL: 'uninstall application',
+    UPDATE: 'update application',
+    RESETPASSWORD: 'reset password',
 };
-
-export const gravatar = (email, size = 80) => `https://www.gravatar.com/avatar/${md5(email)}.jpg?s=${size}&d=mp`;

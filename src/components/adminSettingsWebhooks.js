@@ -20,15 +20,16 @@ export default () => {
     const events = [
         EVENTS.INSTALL,
         EVENTS.UNINSTALL,
+        EVENTS.UPDATE,
+        EVENTS.RESETPASSWORD,
         EVENTS.REGISTER,
         EVENTS.UNSUBSCRIBE,
-        EVENTS.UPDATE,
     ];
 
     return (
         <>
             <div className="col-span-2">
-                <label htmlFor="main_ip" className="block text-sm font-medium leading-5 text-gray-700">
+                <label htmlFor="webhooks" className="block text-sm font-medium leading-5 text-gray-700">
                     Webhooks
                     <button
                         type="button"
@@ -39,13 +40,13 @@ export default () => {
                         }}
                         className="inline-flex items-center relative justify-center px-2 border border-gray-300 rounded-md ml-2 focus:outline-none"
                     >
-                        <PlusIcon className="w-3" />
+                        <PlusIcon className="w-3 text-gray-800" />
                         <span className="ml-2">Add webhook</span>
                     </button>
                 </label>
                 { webhooks.map((webhook, index) => {
                     return (
-                        <div key={webhook.id} className="grid gap-1 grid-cols-11 mt-4 sm:mt-1">
+                        <div key={webhook.id} className="grid gap-1 grid-cols-11 mt-2">
                             <div className="col-span-11 sm:col-span-5 flex rounded-md shadow-sm">
                                 <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">Event</span>
                                 <select

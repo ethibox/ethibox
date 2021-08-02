@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import bcrypt from 'bcrypt';
 import Stripe from 'stripe';
 import templates from './templates.json';
@@ -36,11 +34,11 @@ export const addUsers = async (users, prisma) => {
 };
 
 export const addApps = async (apps, prisma) => {
-    const rootDomain = 'local.ethibox.fr';
+    const rootDomain = 'localhost';
 
     for await (const app of apps) {
         const { templateId, userId, task, state, error, domain, lastTaskDate } = app;
-        const template = await prisma.template.findOne({ where: { id: templateId } });
+        const template = await prisma.template.findUnique({ where: { id: templateId } });
 
         if (!template) throw new Error('No template found');
 
@@ -112,8 +110,6 @@ export const addWebhooks = async (webhooks, prisma) => {
 };
 
 export const reset = async (prisma) => {
-    fs.writeFileSync(path.join(__dirname, '../../.token'), '');
-
     await prisma.setting.deleteMany();
     await prisma.webhook.deleteMany();
     await prisma.env.deleteMany();

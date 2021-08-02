@@ -1,24 +1,20 @@
 import jwt from 'jsonwebtoken';
-import nodemailer from 'nodemailer';
-import mjml2html from 'mjml';
 import isEmail from 'validator/lib/isEmail';
 import Stripe from 'stripe';
 import bcrypt from 'bcrypt';
 import { generate } from 'generate-password';
-import MatomoTracker from 'matomo-tracker';
-import { invoiceList, upgradeSubscription, downgradeSubscription, upsertCustomer } from './stripe';
+import { invoiceList, upsertCustomer, upsertProduct, upsertPrice } from './stripe';
 import {
     validStripe,
-    secret,
-    tokenExpiration,
     asyncForEach,
     getSettings,
     generateReleaseName,
     checkDnsRecord,
-    fileToJson,
     getIp,
     sendWebhooks,
-    TASKS,
+    updateTemplates,
+    TOKEN_EXPIRATION,
+    SECRET,
     STATES,
     EVENTS,
 } from './utils';
@@ -28,33 +24,25 @@ export const registerMutation = async (_, { email, password }, ctx) => {
         throw new Error('Email/password error');
     }
 
-    const hashPassword = await bcrypt.hash(password, 10);
-
     if (await ctx.prisma.user.count({ where: { email } })) {
         throw new Error('User already exist');
     }
+
+    const hashPassword = await bcrypt.hash(password, 10);
 
     const isAdmin = !(await ctx.prisma.user.count());
 
     const user = await ctx.prisma.user.create({ data: { email, password: hashPassword, isAdmin } });
 
-    const { stripeEnabled, stripeSecretKey } = await getSettings(null, ctx.prisma);
+    const token = jwt.sign({ id: user.id, email: user.email, isAdmin }, SECRET, { expiresIn: TOKEN_EXPIRATION });
 
-    if (stripeEnabled) {
-        const stripe = Stripe(stripeSecretKey);
-        await upsertCustomer(stripe, user.id, email);
-    }
+    await sendWebhooks(EVENTS.REGISTER, { email, token }, ctx.prisma);
 
-    const token = jwt.sign({ id: user.id, email: user.email, isAdmin }, secret, { expiresIn: tokenExpiration });
-
-    return {
-        token,
-        user,
-    };
+    return { token, user };
 };
 
 export const loginMutation = async (_, { email, password, remember }, ctx) => {
-    const user = await ctx.prisma.user.findOne({ where: { email } });
+    const user = await ctx.prisma.user.findUnique({ where: { email } });
 
     if (!user || !user.enabled) {
         throw new Error('Invalid credentials');
@@ -66,76 +54,29 @@ export const loginMutation = async (_, { email, password, remember }, ctx) => {
         throw new Error('Invalid credentials');
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email, isAdmin: user.isAdmin }, secret, { expiresIn: ((remember) ? tokenExpiration : '7d') });
+    const token = jwt.sign({ id: user.id, email: user.email, isAdmin: user.isAdmin }, SECRET, { expiresIn: ((remember) ? TOKEN_EXPIRATION : '7d') });
 
-    return {
-        token,
-        user,
-    };
+    return { token, user };
 };
 
-export const resetMutation = async (_, { email }, ctx) => {
-    const user = await ctx.prisma.user.findOne({ where: { email } });
+export const resetMutation = async (_, { baseUrl, email }, ctx) => {
+    const user = await ctx.prisma.user.findUnique({ where: { email } });
 
-    if (!user) {
-        return null;
-    }
+    if (!user) return null;
 
-    const transporter = nodemailer.createTransport({
-        port: process.env.MAIL_PORT || 587,
-        host: process.env.MAIL_HOST || 'mail.ethibox.fr',
-        tls: process.env.MAIL_TLS || true,
-        auth: {
-            user: process.env.MAIL_USER || 'noreply@ethibox.fr',
-            pass: process.env.MAIL_PASS,
-        },
-    });
+    const token = jwt.sign({ id: user.id, email: user.email }, SECRET, { expiresIn: '10m' });
+    const link = `${baseUrl}/app/resetpassword?token=${token}`;
 
-    const token = jwt.sign({ id: user.id, email: user.email }, secret, { expiresIn: '10m' });
-    const link = `https://ethibox.fr/app/resetpassword?token=${token}`;
-
-    const { html } = mjml2html(`
-    <mjml>
-        <mj-body>
-            <mj-section>
-                <mj-column>
-                    <mj-text>Hello,</mj-text>
-                    <mj-text>A reset password procedure for your account ${email} has been requested.</mj-text>
-                    <mj-text>Please follow this link to reset it:</mj-text>
-                    <mj-button href="${link}" align="left">Reset my password</mj-button>
-                    <mj-text>(the link will expire within 1 hour)</mj-text>
-                    <mj-text>If you are not the person who initiated this request, please ignore this email.</mj-text>
-                    <mj-text>Ethibox</mj-text>
-                </mj-column>
-            </mj-section>
-        </mj-body>
-    </mjml>
-    `);
-
-    const mailOptions = {
-        from: process.env.MAIL_FROM || 'noreply@ethibox.fr',
-        subject: process.env.MAIL_SUBJECT || 'Reset your password',
-        html,
-    };
-
-    console.info(link);
-
-    transporter.sendMail({ ...mailOptions, to: email }).catch(({ message }) => {
-        console.error(message);
-
-        if (process.env.NODE_ENV === 'production') {
-            throw new Error('Internal Server Error');
-        }
-    });
+    await sendWebhooks(EVENTS.RESETPASSWORD, { email: user.email, token, link }, ctx.prisma);
 
     return true;
 };
 
 export const resetPasswordMutation = async (_, { token, password }, ctx) => {
     try {
-        const decoded = jwt.verify(token, secret);
+        const decoded = jwt.verify(token, SECRET);
         const hashPassword = await bcrypt.hash(password, 10);
-        const user = await ctx.prisma.user.findOne({ where: { id: decoded.id } });
+        const user = await ctx.prisma.user.findUnique({ where: { id: decoded.id } });
 
         if (!user) {
             throw new Error('Bad token');
@@ -155,17 +96,9 @@ export const resetPasswordMutation = async (_, { token, password }, ctx) => {
 export const installApplicationMutation = async (_, { templateId }, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 
-    const template = await ctx.prisma.template.findOne({ where: { id: templateId } });
+    const template = await ctx.prisma.template.findUnique({ where: { id: templateId } });
 
     if (!template) throw new Error('Not existing application');
-
-    const appsUserLimit = await getSettings('appsUserLimit', ctx.prisma);
-
-    const userApps = await ctx.prisma.application.count({ where: { userId: ctx.user.id, NOT: { state: STATES.DELETED } } });
-
-    if (appsUserLimit && userApps >= appsUserLimit) {
-        throw new Error('Your apps number limit is exceeded');
-    }
 
     const { stripeEnabled, stripeSecretKey } = await getSettings(null, ctx.prisma);
 
@@ -179,7 +112,7 @@ export const installApplicationMutation = async (_, { templateId }, ctx) => {
         }
     }
 
-    const rootDomain = (await getSettings('rootDomain', ctx.prisma)) || 'local.ethibox.fr';
+    const rootDomain = (await getSettings('rootDomain', ctx.prisma)) || 'localhost';
 
     const releaseName = await generateReleaseName(template.name, ctx.prisma);
 
@@ -217,6 +150,10 @@ export const installApplicationMutation = async (_, { templateId }, ctx) => {
         });
     }
 
+    const { envs } = await ctx.prisma.application.findUnique({ where: { releaseName }, include: { envs: true } });
+
+    await sendWebhooks(EVENTS.INSTALL, { releaseName, template, envs: JSON.stringify(envs) }, ctx.prisma);
+
     return true;
 };
 
@@ -226,12 +163,13 @@ export const uninstallApplicationMutation = async (_, { releaseName }, ctx) => {
     await ctx.prisma.application.update({
         where: { releaseName },
         data: {
-            task: TASKS.UNINSTALL,
-            state: STATES.UNINSTALLING,
+            state: STATES.DELETED,
             lastTaskDate: new Date(),
             user: { connect: { id: ctx.user.id } },
         },
     }).catch(() => false);
+
+    await sendWebhooks(EVENTS.UNINSTALL, { releaseName }, ctx.prisma);
 
     return true;
 };
@@ -333,7 +271,7 @@ export const removePaymentMethodMutation = async (_, __, ctx) => {
 export const userQuery = async (_, __, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 
-    const user = await ctx.prisma.user.findOne({ where: { id: ctx.user.id } });
+    const user = await ctx.prisma.user.findUnique({ where: { id: ctx.user.id } });
 
     if (!user) throw new Error('Not authorized');
 
@@ -379,13 +317,7 @@ export const settingsQuery = async (_, __, ctx) => {
 
     const settings = await ctx.prisma.setting.findMany();
 
-    return settings.filter(({ name }) => name !== 'portainerToken').map((setting) => {
-        if (setting.name === 'portainerPassword') {
-            return { ...setting, value: '************' };
-        }
-
-        return setting;
-    });
+    return settings;
 };
 
 export const globalEnvsQuery = async (_, __, ctx) => {
@@ -399,7 +331,7 @@ export const globalEnvsQuery = async (_, __, ctx) => {
 export const applicationEnvsQuery = async (_, { releaseName }, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 
-    const application = await ctx.prisma.application.findOne({ where: { releaseName }, include: { template: true, envs: true } });
+    const application = await ctx.prisma.application.findUnique({ where: { releaseName }, include: { template: true, envs: true } });
 
     if (!application || application.userId !== ctx.user.id) {
         throw new Error('Not found');
@@ -434,7 +366,7 @@ export const applicationsQuery = async (_, __, ctx) => {
 export const templatesQuery = async (_, __, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 
-    const templates = await ctx.prisma.template.findMany({ where: { enabled: true } });
+    const templates = await ctx.prisma.template.findMany();
 
     return templates;
 };
@@ -459,87 +391,10 @@ export const updateWebhooksMutation = async (_, { webhooks }, ctx) => {
     return true;
 };
 
-export const upgradeStripeSubscriptionMutation = async (_, { appId, price }, ctx) => {
-    if (!ctx.user) throw new Error('Not authorized');
-
-    const { stripeEnabled, stripeSecretKey } = await getSettings(null, ctx.prisma);
-
-    if (!stripeEnabled) {
-        throw new Error('Stripe is not enabled');
-    }
-
-    const application = await ctx.prisma.application.findOne({ where: { id: appId }, include: { template: true } });
-
-    if (!application) {
-        throw new Error('No application found');
-    }
-
-    const appName = application.template.name;
-    const stripe = Stripe(stripeSecretKey);
-    await upgradeSubscription(stripe, ctx.user.id, appName, price, appId);
-
-    if (process.env.MATOMO_ENABLED) {
-        const matomo = new MatomoTracker(process.env.MATOMO_SITEID, `${process.env.MATOMO_URL}/matomo.php`);
-        matomo.track({
-            url: '/paid',
-            e_c: 'app',
-            e_a: 'paid',
-            uid: ctx.user.email,
-        });
-    }
-
-    return true;
-};
-
-export const downgradeStripeSubscriptionMutation = async (_, { appId }, ctx) => {
-    if (!ctx.user) throw new Error('Not authorized');
-
-    const { stripeEnabled, stripeSecretKey } = await getSettings(null, ctx.prisma);
-
-    if (!stripeEnabled) {
-        throw new Error('Stripe is not enabled');
-    }
-
-    const stripe = Stripe(stripeSecretKey);
-    await downgradeSubscription(stripe, ctx.user.id, appId);
-
-    return true;
-};
-
-export const uploadTemplatesMutation = async (_, { file }, ctx) => {
+export const updateTemplatesMutation = async (_, { templatesUrl }, ctx) => {
     if (!ctx.user || !ctx.user.isAdmin) throw new Error('Not authorized');
 
-    const { createReadStream, mimetype } = await file;
-
-    if (mimetype !== 'application/json') {
-        throw new Error('Not a valid json file');
-    }
-
-    const templates = await fileToJson(createReadStream);
-
-    if (!templates.length) {
-        throw new Error('Not a valid json file');
-    }
-
-    const existingTemplates = await ctx.prisma.template.findMany();
-
-    await asyncForEach(existingTemplates, async ({ id, name }) => {
-        const existingTemplate = templates.find((t) => t.name === name);
-
-        if (!existingTemplate) {
-            await ctx.prisma.template.update({ where: { id }, data: { enabled: false } });
-        }
-    });
-
-    await asyncForEach(templates.filter((t) => t.enabled), async (template) => {
-        const { name, description, category, logo, website, auto, repositoryUrl, stackFile, price, trial, adminPath, envs } = template;
-
-        await ctx.prisma.template.upsert({
-            where: { name },
-            create: { name, description, category, logo, website, auto, price, trial, adminPath, repositoryUrl, stackFile, envs: JSON.stringify(envs || []) },
-            update: { name, description, category, logo, website, auto, price, trial, adminPath, repositoryUrl, stackFile, envs: JSON.stringify(envs || []) },
-        });
-    });
+    await updateTemplates(templatesUrl, ctx.prisma);
 
     return true;
 };
@@ -547,8 +402,8 @@ export const uploadTemplatesMutation = async (_, { file }, ctx) => {
 export const updateAppMutation = async (_, { releaseName, domain, envs }, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 
-    const application = await ctx.prisma.application.findOne({ where: { releaseName } });
-    const rootDomain = (await getSettings('rootDomain', ctx.prisma)) || 'local.ethibox.fr';
+    const application = await ctx.prisma.application.findUnique({ where: { releaseName } });
+    const rootDomain = (await getSettings('rootDomain', ctx.prisma)) || 'localhost';
     const ip = await getIp(rootDomain);
 
     if (!application || application.userId !== ctx.user.id) {
@@ -573,7 +428,7 @@ export const updateAppMutation = async (_, { releaseName, domain, envs }, ctx) =
         throw new DNSError('Please setup a correct DNS zone of type A for your domain {domain} with the ip {ip} on your registrar (ex: Gandi, OVH, Online, 1&1)');
     }
 
-    await sendWebhooks(EVENTS.UPDATE, { releaseName, domain, envs }, ctx.prisma);
+    await sendWebhooks(EVENTS.UPDATE, { releaseName, domain, envs: JSON.stringify(envs.concat([{ name: 'DOMAIN', value: domain }])) }, ctx.prisma);
 
     await ctx.prisma.application.update({
         where: { releaseName },
@@ -594,7 +449,7 @@ export const updateAppMutation = async (_, { releaseName, domain, envs }, ctx) =
 export const applicationQuery = async (_, { releaseName }, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 
-    const application = await ctx.prisma.application.findOne({ where: { releaseName } });
+    const application = await ctx.prisma.application.findUnique({ where: { releaseName } });
 
     if (!application || application.userId !== ctx.user.id) {
         throw new Error('Not found');
@@ -629,8 +484,7 @@ export const deleteAccountMutation = async (_, __, ctx) => {
         await ctx.prisma.application.update({
             where: { id: application.id },
             data: {
-                task: TASKS.UNINSTALL,
-                state: STATES.UNINSTALLING,
+                state: STATES.DELETED,
                 lastTaskDate: new Date(),
             },
         });
@@ -640,6 +494,8 @@ export const deleteAccountMutation = async (_, __, ctx) => {
         where: { id: ctx.user.id },
         data: { email: `deleted+${ctx.user.email}`, enabled: false },
     });
+
+    await sendWebhooks(EVENTS.UNSUBSCRIBE, { user: ctx.user }, ctx.prisma);
 
     return true;
 };
@@ -651,7 +507,9 @@ export const invoicesQuery = async (_, __, ctx) => {
 
     const stripe = Stripe(stripeSecretKey);
 
-    const data = await invoiceList(stripe, ctx.user.id);
+    const data = await invoiceList(stripe, ctx.user.id).catch(() => false);
+
+    if (!data) return [];
 
     const invoices = data.map((invoice) => {
         invoice.url = invoice.hosted_invoice_url;
@@ -660,4 +518,35 @@ export const invoicesQuery = async (_, __, ctx) => {
     });
 
     return invoices;
+};
+
+export const createSessionCheckoutMutation = async (_, { templateId, baseUrl }, ctx) => {
+    if (!ctx.user) throw new Error('Not authorized');
+
+    const template = await ctx.prisma.template.findUnique({ where: { id: templateId } });
+
+    if (!template) throw new Error('No template found');
+
+    const { logo, price, name, description, trial } = template;
+
+    const { stripeSecretKey } = await getSettings(null, ctx.prisma);
+
+    const stripe = Stripe(stripeSecretKey);
+
+    const product = await upsertProduct(stripe, name, description, [logo]);
+
+    const { id: priceId } = await upsertPrice(stripe, product.id, price);
+
+    const { url } = await stripe.checkout.sessions.create({
+        success_url: `${baseUrl}/`,
+        cancel_url: `${baseUrl}/`,
+        payment_method_types: ['card'],
+        line_items: [{ price: priceId, quantity: 1 }],
+        allow_promotion_codes: true,
+        locale: 'fr',
+        mode: 'subscription',
+        ...(trial && { subscription_data: { trial_period_days: trial || 0 } }),
+    });
+
+    return url;
 };

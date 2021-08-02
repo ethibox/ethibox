@@ -155,7 +155,7 @@ export default () => {
                     </div>
 
                     <p className="mt-2 text-sm leading-5 text-gray-600 text-center">
-                        {intl.formatMessage({ id: 'By creating an account, you agree to the' })} <a href="https://ethibox.fr/cgu" target="_blank" className="underline">{intl.formatMessage({ id: 'Terms of Service' })}</a>
+                        {intl.formatMessage({ id: 'By creating an account, you agree to the' })} <a href="/cgu" target="_blank" className="underline">{intl.formatMessage({ id: 'Terms of Service' })}</a>
                     </p>
                 </form>
             </div>

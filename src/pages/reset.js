@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { useIntl, Link } from 'gatsby-plugin-intl';
 import isEmail from 'validator/lib/isEmail';
 import { withPrefix } from 'gatsby';
+import { useLocation } from '@reach/router';
 
 import { checkStatus, navigate, isLoggedIn } from '../utils';
 
 export default () => {
     const intl = useIntl();
+    const location = useLocation();
     const [state, setState] = useState({ email: '', errors: [], success: false, isLoading: false });
 
     const handleChange = (e) => setState({ ...state, [e.target.name]: e.target.value, errors: [], success: false });
@@ -26,11 +28,13 @@ export default () => {
 
             setState({ ...state, isLoading: true });
 
+            const baseUrl = `${location.protocol}//${location.host}`;
+
             await fetch(withPrefix('/graphql'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query: `mutation {
-                    reset(email: "${email}")
+                    reset(baseUrl: "${baseUrl}", email: "${email}")
                 }` }),
             })
                 .then(checkStatus)

@@ -43,7 +43,8 @@ const config = {
             options: {
                 path: `${__dirname}/src/intl`,
                 languages: ['en', 'fr'],
-                defaultLanguage: process.env.NODE_ENV === 'production' ? 'fr' : 'en',
+                defaultLanguage: 'en',
+                redirect: true,
             },
         },
         {
@@ -72,29 +73,5 @@ const config = {
         LAZY_IMAGES: false,
     },
 };
-
-if (process.env.MATOMO_ENABLED === 'true') {
-    config.plugins.push({
-        resolve: 'gatsby-plugin-matomo',
-        options: {
-            siteId: process.env.MATOMO_SITEID,
-            matomoUrl: process.env.MATOMO_URL,
-            trackLoad: false,
-            dev: process.env.NODE_ENV === 'development',
-        },
-    });
-}
-
-if (process.env.POSTHOG_ENABLED === 'true') {
-    config.plugins.push({
-        resolve: 'gatsby-plugin-posthog',
-        options: {
-            apiKey: process.env.POSTHOG_APIKEY,
-            apiHost: process.env.POSTHOG_URL,
-            head: true,
-            isEnabledDevMode: false,
-        },
-    });
-}
 
 module.exports = config;
