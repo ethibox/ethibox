@@ -7,6 +7,8 @@
 
 Ethibox is an open-source web apps hoster. Host and share the most popular open-source web apps for your friends and/or your clients.
 
+![screenshot](https://raw.githubusercontent.com/ethibox/ethibox/master/static/screenshot.jpg)
+
 ## Installation
 
 ```bash
