@@ -105,9 +105,8 @@ export const installApplicationMutation = async (_, { templateId }, ctx) => {
     if (stripeEnabled) {
         const stripe = Stripe(stripeSecretKey);
         const cardMethod = await stripe.paymentMethods.list({ customer: ctx.user.id, type: 'card' }).catch(() => false);
-        const ibanMethod = await stripe.paymentMethods.list({ customer: ctx.user.id, type: 'sepa_debit' }).catch(() => false);
 
-        if (!cardMethod.data.length && !ibanMethod.data.length) {
+        if (!cardMethod.data.length) {
             throw new Error('Method of payment required');
         }
     }
@@ -253,15 +252,9 @@ export const removePaymentMethodMutation = async (_, __, ctx) => {
     const stripe = Stripe(stripeSecretKey);
 
     const cardMethod = await stripe.paymentMethods.list({ customer: ctx.user.id, type: 'card' }).catch(() => false);
-    const ibanMethod = await stripe.paymentMethods.list({ customer: ctx.user.id, type: 'sepa_debit' }).catch(() => false);
 
     if (cardMethod && cardMethod.data.length) {
         const paymentMethodId = cardMethod.data[0].id;
-        await stripe.paymentMethods.detach(paymentMethodId);
-    }
-
-    if (ibanMethod && ibanMethod.data.length) {
-        const paymentMethodId = ibanMethod.data[0].id;
         await stripe.paymentMethods.detach(paymentMethodId);
     }
 
@@ -289,17 +282,11 @@ export const stripeQuery = async (_, __, ctx) => {
         const stripe = Stripe(stripeSecretKey);
 
         const cardMethod = await stripe.paymentMethods.list({ customer: ctx.user.id, type: 'card' }).catch(() => false);
-        const ibanMethod = await stripe.paymentMethods.list({ customer: ctx.user.id, type: 'sepa_debit' }).catch(() => false);
 
-        if (cardMethod || ibanMethod) {
+        if (cardMethod) {
             if (cardMethod.data.length) {
                 const { last4 } = cardMethod.data[0].card;
                 return { ...data, stripeLast4: last4, stripePaymentMethod: 'card' };
-            }
-
-            if (ibanMethod.data.length) {
-                const { last4 } = ibanMethod.data[0].sepa_debit;
-                return { ...data, stripeLast4: last4, stripePaymentMethod: 'iban' };
             }
         }
 
@@ -432,7 +419,7 @@ export const updateAppMutation = async (_, { releaseName, domain, envs }, ctx) =
 
     await ctx.prisma.application.update({
         where: { releaseName },
-        data: { domain },
+        data: { domain, state: STATES.STANDBY },
     });
 
     for (const { id, name, value } of envs) {
