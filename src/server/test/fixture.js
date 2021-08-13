@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import Stripe from 'stripe';
-import templates from './templates.json';
+import { templates } from './templates.json';
 import { upsertCustomer } from '../stripe';
 import { getSettings, generateReleaseName, asyncForEach } from '../utils';
 
@@ -91,12 +91,12 @@ export const addSettings = async (settings, prisma) => {
 
 export const importTemplates = async (prisma) => {
     for await (const template of templates) {
-        const { name, description, category, logo, auto, repositoryUrl, stackFile, price, adminPath, envs } = template;
+        const { title: name, description, categories: [category], logo, website, auto, repository: { url: repositoryUrl, stackfile: stackFile }, price, trial, adminPath, env: envs } = template;
 
         await prisma.template.upsert({
             where: { name },
-            create: { name, description, category, logo, auto, price, repositoryUrl, stackFile, adminPath, envs: JSON.stringify(envs) },
-            update: { name, description, category, logo, auto, price, repositoryUrl, stackFile, adminPath, envs: JSON.stringify(envs) },
+            create: { name, description, category, logo, website, auto, price, trial, adminPath, repositoryUrl, stackFile, envs: JSON.stringify(envs || []) },
+            update: { name, description, category, logo, website, auto, price, trial, adminPath, repositoryUrl, stackFile, envs: JSON.stringify(envs || []) },
         });
     }
 };
