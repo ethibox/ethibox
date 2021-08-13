@@ -7,7 +7,7 @@ export const SECRET = process.env.SECRET || crypto.randomBytes(32).toString('hex
 export const TEMPLATES_URL = process.env.TEMPLATES_URL || 'https://raw.githubusercontent.com/ethibox/awesome-stacks/master/templates.json';
 export const ROOT_DOMAIN = process.env.ROOT_DOMAIN || 'localhost';
 export const STRIPE_ENABLED = process.env.STRIPE_ENABLED || 'false';
-export const STRIPE_PUBLISHABLE_KEY = process.env.PUBLISHABLE_KEY || '';
+export const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY || '';
 export const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
 export const TOKEN_EXPIRATION = process.env.TOKEN_EXPIRATION || '30d';
 
