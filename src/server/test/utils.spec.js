@@ -36,7 +36,7 @@ test('Should generate new release name', async () => {
 
     await importTemplates(prisma);
     const user = await addUser({ email: 'user@example.com', password: 'myp@ssw0rd', isAdmin: false }, prisma);
-    await addApps([{ templateId: 1, userId: user.id, state: STATES.RUNNING }], prisma);
+    await addApps([{ templateId: 1, userId: user.id, state: STATES.ONLINE }], prisma);
 
     expect(await generateReleaseName('Wordpress', prisma)).toEqual('wordpress2');
 });
