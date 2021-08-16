@@ -161,27 +161,23 @@ export const updateTemplates = async (templatesUrl, prisma) => {
 };
 
 export const init = async (prisma) => {
-    const settings = await prisma.setting.findMany();
+    const settings = [
+        { name: 'rootDomain', value: ROOT_DOMAIN },
+        { name: 'stripeEnabled', value: STRIPE_ENABLED },
+        { name: 'stripePublishableKey', value: STRIPE_PUBLISHABLE_KEY },
+        { name: 'stripeSecretKey', value: STRIPE_SECRET_KEY },
+        { name: 'templatesUrl', value: TEMPLATES_URL },
+    ];
 
-    if (!settings.length) {
-        const defaultSettings = [
-            { name: 'rootDomain', value: ROOT_DOMAIN },
-            { name: 'stripeEnabled', value: STRIPE_ENABLED },
-            { name: 'stripePublishableKey', value: STRIPE_PUBLISHABLE_KEY },
-            { name: 'stripeSecretKey', value: STRIPE_SECRET_KEY },
-            { name: 'templatesUrl', value: TEMPLATES_URL },
-        ];
-
-        await asyncForEach(defaultSettings, async ({ name, value }) => {
-            await prisma.setting.upsert({
-                where: { name },
-                create: { name, value },
-                update: { name, value },
-            }).then(true);
-        });
-
-        await updateTemplates(TEMPLATES_URL, prisma);
+    for (const { name, value } of settings) {
+        await prisma.setting.upsert({
+            where: { name },
+            create: { name, value },
+            update: { name, value },
+        }).then(true);
     }
+
+    await updateTemplates(TEMPLATES_URL, prisma);
 };
 
 export const generateReleaseName = async (appName, prisma, number = 1) => {
