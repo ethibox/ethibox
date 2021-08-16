@@ -353,7 +353,7 @@ export const applicationsQuery = async (_, __, ctx) => {
 export const templatesQuery = async (_, __, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 
-    const templates = await ctx.prisma.template.findMany();
+    const templates = await ctx.prisma.template.findMany({ where: { enabled: true } });
 
     return templates;
 };

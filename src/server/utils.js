@@ -141,21 +141,22 @@ export const updateTemplates = async (templatesUrl, prisma) => {
 
     const existingTemplates = await prisma.template.findMany();
 
-    await asyncForEach(existingTemplates, async ({ id, title: name }) => {
+    for (const { id, title: name } of existingTemplates) {
         const existingTemplate = templates.find((t) => t.name === name);
 
         if (!existingTemplate) {
-            await prisma.template.update({ where: { id } });
+            await prisma.template.update({ where: { id }, data: { enabled: false } });
         }
-    });
+    }
 
-    for (const template of templates.filter(({ repository }) => repository !== undefined)) {
-        const { title: name, description, categories: [category], logo, website, auto, repository: { url: repositoryUrl, stackfile: stackFile }, price, trial, adminPath, env: envs } = template;
+    for (const template of templates) {
+        const { title: name, description, enabled, logo, website, auto, price, trial, adminPath } = template;
+        const { categories: [category], repository: { url: repositoryUrl, stackfile: stackFile }, env: envs } = template;
 
         await prisma.template.upsert({
             where: { name },
-            create: { name, description, category, logo, website, auto, price, trial, adminPath, repositoryUrl, stackFile, envs: JSON.stringify(envs || []) },
-            update: { name, description, category, logo, website, auto, price, trial, adminPath, repositoryUrl, stackFile, envs: JSON.stringify(envs || []) },
+            create: { name, description, category, logo, website, auto, enabled, price, trial, adminPath, repositoryUrl, stackFile, envs: JSON.stringify(envs || []) },
+            update: { name, description, category, logo, website, auto, enabled, price, trial, adminPath, repositoryUrl, stackFile, envs: JSON.stringify(envs || []) },
         });
     }
 };
