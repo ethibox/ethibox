@@ -162,7 +162,9 @@ export const updateTemplates = async (templatesUrl, prisma) => {
 };
 
 export const init = async (prisma) => {
-    const settings = [
+    const settings = await prisma.setting.findMany();
+
+    const defaultSettings = [
         { name: 'rootDomain', value: ROOT_DOMAIN },
         { name: 'stripeEnabled', value: STRIPE_ENABLED },
         { name: 'stripePublishableKey', value: STRIPE_PUBLISHABLE_KEY },
@@ -170,12 +172,14 @@ export const init = async (prisma) => {
         { name: 'templatesUrl', value: TEMPLATES_URL },
     ];
 
-    for (const { name, value } of settings) {
-        await prisma.setting.upsert({
-            where: { name },
-            create: { name, value },
-            update: { name, value },
-        }).then(true);
+    if (!settings.length) {
+        for (const { name, value } of defaultSettings) {
+            await prisma.setting.upsert({
+                where: { name },
+                create: { name, value },
+                update: { name, value },
+            }).then(true);
+        }
     }
 
     await updateTemplates(TEMPLATES_URL, prisma);
