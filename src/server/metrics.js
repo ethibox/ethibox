@@ -31,11 +31,12 @@ const fetchDomains = async () => {
 const app = express();
 
 const clientIp = (req) => {
-    return req.headers['x-forwarded-for'] ? (req.headers['x-forwarded-for']).split(',')[0] : req.socket.remoteAddress;
+    const ip = req.headers['x-forwarded-for'] ? (req.headers['x-forwarded-for']).split(',')[0] : req.socket.remoteAddress;
+    return ip.replace('::ffff:', '');
 };
 
 const ips = ['172.17.0.0/16', '10.10.0.0/16', '127.0.0.1', '::1'];
-app.use(IpFilter(ips, { mode: 'allow', detectIp: clientIp }));
+app.use(IpFilter(ips, { mode: 'allow', logLevel: 'deny', detectIp: clientIp }));
 
 app.use((err, req, res, next) => {
     if (err instanceof IpDeniedError) {
