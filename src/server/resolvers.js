@@ -525,8 +525,8 @@ export const createSessionCheckoutMutation = async (_, { templateId, baseUrl }, 
     const { id: priceId } = await upsertPrice(stripe, product.id, price);
 
     const { url } = await stripe.checkout.sessions.create({
-        success_url: `${baseUrl}/`,
-        cancel_url: `${baseUrl}/`,
+        success_url: `${baseUrl}`,
+        cancel_url: `${baseUrl}`,
         payment_method_types: ['card'],
         line_items: [{ price: priceId, quantity: 1 }],
         allow_promotion_codes: true,

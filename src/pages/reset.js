@@ -28,7 +28,7 @@ export default () => {
 
             setState({ ...state, isLoading: true });
 
-            const baseUrl = `${location.protocol}//${location.host}`;
+            const baseUrl = `${location.protocol}//${location.host}${withPrefix('/')}`;
 
             await fetch(withPrefix('/graphql'), {
                 method: 'POST',

@@ -44,7 +44,7 @@ export default withNotifier(({ template, notify }) => {
             return;
         }
 
-        const baseUrl = `${location.protocol}//${location.host}`;
+        const baseUrl = `${location.protocol}//${location.host}${withPrefix('/')}`;
 
         await fetch(withPrefix('/graphql'), {
             method: 'POST',
