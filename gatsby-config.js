@@ -74,4 +74,16 @@ const config = {
     },
 };
 
+if (process.env.POSTHOG_ENABLED === 'true') {
+    config.plugins.push({
+        resolve: 'gatsby-plugin-posthog',
+        options: {
+            apiKey: process.env.POSTHOG_APIKEY,
+            apiHost: process.env.POSTHOG_URL,
+            head: true,
+            isEnabledDevMode: false,
+        },
+    });
+}
+
 module.exports = config;

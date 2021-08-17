@@ -88,6 +88,9 @@ jobs:
         run: |
           docker build \
           --build-arg PREFIX_PATHS=true \
+          --build-arg POSTHOG_ENABLED=${{ secrets.POSTHOG_ENABLED }} \
+          --build-arg POSTHOG_URL=${{ secrets.POSTHOG_URL }} \
+          --build-arg POSTHOG_APIKEY=${{ secrets.POSTHOG_APIKEY }} \
           -t registry.ethibox.fr/ethibox:${VERSION} .
 
       - name: Push the Docker image

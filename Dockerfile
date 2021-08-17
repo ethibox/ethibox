@@ -10,6 +10,12 @@ COPY . /app
 
 ARG PREFIX_PATHS
 
+ARG POSTHOG_ENABLED
+
+ARG POSTHOG_URL
+
+ARG POSTHOG_APIKEY
+
 RUN yarn install
 
 RUN npm run build
