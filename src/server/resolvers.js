@@ -114,6 +114,10 @@ export const installApplicationMutation = async (_, data, ctx) => {
         if (session) {
             templateId = Number(session.metadata.templateId);
         }
+
+        const { name: templateName } = await ctx.prisma.template.findUnique({ where: { id: templateId } });
+        const releaseName = await generateReleaseName(templateName, ctx.prisma);
+        await stripe.subscriptions.update(session.subscription, { metadata: { releaseName } });
     }
 
     const template = await ctx.prisma.template.findUnique({ where: { id: templateId } });
@@ -167,6 +171,16 @@ export const installApplicationMutation = async (_, data, ctx) => {
 
 export const uninstallApplicationMutation = async (_, { releaseName }, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
+
+    const { stripeEnabled, stripeSecretKey } = await getSettings(null, ctx.prisma);
+
+    if (stripeEnabled) {
+        const stripe = Stripe(stripeSecretKey);
+        const { data: subscriptions } = await stripe.subscriptions.list({ customer: ctx.user.id });
+
+        const subscription = subscriptions.find((sub) => sub.metadata.releaseName === releaseName);
+        await stripe.subscriptions.del(subscription.id, { prorate: false });
+    }
 
     await ctx.prisma.application.update({
         where: { releaseName },
