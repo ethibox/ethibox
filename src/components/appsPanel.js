@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { withPrefix } from 'gatsby';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useLocation } from '@reach/router';
 import { Link, useIntl } from 'gatsby-plugin-intl';
+import Confetti from 'react-confetti';
+import queryString from 'query-string';
 
 import { withModal } from '../context/ModalContext';
-import { STATES, checkStatus, getToken, remainingTimePercentage } from '../utils';
+import { STATES, checkStatus, getToken, remainingTimePercentage, navigate } from '../utils';
 import { applicationsState } from '../atoms';
 import GridIcon from '../images/grid.svg';
 import DeleteIcon from '../images/delete.svg';
@@ -17,6 +20,7 @@ const MAX_TASK_TIME = process.env.MAX_TASK_TIME || 15;
 
 export default withModal(({ openModal }) => {
     const intl = useIntl();
+    const location = useLocation();
 
     const [editModal, updateEditModal] = useState(false);
     const applications = useRecoilValue(applicationsState);
@@ -58,7 +62,44 @@ export default withModal(({ openModal }) => {
             });
     };
 
-    useEffect(() => {
+    const installApplication = async ({ sessionId }) => {
+        const response = await fetch(withPrefix('/graphql'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-access-token': getToken() },
+            body: JSON.stringify({ query: `mutation {
+                installApplication(sessionId: "${sessionId}")
+            }` }),
+        })
+            .then(checkStatus)
+            .then(() => {
+                return true;
+            })
+            .catch(() => {
+                return false;
+            });
+
+        return response;
+    };
+
+    useEffect(async () => {
+        const { session_id: sessionId } = queryString.parse(location.search);
+
+        if (sessionId) {
+            navigate('/apps');
+            await installApplication({ sessionId });
+
+            openModal({
+                closeButton: 'Close',
+                content: (
+                    <>
+                        <Confetti width={500} height={200} recycle={false} />
+                        <p className="font-bold mb-4 text-xl">{intl.formatMessage({ id: 'Congratulations! 🎉' })}</p>
+                        <p className="my-2">{intl.formatMessage({ id: 'The installation of your application is in progress' })}.</p>
+                    </>
+                ),
+            });
+        }
+
         const loadInterval = setInterval(loadData, INTERVAL);
         return () => clearInterval(loadInterval);
     }, []);
@@ -110,8 +151,8 @@ export default withModal(({ openModal }) => {
                         <div className="bg-white shadow rounded-lg relative" key={app.releaseName}>
                             { app.state === STATES.STANDBY && (
                                 <>
-                                    <div className="absolute inset-0 flex items-center justify-center text-center opacity-75 bg-white z-20 rounded-lg" />
-                                    <div className="text-gray-700 absolute inset-y-auto text-center w-full p-4 z-20" style={{ transform: 'translate(-50%, -50%)', top: '50%', left: '50%' }}>
+                                    <div className="absolute inset-0 flex items-center justify-center text-center opacity-75 bg-white z-10 rounded-lg" />
+                                    <div className="text-gray-700 absolute inset-y-auto text-center w-full p-4 z-10" style={{ transform: 'translate(-50%, -50%)', top: '50%', left: '50%' }}>
                                         <h3 className="font-bold">
                                             <img src={`${withPrefix('/spinner-black.svg')}`} className="spinner w-4 inline-block mr-2" alt="spinner" />
                                             <span className="inline-block align-middle">{intl.formatMessage({ id: 'Action in progress' })}</span>

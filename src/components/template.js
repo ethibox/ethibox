@@ -62,6 +62,7 @@ export default withNotifier(({ template, notify }) => {
                 }
             })
             .catch(({ message }) => {
+                updateLoading(false);
                 notify({ type: 'error', title: intl.formatMessage({ id: message }) });
             });
     };

@@ -93,12 +93,11 @@ export const resetPasswordMutation = async (_, { token, password }, ctx) => {
     }
 };
 
-export const installApplicationMutation = async (_, { templateId }, ctx) => {
+export const installApplicationMutation = async (_, data, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 
-    const template = await ctx.prisma.template.findUnique({ where: { id: templateId } });
-
-    if (!template) throw new Error('Not existing application');
+    let { templateId } = data;
+    const { sessionId } = data;
 
     const { stripeEnabled, stripeSecretKey } = await getSettings(null, ctx.prisma);
 
@@ -109,7 +108,17 @@ export const installApplicationMutation = async (_, { templateId }, ctx) => {
         if (!cardMethod.data.length) {
             throw new Error('Method of payment required');
         }
+
+        const session = await stripe.checkout.sessions.retrieve(sessionId).catch(() => false);
+
+        if (session) {
+            templateId = Number(session.metadata.templateId);
+        }
     }
+
+    const template = await ctx.prisma.template.findUnique({ where: { id: templateId } });
+
+    if (!template) throw new Error('Not existing application');
 
     const rootDomain = (await getSettings('rootDomain', ctx.prisma)) || 'localhost';
 
@@ -522,16 +531,21 @@ export const createSessionCheckoutMutation = async (_, { templateId, baseUrl }, 
 
     const product = await upsertProduct(stripe, name, description, [logo]);
 
+    await upsertCustomer(stripe, ctx.user.id, ctx.user.email);
+
     const { id: priceId } = await upsertPrice(stripe, product.id, price);
 
     const { url } = await stripe.checkout.sessions.create({
-        success_url: `${baseUrl}/apps`,
-        cancel_url: `${baseUrl}`,
+        success_url: `${baseUrl}apps?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: baseUrl,
         payment_method_types: ['card'],
         line_items: [{ price: priceId, quantity: 1 }],
         allow_promotion_codes: true,
+        customer: ctx.user.id,
+        customer_update: { name: 'auto' },
         locale: 'fr',
         mode: 'subscription',
+        metadata: { templateId },
         ...(trial && { subscription_data: { trial_period_days: trial || 0 } }),
     });
 

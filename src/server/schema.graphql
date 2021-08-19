@@ -136,7 +136,7 @@ type Mutation {
     resetpassword(token: String!, password: String!): Boolean
     removePaymentMethod: Boolean
     deleteAccount: Boolean
-    installApplication(templateId: Int): Boolean
+    installApplication(templateId: Int, sessionId: String): Boolean
     createSessionCheckout(templateId: Int, baseUrl: String): String
     uninstallApplication(releaseName: String!): Boolean
     updateUser(firstName: String, lastName: String, email: String): Boolean
