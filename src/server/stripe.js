@@ -8,6 +8,7 @@ export const upsertProduct = async (stripe, appName, description = '', images = 
             name: appName,
             images,
             ...(description && { description }),
+            metadata: { application: 'ethibox' },
         });
     }
 
@@ -25,6 +26,7 @@ export const upsertPrice = async (stripe, productId, productPrice) => {
             currency: 'eur',
             recurring: { interval: 'month' },
             product: productId,
+            metadata: { application: 'ethibox' },
         });
     }
 
@@ -37,7 +39,12 @@ export const upsertCustomer = async (stripe, userId, email, name) => {
     let customer = customers.find((c) => c.id === `${userId}`);
 
     if (!customer) {
-        customer = await stripe.customers.create({ id: userId, email, preferred_locales: ['fr'] });
+        customer = await stripe.customers.create({
+            id: userId,
+            email,
+            metadata: { application: 'ethibox' },
+            preferred_locales: ['fr'],
+        });
     }
 
     if (name) {

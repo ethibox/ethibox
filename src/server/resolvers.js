@@ -117,7 +117,7 @@ export const installApplicationMutation = async (_, data, ctx) => {
 
         const { name: templateName } = await ctx.prisma.template.findUnique({ where: { id: templateId } });
         const releaseName = await generateReleaseName(templateName, ctx.prisma);
-        await stripe.subscriptions.update(session.subscription, { metadata: { release_name: releaseName } });
+        await stripe.subscriptions.update(session.subscription, { metadata: { release_name: releaseName, application: 'ethibox' } });
     }
 
     const template = await ctx.prisma.template.findUnique({ where: { id: templateId } });
@@ -529,7 +529,7 @@ export const createSessionCheckoutMutation = async (_, { templateId, baseUrl }, 
         customer_update: { name: 'auto' },
         locale: 'fr',
         mode: 'subscription',
-        metadata: { template_id: templateId },
+        metadata: { template_id: templateId, application: 'ethibox' },
         ...(trial && { subscription_data: { trial_period_days: trial || 0 } }),
     });
 
