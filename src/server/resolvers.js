@@ -244,18 +244,6 @@ export const updateSettingsMutation = async (_, { settings }, ctx) => {
     return true;
 };
 
-export const updateGlobalEnvsMutation = async (_, { globalEnvs }, ctx) => {
-    if (!ctx.user || !ctx.user.isAdmin) throw new Error('Not authorized');
-
-    await ctx.prisma.env.deleteMany({ where: { global: true } });
-
-    for (const { name, value } of globalEnvs) {
-        await ctx.prisma.env.create({ data: { name, value, global: true } });
-    }
-
-    return true;
-};
-
 export const updateDefaultPaymentMethodMutation = async (_, { paymentMethodId }, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 

@@ -153,5 +153,7 @@
     "Edit configuration": "Edit configuration",
     "Cancel": "Cancel",
     "Add templates": "Add templates",
-    "Offline": "Offline"
+    "Offline": "Offline",
+    "The installation of your application is in progress": "The installation of your application is in progress",
+    "Congratulations! 🎉": "Congratulations! 🎉"
 }

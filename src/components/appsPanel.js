@@ -81,25 +81,30 @@ export default withModal(({ openModal }) => {
         return response;
     };
 
-    useEffect(async () => {
-        const { session_id: sessionId } = queryString.parse(location.search);
+    const { session_id: sessionId } = queryString.parse(location.search);
 
-        if (sessionId) {
-            navigate('/apps');
-            await installApplication({ sessionId });
+    useEffect(() => {
+        async function install() {
+            if (sessionId) {
+                navigate('/apps');
+                await installApplication({ sessionId });
 
-            openModal({
-                closeButton: 'Close',
-                content: (
-                    <>
-                        <Confetti width={500} height={200} recycle={false} />
-                        <p className="font-bold mb-4 text-xl">{intl.formatMessage({ id: 'Congratulations! 🎉' })}</p>
-                        <p className="my-2">{intl.formatMessage({ id: 'The installation of your application is in progress' })}.</p>
-                    </>
-                ),
-            });
+                openModal({
+                    closeButton: 'Close',
+                    content: (
+                        <>
+                            <Confetti width={500} height={200} recycle={false} />
+                            <p className="font-bold mb-4 text-xl">{intl.formatMessage({ id: 'Congratulations! 🎉' })}</p>
+                            <p className="my-2">{intl.formatMessage({ id: 'The installation of your application is in progress' })}.</p>
+                        </>
+                    ),
+                });
+            }
         }
+        install();
+    }, [sessionId]);
 
+    useEffect(() => {
         const loadInterval = setInterval(loadData, INTERVAL);
         return () => clearInterval(loadInterval);
     }, []);

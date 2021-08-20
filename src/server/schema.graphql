@@ -64,16 +64,6 @@ type Application {
     lastTaskDate: Date
 }
 
-type Subscription {
-    id: Int
-    price: Int
-}
-
-type UserSubscription {
-    updateUrl: String
-    cancelUrl: String
-}
-
 input WebhookInput {
     event: String
     targetUrl: String
@@ -103,8 +93,6 @@ type Envs {
 type Query {
     user: User
     stripe: Stripe
-    userSubscription: UserSubscription
-    subscription: Subscription
     applicationEnvs(releaseName: String): [Envs]
     applications: [Application]
     application(releaseName: String): Application
@@ -132,7 +120,6 @@ type Mutation {
     uninstallApplication(releaseName: String!): Boolean
     updateUser(firstName: String, lastName: String, email: String): Boolean
     updateSettings(settings: [VarInput]): Boolean
-    updateGlobalEnvs(globalEnvs: [VarInput]): Boolean
     updateDefaultPaymentMethod(paymentMethodId: String): Boolean
     updateWebhooks(webhooks: [WebhookInput]): Boolean
     updateApp(releaseName: String, domain: String, envs: [VarInput]): Boolean
