@@ -14,7 +14,6 @@ import './cron';
 import {
     userQuery,
     stripeQuery,
-    summaryQuery,
     settingsQuery,
     webhooksQuery,
     applicationEnvsQuery,
@@ -71,7 +70,6 @@ const resolvers = {
     Query: {
         user: userQuery,
         stripe: stripeQuery,
-        summary: summaryQuery,
         applicationEnvs: applicationEnvsQuery,
         applications: applicationsQuery,
         application: applicationQuery,

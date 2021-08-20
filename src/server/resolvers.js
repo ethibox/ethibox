@@ -467,23 +467,6 @@ export const applicationQuery = async (_, { releaseName }, ctx) => {
     return application;
 };
 
-export const summaryQuery = async (_, __, ctx) => {
-    const applications = await ctx.prisma.application.findMany({ where: { NOT: { price: 0 } } });
-    const templates = await ctx.prisma.template.findMany();
-
-    const prices = templates.reduce((a, b) => a + b.price, 0);
-    const priceAvg = Math.floor(prices / templates.length);
-
-    const total = applications.filter((app) => app.state !== STATES.DELETED).reduce((a, b) => a + b.price, 0);
-
-    return {
-        templates,
-        applications: applications.length,
-        priceAvg,
-        total,
-    };
-};
-
 export const deleteAccountMutation = async (_, __, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 

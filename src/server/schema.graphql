@@ -100,17 +100,9 @@ type Envs {
     select: [Select]
 }
 
-type Summary {
-    templates: [Template]
-    applications: Int
-    priceAvg: Int
-    total: Int
-}
-
 type Query {
     user: User
     stripe: Stripe
-    summary: Summary
     userSubscription: UserSubscription
     subscription: Subscription
     applicationEnvs(releaseName: String): [Envs]
