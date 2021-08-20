@@ -112,12 +112,12 @@ export const installApplicationMutation = async (_, data, ctx) => {
         const session = await stripe.checkout.sessions.retrieve(sessionId).catch(() => false);
 
         if (session) {
-            templateId = Number(session.metadata.templateId);
+            templateId = Number(session.metadata.template_id);
         }
 
         const { name: templateName } = await ctx.prisma.template.findUnique({ where: { id: templateId } });
         const releaseName = await generateReleaseName(templateName, ctx.prisma);
-        await stripe.subscriptions.update(session.subscription, { metadata: { releaseName } });
+        await stripe.subscriptions.update(session.subscription, { metadata: { release_name: releaseName } });
     }
 
     const template = await ctx.prisma.template.findUnique({ where: { id: templateId } });
@@ -178,7 +178,7 @@ export const uninstallApplicationMutation = async (_, { releaseName }, ctx) => {
         const stripe = Stripe(stripeSecretKey);
         const { data: subscriptions } = await stripe.subscriptions.list({ customer: ctx.user.id });
 
-        const subscription = subscriptions.find((sub) => sub.metadata.releaseName === releaseName);
+        const subscription = subscriptions.find((sub) => sub.metadata.release_name === releaseName);
         await stripe.subscriptions.del(subscription.id, { prorate: false });
     }
 
@@ -559,7 +559,7 @@ export const createSessionCheckoutMutation = async (_, { templateId, baseUrl }, 
         customer_update: { name: 'auto' },
         locale: 'fr',
         mode: 'subscription',
-        metadata: { templateId },
+        metadata: { template_id: templateId },
         ...(trial && { subscription_data: { trial_period_days: trial || 0 } }),
     });
 
