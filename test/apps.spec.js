@@ -43,7 +43,7 @@ describe('Applications Page', () => {
         cy.visit('/apps');
         cy.get('.grid > div:first-child button:last').click({ force: true });
         cy.get('.grid > div:first-child button:last').click();
-        cy.get('div[aria-modal="true"] button:first').click();
+        cy.get('div[aria-modal="true"] button:last').click();
         cy.get('.grid > div').should('have.length', 2);
     });
 
