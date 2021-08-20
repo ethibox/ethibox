@@ -203,8 +203,22 @@ export default withModal(({ openModal }) => {
                                     <AppDropdown
                                         actions={[
                                             { text: intl.formatMessage({ id: 'Settings' }) },
-                                            { text: intl.formatMessage({ id: 'Edit configuration' }), icon: <EditIcon className="w-5 h-5 mr-3 text-gray-500" fill="none" />, action: () => openEditModal(app) },
-                                            { text: intl.formatMessage({ id: 'Uninstall application' }), action: () => openModal({ content: modalContent, onConfirm: () => uninstallApplication(app.releaseName), confirmButton: intl.formatMessage({ id: 'Uninstall application' }), confirmClass: 'bg-red-700 hover:bg-red-800' }), icon: <DeleteIcon className="w-5 h-5 mr-3 text-gray-500" /> },
+                                            {
+                                                text: intl.formatMessage({ id: 'Edit configuration' }),
+                                                icon: <EditIcon className="w-5 h-5 mr-3 text-gray-500" fill="none" />,
+                                                action: () => openEditModal(app),
+                                            },
+                                            {
+                                                text: intl.formatMessage({ id: 'Uninstall application' }),
+                                                icon: <DeleteIcon className="w-5 h-5 mr-3 text-gray-500" />,
+                                                action: () => openModal({
+                                                    content: modalContent,
+                                                    onConfirm: () => uninstallApplication(app.releaseName),
+                                                    confirmButton: intl.formatMessage({ id: 'Uninstall application' }),
+                                                    confirmClass: 'bg-red-700 hover:bg-red-800',
+                                                    closeButton: intl.formatMessage({ id: 'Cancel' }),
+                                                }),
+                                            },
                                         ]}
                                     />
                                 </div>
