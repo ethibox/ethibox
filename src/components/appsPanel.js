@@ -39,7 +39,7 @@ export default withModal(({ openModal }) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'x-access-token': getToken() },
             body: JSON.stringify({ query: `{
-                applications { name, description, releaseName, category, logo, task, state, error, adminPath, price, domain, lastTaskDate }
+                applications { name, description, releaseName, category, logo, task, state, error, adminPath, domain, lastTaskDate }
             }` }),
         })
             .then(checkStatus)
