@@ -132,7 +132,6 @@ export const installApplicationMutation = async (_, data, ctx) => {
 
     const application = await ctx.prisma.application.create({
         data: {
-            price: template.price,
             releaseName,
             domain,
             user: { connect: { id: ctx.user.id } },

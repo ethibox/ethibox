@@ -48,7 +48,6 @@ model Application {
   id           Int       @id @default(autoincrement())
   releaseName  String    @unique
   domain       String    @unique
-  price        Int       @default(0)
   envs         Env[]
   state        String    @default("standby")
   lastTaskDate DateTime? @default(now())

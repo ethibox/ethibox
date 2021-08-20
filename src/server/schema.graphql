@@ -53,7 +53,6 @@ type Application {
     id: Int
     name: String
     description: String
-    price: Int
     adminPath: String
     releaseName: String
     domain: String
