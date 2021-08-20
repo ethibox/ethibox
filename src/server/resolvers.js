@@ -163,7 +163,11 @@ export const installApplicationMutation = async (_, data, ctx) => {
 
     const { envs } = await ctx.prisma.application.findUnique({ where: { releaseName }, include: { envs: true } });
 
-    await sendWebhooks(EVENTS.INSTALL, { releaseName, template, envs: JSON.stringify(envs.concat([{ name: 'DOMAIN', value: domain }])) }, ctx.prisma);
+    await sendWebhooks(EVENTS.INSTALL, {
+        releaseName,
+        template,
+        envs: JSON.stringify(envs.concat([{ name: 'DOMAIN', value: domain }, { name: 'NUMBER', value: application.id }])),
+    }, ctx.prisma);
 
     return true;
 };
