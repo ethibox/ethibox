@@ -219,7 +219,19 @@ export default withNotifier(withModal(({ notify, openModal }) => {
                     </div>
                     <div className="mt-8 border-t border-gray-200 pt-5">
                         <div className="flex justify-end">
-                            <button type="button" className="focus:outline-none" onClick={() => openModal({ content: modalContent, confirmButton: intl.formatMessage({ id: 'Delete account' }), confirmClass: 'bg-red-700 hover:bg-red-800', onConfirm: deleteAccount })}>{intl.formatMessage({ id: 'Delete account' })}</button>
+                            <button
+                                type="button"
+                                className="focus:outline-none"
+                                onClick={() => openModal({
+                                    content: modalContent,
+                                    confirmButton: intl.formatMessage({ id: 'Delete account' }),
+                                    confirmClass: 'bg-red-700 hover:bg-red-800',
+                                    onConfirm: deleteAccount,
+                                    closeButton: intl.formatMessage({ id: 'Cancel' }),
+                                })}
+                            >
+                                {intl.formatMessage({ id: 'Delete account' })}
+                            </button>
                             <span className="ml-3 inline-flex rounded-md shadow-sm">
                                 { isLoading ? (
                                     <button
