@@ -39,6 +39,7 @@ export default ({ actions }) => {
                                 { actions.slice(1).map(({ icon, text, action }) => {
                                     return (
                                         <button
+                                            key={text}
                                             type="button"
                                             onClick={action}
                                             className="flex items-center w-full text-left px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
