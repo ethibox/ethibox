@@ -3,7 +3,14 @@ export const upsertProduct = async (stripe, appName, description = '', images = 
 
     let product = products.find((p) => p.name === appName);
 
-    if (!product) {
+    if (product) {
+        product = await stripe.products.update(product.id, {
+            name: appName,
+            images,
+            ...(description && { description }),
+            metadata: { application: 'ethibox' },
+        });
+    } else {
         product = await stripe.products.create({
             name: appName,
             images,
