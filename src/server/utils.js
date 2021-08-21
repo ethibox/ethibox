@@ -124,12 +124,6 @@ export const getIp = (domain) => new Promise((resolve) => dns.lookup(domain, (er
     resolve(ip);
 }));
 
-export const asyncForEach = async (array, callback) => {
-    for (let index = 0; index < array.length; index += 1) {
-        await callback(array[index], index, array);
-    }
-};
-
 export const updateTemplates = async (templatesUrl, prisma) => {
     if (!templatesUrl) return;
 

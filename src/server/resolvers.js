@@ -6,7 +6,6 @@ import { generate } from 'generate-password';
 import { invoiceList, upsertCustomer, upsertProduct, upsertPrice } from './stripe';
 import {
     validStripe,
-    asyncForEach,
     getSettings,
     generateReleaseName,
     checkDnsRecord,
@@ -140,7 +139,7 @@ export const installApplicationMutation = async (_, data, ctx) => {
     });
 
     if (template.envs) {
-        await asyncForEach(JSON.parse(template.envs), async (env) => {
+        for (const env of JSON.parse(template.envs)) {
             let { value } = env;
 
             if (env.name === 'ADMIN_EMAIL') {
@@ -158,7 +157,7 @@ export const installApplicationMutation = async (_, data, ctx) => {
                     application: { connect: { id: application.id } },
                 },
             });
-        });
+        }
     }
 
     const { envs } = await ctx.prisma.application.findUnique({ where: { releaseName }, include: { envs: true } });
@@ -224,11 +223,11 @@ export const updateUserMutation = async (_, { firstName, lastName }, ctx) => {
 export const updateSettingsMutation = async (_, { settings }, ctx) => {
     if (!ctx.user || !ctx.user.isAdmin) throw new Error('Not authorized');
 
-    await asyncForEach(settings, async (setting) => {
+    for (const setting of settings) {
         const { name, value } = setting;
 
         if (value === '************') {
-            return;
+            break;
         }
 
         await ctx.prisma.setting.upsert({
@@ -236,7 +235,7 @@ export const updateSettingsMutation = async (_, { settings }, ctx) => {
             create: { name, value },
             update: { name, value },
         });
-    });
+    }
 
     const { stripeEnabled, stripePublishableKey, stripeSecretKey } = await getSettings(null, ctx.prisma);
 

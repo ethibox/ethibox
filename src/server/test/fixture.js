@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import Stripe from 'stripe';
 import { templates } from './templates.json';
 import { upsertCustomer } from '../stripe';
-import { getSettings, generateReleaseName, asyncForEach } from '../utils';
+import { getSettings, generateReleaseName } from '../utils';
 
 export const addUser = async (user, prisma) => {
     const { email, password, isAdmin } = user;
@@ -26,9 +26,9 @@ export const addUser = async (user, prisma) => {
 export const addUsers = async (users, prisma) => {
     const results = [];
 
-    await asyncForEach(users, async (user) => {
+    for (const user of users) {
         results.push(await addUser(user, prisma));
-    });
+    }
 
     return results;
 };
@@ -78,7 +78,7 @@ export const deleteApp = async (releaseName, prisma) => {
 };
 
 export const addSettings = async (settings, prisma) => {
-    await asyncForEach(settings, async (setting) => {
+    for (const setting of settings) {
         const { name, value } = setting;
 
         await prisma.setting.upsert({
@@ -86,7 +86,7 @@ export const addSettings = async (settings, prisma) => {
             create: { name, value },
             update: { name, value },
         });
-    });
+    }
 };
 
 export const importTemplates = async (prisma) => {
