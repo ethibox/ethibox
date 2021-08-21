@@ -181,7 +181,10 @@ export const uninstallApplicationMutation = async (_, { releaseName }, ctx) => {
         const { data: subscriptions } = await stripe.subscriptions.list({ customer: ctx.user.id });
 
         const subscription = subscriptions.find((sub) => sub.metadata.release_name === releaseName);
-        await stripe.subscriptions.del(subscription.id, { prorate: false });
+
+        if (subscription) {
+            await stripe.subscriptions.del(subscription.id, { prorate: false });
+        }
     }
 
     await ctx.prisma.application.update({
