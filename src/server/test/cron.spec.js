@@ -101,5 +101,5 @@ test('Should set response time', async () => {
 
     const applications = await prisma.application.findMany();
 
-    expect(applications[0].responseTime).toBeGreaterThan(1000);
+    expect(applications[0].responseTime).toBeGreaterThanOrEqual(1000);
 });
