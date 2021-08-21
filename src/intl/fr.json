@@ -133,5 +133,13 @@
     "Total": "Total",
     "View invoice": "Voir la facture",
     "Enable SEPA": "Activer les virements SEPA",
-    "Check this case to enable SEPA Direct Debit payments": "Cochez cette case pour activer les paiements par prélèvement SEPA"
+    "Check this case to enable SEPA Direct Debit payments": "Cochez cette case pour activer les paiements par prélèvement SEPA",
+    "Edit configuration": "Editer la configuration",
+    "Confirm Application Deletion": "Confirmer la suppression de l'application",
+    "By deleting your application, you will also delete all your application's data and cancel your billing associated": "En supprimant votre application, vous supprimerez également toutes les données de votre application et annulerez votre abonnement associé.",
+    "Action in progress": "Action en cours",
+    "Offline": "Hors ligne",
+    "Are you sure you want to delete your application?": "Êtes-vous sûr de vouloir supprimer votre application ?",
+    "The installation of your application is in progress": "L'installation de votre application est en cours de progression",
+    "Congratulations! 🎉": "Bravo ! 🎉"
 }
