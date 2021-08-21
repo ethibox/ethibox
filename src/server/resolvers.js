@@ -303,6 +303,8 @@ export const stripeQuery = async (_, __, ctx) => {
             }
         }
 
+        await upsertCustomer(stripe, ctx.user.id, ctx.user.email);
+
         const intent = await stripe.setupIntents.create({ customer: ctx.user.id, payment_method_types: ['card', 'sepa_debit'] }).catch(() => false);
         const stripeClientSecret = intent.client_secret;
 
