@@ -7,6 +7,7 @@ import Confetti from 'react-confetti';
 import queryString from 'query-string';
 
 import { withModal } from '../context/ModalContext';
+import { withNotifier } from '../context/NotificationContext';
 import { STATES, checkStatus, getToken, remainingTimePercentage, navigate } from '../utils';
 import { applicationsState } from '../atoms';
 import GridIcon from '../images/grid.svg';
@@ -18,7 +19,7 @@ import AppDropdown from './appDropdown';
 const INTERVAL = process.env.NODE_ENV === 'production' ? 5000 : 2000;
 const MAX_TASK_TIME = process.env.MAX_TASK_TIME || 15;
 
-export default withModal(({ openModal }) => {
+export default withNotifier(withModal(({ openModal, notify }) => {
     const intl = useIntl();
     const location = useLocation();
 
@@ -58,7 +59,7 @@ export default withModal(({ openModal }) => {
         })
             .then(checkStatus)
             .catch(({ message }) => {
-                console.error(message);
+                notify({ type: 'error', title: intl.formatMessage({ id: message }) });
             });
     };
 
@@ -229,4 +230,4 @@ export default withModal(({ openModal }) => {
             </div>
         </>
     );
-});
+}));
