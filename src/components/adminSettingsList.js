@@ -34,8 +34,7 @@ export default () => {
                                 name={name}
                                 value={value}
                                 onChange={(e) => handleChange(e, index)}
-                                className="mt-1 block form-select w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 appearance-none"
-                                style={{ WebkitAppearance: 'none' }}
+                                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 sm:text-sm rounded-md appearance-none"
                             >
                                 <option value="false">No</option>
                                 <option value="true">Yes</option>

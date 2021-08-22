@@ -50,6 +50,7 @@ export default () => {
                             <div className="col-span-11 sm:col-span-5 flex rounded-md shadow-sm">
                                 <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">Event</span>
                                 <select
+                                    className="rounded-l-none rounded-md border-gray-300 w-full transition duration-150 sm:text-sm sm:leading-5 appearance-none"
                                     value={webhook.event}
                                     onChange={(e) => {
                                         const { value } = e.target;
@@ -57,7 +58,6 @@ export default () => {
                                             draft[index].event = value;
                                         });
                                     }}
-                                    className="rounded-l-none block form-select w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 appearance-none"
                                     style={{ WebkitAppearance: 'none' }}
                                 >
                                     { events.map((event) => (
@@ -68,6 +68,8 @@ export default () => {
                             <div className="col-span-11 sm:col-span-5 flex rounded-md shadow-sm">
                                 <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">Target URL</span>
                                 <input
+                                    className="flex-1 border-gray-300 w-full rounded-none rounded-r-md transition sm:text-sm sm:leading-5"
+                                    type="text"
                                     value={webhook.targetUrl}
                                     onChange={(e) => {
                                         const { value } = e.target;
@@ -75,7 +77,6 @@ export default () => {
                                             draft[index].targetUrl = value;
                                         });
                                     }}
-                                    className="flex-1 form-input block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5"
                                 />
                             </div>
                             <button

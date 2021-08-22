@@ -30,15 +30,6 @@ const config = {
             },
         },
         {
-            resolve: 'gatsby-plugin-sass',
-            options: {
-                postCssPlugins: [
-                    require('tailwindcss'), // eslint-disable-line
-                    require('./tailwind.config.js'), // eslint-disable-line
-                ],
-            },
-        },
-        {
             resolve: 'gatsby-plugin-intl',
             options: {
                 path: `${__dirname}/src/intl`,
