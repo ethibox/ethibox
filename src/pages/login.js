@@ -128,7 +128,7 @@ const Login = () => {
                                 value={email}
                                 onChange={handleChange}
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:z-10 sm:text-sm sm:leading-5"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:z-10 focus:border-gray-300 focus:ring-0 sm:text-sm sm:leading-5"
                                 placeholder={intl.formatMessage({ id: 'Email address' })}
                             />
                         </div>
@@ -139,7 +139,7 @@ const Login = () => {
                                 value={password}
                                 onChange={handleChange}
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:z-10 sm:text-sm sm:leading-5"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:z-10 focus:border-gray-300 focus:ring-0 sm:text-sm sm:leading-5"
                                 placeholder={intl.formatMessage({ id: 'Password' })}
                             />
                         </div>
@@ -153,7 +153,7 @@ const Login = () => {
                                 defaultChecked={false}
                                 onChange={toggleRemember}
                                 type="checkbox"
-                                className="form-checkbox h-4 w-4 text-gray-600 transition duration-150 ease-in-out"
+                                className="h-4 w-4 text-gray-600 border-gray-300 rounded focus:ring-0"
                             />
                             <label htmlFor="remember_me" className="ml-2 block text-sm leading-5 text-gray-900">
                                 {intl.formatMessage({ id: 'Remember me' })}

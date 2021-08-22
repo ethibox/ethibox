@@ -146,7 +146,7 @@ export default withNotifier(withModal(({ notify, openModal }) => {
                                     <label htmlFor="email_address" className="block text-sm font-medium leading-5 text-gray-700">{intl.formatMessage({ id: 'Email address' })}</label>
                                     <input
                                         id="email_address"
-                                        className="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5 bg-gray-200"
+                                        className="mt-1 w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-none sm:text-sm sm:leading-5 bg-gray-200"
                                         value={email}
                                         name="email"
                                         onChange={handleChange}
@@ -158,7 +158,7 @@ export default withNotifier(withModal(({ notify, openModal }) => {
                                     <label htmlFor="first_name" className="block text-sm font-medium leading-5 text-gray-700">{intl.formatMessage({ id: 'First name' })}</label>
                                     <input
                                         id="first_name"
-                                        className="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                                        className="mt-1 w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-none sm:text-sm sm:leading-5"
                                         name="firstName"
                                         value={firstName || ''}
                                         placeholder="John"
@@ -170,7 +170,7 @@ export default withNotifier(withModal(({ notify, openModal }) => {
                                     <label htmlFor="last_name" className="block text-sm font-medium leading-5 text-gray-700">{intl.formatMessage({ id: 'Last name' })}</label>
                                     <input
                                         id="last_name"
-                                        className="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                                        className="mt-1 w-full py-2 px-3 border border-gray-300 rounded-md sm focus:outline-none focus:shadow-outline-none sm:text-sm sm:leading-5"
                                         name="lastName"
                                         placeholder="Doe"
                                         value={lastName || ''}
@@ -199,7 +199,7 @@ export default withNotifier(withModal(({ notify, openModal }) => {
                                                     </div>
                                                     <div className="mt-4 sm:mt-0 sm:ml-6 sm:flex-shrink-0">
                                                         <span className="inline-flex rounded-md shadow-sm">
-                                                            <button onClick={() => notify({ type: 'confirm', title: 'Confirmation', message: intl.formatMessage({ id: 'Are you sure ?' }), onConfirm: () => removePaymentMethod() })} type="button" id="change_card" className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                                            <button onClick={() => notify({ type: 'confirm', title: 'Confirmation', message: intl.formatMessage({ id: 'Are you sure ?' }), onConfirm: () => removePaymentMethod() })} type="button" id="change_card" className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-gray-300 focus:shadow-outline-gray active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
                                                                 {intl.formatMessage({ id: 'Change card' })}
                                                             </button>
                                                         </span>
@@ -209,7 +209,7 @@ export default withNotifier(withModal(({ notify, openModal }) => {
                                         ) : (
                                             <div className="col-span-6 sm:col-span-3">
                                                 <label htmlFor="card" className="block text-sm font-medium leading-5 text-gray-700">{intl.formatMessage({ id: 'Card number' })}</label>
-                                                <CardElement id="card" className="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                                                <CardElement id="card" className="mt-1 w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-none sm:text-sm sm:leading-5" />
                                             </div>
                                         ) }
                                     </>

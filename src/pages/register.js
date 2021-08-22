@@ -115,7 +115,7 @@ const Register = () => {
                                 value={email}
                                 onChange={handleChange}
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:z-10 sm:text-sm sm:leading-5"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:z-10 focus:border-gray-300 focus:ring-0 sm:text-sm sm:leading-5"
                                 placeholder={intl.formatMessage({ id: 'Email address' })}
                             />
                         </div>
@@ -126,7 +126,7 @@ const Register = () => {
                                 value={password}
                                 onChange={handleChange}
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:z-10 sm:text-sm sm:leading-5"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:z-10 focus:border-gray-300 focus:ring-0 sm:text-sm sm:leading-5"
                                 placeholder={intl.formatMessage({ id: 'Password' })}
                             />
                         </div>
