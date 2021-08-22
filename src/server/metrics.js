@@ -23,7 +23,7 @@ const fetchDomains = async () => {
     const applications = await prisma.application.findMany({ where: { NOT: { state: STATES.DELETED } } });
     applications.forEach((app) => {
         const { domain, responseTime, state } = app;
-        gauge1.set({ domain }, state === STATES.ONLINE ? 0 : 1);
+        gauge1.set({ domain }, state === STATES.OFFLINE ? 1 : 0);
         gauge2.set({ domain }, responseTime);
     });
 };
