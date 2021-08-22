@@ -12,7 +12,7 @@ import { withNotifier } from '../context/NotificationContext';
 export default withNotifier(({ application, onClose, notify }) => {
     const intl = useIntl();
     const [applicationEnvs, setApplicationEnvs] = useRecoilState(applicationEnvsSelector(application.releaseName));
-    const [app, updateApp] = useImmer({ ...application, envs: applicationEnvs, domain: application.domain, ip: null, error: false, success: false });
+    const [app, updateApplication] = useImmer({ ...application, envs: applicationEnvs, domain: application.domain, ip: null, error: false, success: false });
     const [isLoading, updateLoading] = useImmer(false);
     const [passwordDisplayed, updatePassword] = useState(false);
 
@@ -29,7 +29,7 @@ export default withNotifier(({ application, onClose, notify }) => {
             updateLoading(() => false);
             const error = 'Nom de domaine invalide';
             notify({ type: 'error', title: intl.formatMessage({ id: error }) });
-            updateApp((draft) => { draft.error = error; });
+            updateApplication((draft) => { draft.error = error; });
             return;
         }
 
@@ -42,7 +42,7 @@ export default withNotifier(({ application, onClose, notify }) => {
             headers: { 'Content-Type': 'application/json', 'x-access-token': getToken() },
             body: JSON.stringify({
                 query: `mutation($envs: [VarInput!]!) {
-                    updateApp(releaseName: "${releaseName}", domain: "${domain}", envs: $envs)
+                    updateApplication(releaseName: "${releaseName}", domain: "${domain}", envs: $envs)
                 }`,
                 variables,
             }),
@@ -58,7 +58,7 @@ export default withNotifier(({ application, onClose, notify }) => {
                 const ip = (extensions && extensions.exception.ip) || null;
                 notify({ type: 'error', title: intl.formatMessage({ id: message }, { domain, ip }) });
                 updateLoading(() => false);
-                updateApp((draft) => {
+                updateApplication((draft) => {
                     draft.error = message;
                     draft.ip = ip;
                 });
@@ -103,7 +103,7 @@ export default withNotifier(({ application, onClose, notify }) => {
                                     placeholder="mondomaine.fr"
                                     onChange={(e) => {
                                         const { value } = e.target;
-                                        updateApp((draft) => {
+                                        updateApplication((draft) => {
                                             draft.error = false;
                                             draft.domain = value;
                                         });
@@ -124,7 +124,7 @@ export default withNotifier(({ application, onClose, notify }) => {
                                             style={{ WebkitAppearance: 'none' }}
                                             onChange={(e) => {
                                                 const { value } = e.target;
-                                                updateApp((draft) => {
+                                                updateApplication((draft) => {
                                                     draft.envs[index].value = value;
                                                     draft.error = false;
                                                 });
@@ -146,7 +146,7 @@ export default withNotifier(({ application, onClose, notify }) => {
                                                         className={`form-input block w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5 ${env.disabled && 'bg-gray-200'}`}
                                                         onChange={(e) => {
                                                             const { value } = e.target;
-                                                            updateApp((draft) => {
+                                                            updateApplication((draft) => {
                                                                 draft.envs[index].value = value;
                                                                 draft.error = false;
                                                             });
@@ -174,7 +174,7 @@ export default withNotifier(({ application, onClose, notify }) => {
                                                     className={`form-input block w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5 ${env.disabled && 'bg-gray-200 cursor-not-allowed'}`}
                                                     onChange={(e) => {
                                                         const { value } = e.target;
-                                                        updateApp((draft) => {
+                                                        updateApplication((draft) => {
                                                             draft.envs[index].value = value;
                                                             draft.error = false;
                                                         });

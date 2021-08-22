@@ -404,7 +404,7 @@ export const updateTemplatesMutation = async (_, { templatesUrl }, ctx) => {
     return true;
 };
 
-export const updateAppMutation = async (_, { releaseName, domain, envs }, ctx) => {
+export const updateApplicationMutation = async (_, { releaseName, domain, envs }, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 
     const application = await ctx.prisma.application.findUnique({ where: { releaseName } });

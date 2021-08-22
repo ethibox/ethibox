@@ -122,6 +122,6 @@ type Mutation {
     updateSettings(settings: [VarInput]): Boolean
     updateDefaultPaymentMethod(paymentMethodId: String): Boolean
     updateWebhooks(webhooks: [WebhookInput]): Boolean
-    updateApp(releaseName: String, domain: String, envs: [VarInput]): Boolean
+    updateApplication(releaseName: String, domain: String, envs: [VarInput]): Boolean
     updateTemplates(templatesUrl: String): Boolean
 }

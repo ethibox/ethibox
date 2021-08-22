@@ -13,7 +13,7 @@ import {
     invoicesQuery,
     deleteAccountMutation,
     updateUserMutation,
-    updateAppMutation,
+    updateApplicationMutation,
 } from '../resolvers';
 
 const prisma = new PrismaClient();
@@ -254,5 +254,5 @@ test('Should update application', async () => {
     const envs = [{ name: 'MAIL_PORT', value: '25' }];
 
     const ctx = { user, prisma };
-    expect(await updateAppMutation(null, { releaseName, envs, domain }, ctx)).toEqual(true);
+    expect(await updateApplicationMutation(null, { releaseName, envs, domain }, ctx)).toEqual(true);
 });
