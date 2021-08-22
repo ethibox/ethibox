@@ -123,5 +123,5 @@ export const reset = async (prisma) => {
     await prisma.$queryRaw('DELETE FROM sqlite_sequence WHERE name="Application";');
     await prisma.$queryRaw('DELETE FROM sqlite_sequence WHERE name="Template";');
 
-    await prisma.$queryRaw(`UPDATE SQLITE_SEQUENCE SET seq = "${Date.now()}";`);
+    await prisma.$queryRaw('UPDATE SQLITE_SEQUENCE SET seq = "1";');
 };

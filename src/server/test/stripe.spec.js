@@ -3,11 +3,9 @@ import 'dotenv/config';
 import Stripe from 'stripe';
 import { PrismaClient } from '@prisma/client';
 import { reset, addSettings } from './fixture';
-import { invoiceList, upsertProduct, upsertPrice, upsertCustomer } from '../stripe';
+import { upsertProduct, upsertPrice, upsertCustomer } from '../stripe';
 
 const prisma = new PrismaClient();
-
-const USER_ID = Date.now();
 
 beforeAll(async () => {
     await reset(prisma);
@@ -42,10 +40,10 @@ test('Should upsert a price', async () => {
     );
 });
 
-test('Should upsert a customer', async () => {
+test('Should create a customer', async () => {
     const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
-    const data = { id: USER_ID, email: 'admin@example.com' };
+    const data = { id: 1, email: 'admin@example.com' };
 
     const customer = await upsertCustomer(stripe, data.id, data.email);
 
@@ -54,10 +52,14 @@ test('Should upsert a customer', async () => {
     );
 });
 
-test.skip('Should return invoice list', async () => {
+test('Should update a customer', async () => {
     const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
-    const invoices = await invoiceList(stripe, USER_ID);
+    const data = { id: 1, email: 'admin@example.com', name: 'Marty Mcfly' };
 
-    expect(invoices.length).toEqual(1);
+    const customer = await upsertCustomer(stripe, data.id, data.email, data.name);
+
+    expect(customer).toEqual(
+        expect.objectContaining({ name: data.name }),
+    );
 });
