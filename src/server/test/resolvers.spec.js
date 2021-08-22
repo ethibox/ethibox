@@ -113,7 +113,7 @@ test('Should not uninstall application with bad user', async () => {
     await importTemplates(prisma);
     await addApps([{ templateId: 1, userId: user.id, state: STATES.ONLINE }], prisma);
 
-    const ctx = { user: { ...user, id: 2 }, prisma };
+    const ctx = { user: { ...user, id: 999 }, prisma };
     const { releaseName } = await prisma.application.findUnique({ where: { id: 1 } });
     expect(await uninstallApplicationMutation(null, { releaseName }, ctx)).toEqual(true);
 
