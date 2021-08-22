@@ -6,7 +6,7 @@ import isEmail from 'validator/lib/isEmail';
 
 import { checkStatus, setToken, isLoggedIn, navigate, redirect } from '../utils';
 
-export default () => {
+const Register = () => {
     const intl = useIntl();
     const [state, updateState] = useImmer({ email: '', password: '', errors: [] });
     const [isLoading, updateLoading] = useImmer(false);
@@ -162,3 +162,5 @@ export default () => {
         </div>
     );
 };
+
+export default Register;

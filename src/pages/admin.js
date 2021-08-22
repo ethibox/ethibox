@@ -5,7 +5,7 @@ import Layout from '../components/layout';
 import Loader from '../components/loaders/panelLoader';
 import AdminSettings from '../components/adminSettings';
 
-export default () => {
+const Admin = () => {
     const intl = useIntl();
 
     return (
@@ -20,3 +20,5 @@ export default () => {
         </Layout>
     );
 };
+
+export default Admin;

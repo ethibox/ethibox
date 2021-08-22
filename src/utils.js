@@ -1,6 +1,14 @@
-import jwt from 'jsonwebtoken';
+import { decode } from 'base-64';
 import { withPrefix } from 'gatsby';
 import { navigate as navigateGatsby } from 'gatsby-plugin-intl';
+
+export const jwtDecode = (token) => {
+    const payloadBase64 = token.split('.')[1].replace('-', '+').replace('_', '/');
+    const payloadDecoded = decode(payloadBase64);
+    const payloadObject = JSON.parse(payloadDecoded);
+
+    return payloadObject;
+};
 
 export const checkStatus = (response) => new Promise((resolve, reject) => {
     if (response.status !== 200) {
@@ -42,7 +50,7 @@ export const navigate = (path) => isBrowser() && navigateGatsby(path);
 
 export const isLoggedIn = () => {
     try {
-        const token = isBrowser() && jwt.decode(getToken());
+        const token = isBrowser() && jwtDecode(getToken());
         const tokenExpiration = token.exp;
         const userEmail = token.email;
 
@@ -88,7 +96,7 @@ export const autocast = (string) => {
 
 export const decamelize = (str, separator = ' ') => str.replace(/([a-z\d])([A-Z])/g, `$1${separator}$2`).toLowerCase();
 
-export const userInfo = () => isBrowser() && jwt.decode(getToken());
+export const userInfo = () => isBrowser() && jwtDecode(getToken());
 
 export const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 

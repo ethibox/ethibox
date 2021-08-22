@@ -4,7 +4,7 @@ import Layout from '../components/layout';
 import TemplatesPanel from '../components/templatesPanel';
 import Loader from '../components/loaders/miniLoader';
 
-export default () => {
+const Index = () => {
     return (
         <Layout>
             <React.Suspense fallback={<Loader />}>
@@ -13,3 +13,5 @@ export default () => {
         </Layout>
     );
 };
+
+export default Index;

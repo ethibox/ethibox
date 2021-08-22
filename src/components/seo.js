@@ -14,8 +14,8 @@ export default ({ title, description, meta = [] }) => {
         }
     `);
 
-    const defaultTitle = site.siteMetadata?.title;
-    const defaultDescription = site.siteMetadata?.description;
+    const defaultTitle = site.siteMetadata.title;
+    const defaultDescription = site.siteMetadata.description;
 
     return (
         <Helmet

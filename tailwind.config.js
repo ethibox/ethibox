@@ -6,7 +6,5 @@ module.exports = {
         },
     },
     variants: {},
-    plugins: [
-        require('@tailwindcss/ui'), // eslint-disable-line
-    ],
+    plugins: [],
 };

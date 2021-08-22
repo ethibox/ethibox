@@ -6,7 +6,7 @@ import { useLocation } from '@reach/router';
 
 import { checkStatus, navigate, isLoggedIn } from '../utils';
 
-export default () => {
+const Reset = () => {
     const intl = useIntl();
     const location = useLocation();
     const [state, setState] = useState({ email: '', errors: [], success: false, isLoading: false });
@@ -159,3 +159,5 @@ export default () => {
         </div>
     );
 };
+
+export default Reset;

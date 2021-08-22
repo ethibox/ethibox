@@ -4,7 +4,7 @@ import Layout from '../components/layout';
 import AppsPanel from '../components/appsPanel';
 import Loader from '../components/loaders/miniLoader';
 
-export default () => {
+const App = () => {
     return (
         <Layout>
             <React.Suspense fallback={<Loader />}>
@@ -13,3 +13,5 @@ export default () => {
         </Layout>
     );
 };
+
+export default App;

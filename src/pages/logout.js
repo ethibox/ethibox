@@ -1,6 +1,6 @@
 import { clear, redirect } from '../utils';
 
-export default () => {
+const Logout = () => {
     setTimeout(() => {
         clear();
         redirect('/login');
@@ -8,3 +8,5 @@ export default () => {
 
     return 'Redirect...';
 };
+
+export default Logout;
