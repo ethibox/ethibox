@@ -165,7 +165,7 @@ export const installApplicationMutation = async (_, data, ctx) => {
     await sendWebhooks(EVENTS.INSTALL, {
         releaseName,
         template,
-        envs: JSON.stringify(envs.concat([{ name: 'DOMAIN', value: domain }, { name: 'NUMBER', value: application.id }])),
+        envs: JSON.stringify(envs.concat([{ name: 'DOMAIN', value: domain }, { name: 'NUMBER', value: `${application.id}` }])),
     }, ctx.prisma);
 
     return true;
