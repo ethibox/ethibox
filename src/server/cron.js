@@ -8,13 +8,17 @@ const MAX_TASK_TIME = process.env.MAX_TASK_TIME || 15;
 
 export const checkAppsStatus = async (prisma) => {
     const applications = await prisma.application.findMany({ where: { NOT: { state: STATES.DELETED } } });
-    const currentDate = new Date();
 
-    for await (const { domain, lastTaskDate } of applications) {
+    for await (const application of applications) {
+        const { domain, lastTaskDate, state } = await prisma.application.findUnique({ where: { id: application.id } });
+
+        if (state === STATES.DELETED) break;
+
         const start = new Date();
         const isOnline = await checkUrl(`http://${domain}`);
         const expiryTime = new Date(lastTaskDate.setMinutes(lastTaskDate.getMinutes() + MAX_TASK_TIME));
         const responseTime = new Date() - start;
+        const currentDate = new Date();
 
         await prisma.application.update({ where: { domain }, data: { responseTime } });
 
