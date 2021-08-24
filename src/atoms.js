@@ -73,7 +73,6 @@ const loadAdminSettings = async () => fetch(withPrefix('/graphql'), {
     headers: { 'Content-Type': 'application/json', 'x-access-token': getToken() },
     body: JSON.stringify({ query: `{
         settings { id, name, value }
-        globalEnvs { id, name, value }
         webhooks { id, event, targetUrl }
     }` }),
 })

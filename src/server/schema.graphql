@@ -100,7 +100,6 @@ type Query {
     invoices: [Invoice]
     webhooks: [Webhook]
     settings: [Vars]
-    globalEnvs: [Vars]
 }
 
 type LoginResponse {

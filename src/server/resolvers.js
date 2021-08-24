@@ -324,14 +324,6 @@ export const settingsQuery = async (_, __, ctx) => {
     return settings;
 };
 
-export const globalEnvsQuery = async (_, __, ctx) => {
-    if (!ctx.user || !ctx.user.isAdmin) throw new Error('Not authorized');
-
-    const envs = await ctx.prisma.env.findMany({ where: { global: true } });
-
-    return envs;
-};
-
 export const applicationEnvsQuery = async (_, { releaseName }, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 

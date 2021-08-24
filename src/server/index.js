@@ -36,7 +36,6 @@ import {
     updateSettingsMutation,
     updateWebhooksMutation,
     updateTemplatesMutation,
-    globalEnvsQuery,
 } from './resolvers';
 
 const prisma = new PrismaClient();
@@ -76,7 +75,6 @@ const resolvers = {
         invoices: invoicesQuery,
         settings: settingsQuery,
         webhooks: webhooksQuery,
-        globalEnvs: globalEnvsQuery,
     },
     Mutation: {
         register: registerMutation,

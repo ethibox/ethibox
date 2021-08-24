@@ -64,7 +64,6 @@ model Env {
   id            Int          @id @default(autoincrement())
   name          String
   value         String?
-  global        Boolean      @default(false)
   application   Application? @relation(fields: [applicationId], references: [id])
   applicationId Int?
 }
