@@ -160,7 +160,10 @@ export const installApplicationMutation = async (_, data, ctx) => {
         }
     }
 
-    const { envs } = await ctx.prisma.application.findUnique({ where: { releaseName }, include: { envs: true } });
+    const envs = await ctx.prisma.env.findMany({
+        where: { applicationId: application.id },
+        select: { name: true, value: true },
+    });
 
     await sendWebhooks(EVENTS.INSTALL, {
         releaseName,
@@ -424,7 +427,18 @@ export const updateApplicationMutation = async (_, { releaseName, domain, envs }
         throw new DNSError('Please setup a correct DNS zone of type A for your domain {domain} with the ip {ip} on your registrar (ex: Gandi, OVH, Online, 1&1)');
     }
 
-    await sendWebhooks(EVENTS.UPDATE, { releaseName, domain, envs: JSON.stringify(envs.concat([{ name: 'DOMAIN', value: domain }])) }, ctx.prisma);
+    const currentEnvs = await ctx.prisma.env.findMany({
+        where: { applicationId: application.id },
+        select: { name: true, value: true },
+    });
+
+    const newEnvs = [...new Map([...currentEnvs, ...envs].map((item) => [item.name, item])).values()];
+
+    await sendWebhooks(EVENTS.UPDATE, {
+        releaseName,
+        domain,
+        envs: JSON.stringify(newEnvs.concat([{ name: 'DOMAIN', value: domain }, { name: 'NUMBER', value: `${application.id}` }])),
+    }, ctx.prisma);
 
     await ctx.prisma.application.update({
         where: { releaseName },

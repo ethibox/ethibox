@@ -44,7 +44,7 @@ export const addApps = async (apps, prisma) => {
 
         const releaseName = await generateReleaseName(template.name, prisma);
 
-        await prisma.application.create({
+        const application = await prisma.application.create({
             data: {
                 task,
                 state,
@@ -56,6 +56,20 @@ export const addApps = async (apps, prisma) => {
                 template: { connect: { id: templateId } },
             },
         });
+
+        if (template.envs) {
+            for (const env of JSON.parse(template.envs)) {
+                const { value } = env;
+
+                await prisma.env.create({
+                    data: {
+                        name: env.name,
+                        value: env.type === 'select' ? env.select[0].value : value,
+                        application: { connect: { id: application.id } },
+                    },
+                });
+            }
+        }
     }
 };
 
