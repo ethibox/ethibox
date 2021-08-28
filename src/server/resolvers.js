@@ -96,7 +96,6 @@ export const installApplicationMutation = async (_, data, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 
     let { templateId } = data;
-    const { sessionId } = data;
 
     const { stripeEnabled, stripeSecretKey } = await getSettings(null, ctx.prisma);
 
@@ -108,6 +107,7 @@ export const installApplicationMutation = async (_, data, ctx) => {
             throw new Error('Method of payment required');
         }
 
+        const { sessionId } = data;
         const session = await stripe.checkout.sessions.retrieve(sessionId).catch(() => false);
 
         if (session) {
@@ -169,6 +169,8 @@ export const installApplicationMutation = async (_, data, ctx) => {
         releaseName,
         template,
         envs: JSON.stringify(envs.concat([{ name: 'DOMAIN', value: domain }, { name: 'NUMBER', value: `${application.id}` }])),
+        user: ctx.user,
+        token: jwt.sign({ ...ctx.user }, SECRET, { expiresIn: '7d' }),
     }, ctx.prisma);
 
     return true;
@@ -190,15 +192,16 @@ export const uninstallApplicationMutation = async (_, { releaseName }, ctx) => {
         }
     }
 
-    await ctx.prisma.application.update({
+    const application = await ctx.prisma.application.update({
         where: { releaseName },
         data: {
             state: STATES.DELETED,
             user: { connect: { id: ctx.user.id } },
         },
+        include: { template: true },
     }).catch(() => false);
 
-    await sendWebhooks(EVENTS.UNINSTALL, { releaseName }, ctx.prisma);
+    await sendWebhooks(EVENTS.UNINSTALL, { application, user: ctx.user }, ctx.prisma);
 
     return true;
 };

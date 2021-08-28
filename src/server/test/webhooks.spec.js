@@ -58,6 +58,7 @@ test('Should send webhook during application installation', async () => {
 
     expect(request.releaseName).toBe('invoice-ninja1');
     expect(request.envs).toBe(JSON.stringify(envs));
+    expect(request.user.email).toBe('user@example.com');
 });
 
 test('Should send webhook during application updating', async () => {
@@ -107,5 +108,6 @@ test('Should send webhook during application uninstalling', async () => {
 
     const request = JSON.parse(fs.readFileSync(REQUEST_TMP_FILE));
 
-    expect(request.releaseName).toBe('invoice-ninja1');
+    expect(request.application.releaseName).toBe('invoice-ninja1');
+    expect(request.user.email).toBe('user@example.com');
 });
