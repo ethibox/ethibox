@@ -197,6 +197,7 @@ export const uninstallApplicationMutation = async (_, { releaseName }, ctx) => {
         data: {
             state: STATES.DELETED,
             user: { connect: { id: ctx.user.id } },
+            lastTaskDate: new Date(),
         },
         include: { template: true },
     }).catch(() => false);
@@ -451,7 +452,7 @@ export const updateApplicationMutation = async (_, { releaseName, domain, envs }
 
     await ctx.prisma.application.update({
         where: { releaseName },
-        data: { domain, state: STATES.STANDBY },
+        data: { domain, state: STATES.STANDBY, lastTaskDate: new Date() },
     });
 
     for (const { id, name, value } of envs) {
@@ -485,7 +486,7 @@ export const deleteAccountMutation = async (_, __, ctx) => {
     for (const application of applications) {
         await ctx.prisma.application.update({
             where: { id: application.id },
-            data: { state: STATES.DELETED },
+            data: { state: STATES.DELETED, lastTaskDate: new Date() },
         });
     }
 
