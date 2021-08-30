@@ -404,7 +404,11 @@ export const updateTemplatesMutation = async (_, { templatesUrl }, ctx) => {
 export const updateApplicationMutation = async (_, { releaseName, domain, envs }, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 
-    const application = await ctx.prisma.application.findUnique({ where: { releaseName } });
+    const application = await ctx.prisma.application.findUnique({
+        where: { releaseName },
+        include: { template: true },
+    });
+
     const rootDomain = (await getSettings('rootDomain', ctx.prisma)) || 'localhost';
     const ip = await getIp(rootDomain);
 
@@ -435,7 +439,9 @@ export const updateApplicationMutation = async (_, { releaseName, domain, envs }
         select: { name: true, value: true },
     });
 
-    const newEnvs = [...new Map([...currentEnvs, ...envs].map((item) => [item.name, item])).values()];
+    const templateEnvs = JSON.parse(application.template.envs);
+
+    const newEnvs = [...new Map([...templateEnvs, ...currentEnvs, ...envs].map((item) => [item.name, item])).values()];
 
     await sendWebhooks(EVENTS.UPDATE, {
         releaseName,

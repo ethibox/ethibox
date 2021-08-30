@@ -176,7 +176,10 @@ export const init = async (prisma) => {
         }
     }
 
-    await updateTemplates(TEMPLATES_URL, prisma);
+    const templatesUrl = settings.find((s) => s.name === 'templatesUrl')
+        && settings.find((s) => s.name === 'templatesUrl').value;
+
+    await updateTemplates(templatesUrl || TEMPLATES_URL, prisma);
 };
 
 export const generateReleaseName = async (appName, prisma, number = 1) => {
