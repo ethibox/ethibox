@@ -5,7 +5,7 @@ import Layout from '../components/layout';
 import Loader from '../components/loaders/panelLoader';
 import SettingsPanel from '../components/settingsPanel';
 
-export default () => {
+const Settings = () => {
     const intl = useIntl();
 
     return (
@@ -20,3 +20,5 @@ export default () => {
         </Layout>
     );
 };
+
+export default Settings;

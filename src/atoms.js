@@ -59,7 +59,7 @@ const loadApplications = async () => fetch(withPrefix('/graphql'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-access-token': getToken() },
     body: JSON.stringify({ query: `{
-        applications { name, releaseName, description, price, category, logo, task, state, error, domain, adminPath, lastTaskDate }
+        applications { name, releaseName, description, category, logo, task, state, error, domain, adminPath, lastTaskDate }
     }` }),
 })
     .then(checkStatus)
@@ -73,7 +73,6 @@ const loadAdminSettings = async () => fetch(withPrefix('/graphql'), {
     headers: { 'Content-Type': 'application/json', 'x-access-token': getToken() },
     body: JSON.stringify({ query: `{
         settings { id, name, value }
-        globalEnvs { id, name, value }
         webhooks { id, event, targetUrl }
     }` }),
 })

@@ -1,6 +1,5 @@
 import React from 'react';
-import { Link } from 'gatsby';
-import { useIntl } from 'gatsby-plugin-intl';
+import { Link, useIntl } from 'gatsby-plugin-intl';
 import { useRecoilValue } from 'recoil';
 
 import { invoicesState } from '../atoms';

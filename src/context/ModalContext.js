@@ -12,6 +12,7 @@ const { Provider, Consumer } = modalContext;
 const ModalProvider = (props) => {
     const [modal, updateModal] = useImmer({
         open: false,
+        isLoading: false,
         content: () => {},
         onConfirm: () => {},
         onClose: () => {},
@@ -23,14 +24,18 @@ const ModalProvider = (props) => {
     };
 
     const onConfirm = () => {
-        modal.onConfirm();
-        updateModal((draft) => { draft.open = false; });
+        updateModal((draft) => { draft.isLoading = true; });
+        modal.onConfirm().then(() => {
+            updateModal((draft) => { draft.isLoading = false; });
+            updateModal((draft) => { draft.open = false; });
+        });
     };
 
     const openModal = (m) => {
         const { content, confirmButton, closeButton, confirmClass } = m;
         updateModal((draft) => {
             draft.open = true;
+            draft.isLoading = false;
             draft.content = content;
             draft.confirmButton = confirmButton;
             draft.closeButton = closeButton;
@@ -52,6 +57,7 @@ const ModalProvider = (props) => {
                     confirmClass={modal.confirmClass}
                     confirmButton={modal.confirmButton}
                     closeButton={modal.closeButton}
+                    isLoading={modal.isLoading}
                 />
             ) }
             {children}

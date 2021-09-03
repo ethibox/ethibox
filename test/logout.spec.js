@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const user = { email: 'user@ethibox.fr', password: 'myp@ssw0rd' };
+const user = { email: 'user@example.com', password: 'myp@ssw0rd' };
 
 describe('Logout Page', () => {
     before(() => {
@@ -25,14 +25,14 @@ describe('Logout Page', () => {
     it('Should logout', () => {
         cy.setLocalStorage('token', jwt.sign(user, 'mys3cr3t', { expiresIn: '1d' }));
         cy.visit('/');
-        cy.get('a[href="/logout"]').click({ multiple: true, force: true });
+        cy.get('a[href*="/logout"]').click({ multiple: true, force: true });
         cy.url().should('contain', '/login');
     });
 
     it('Should logout user when expired session and display message', () => {
         cy.setLocalStorage('token', jwt.sign(user, 'mys3cr3t', { expiresIn: '5s' }));
         cy.visit('/');
-        cy.get('a[href="/logout"]').contains('Sign out');
+        cy.get('a[href*="/logout"]').contains('Sign out');
         cy.wait(5000);
         cy.visit('/');
         cy.url().should('contain', '/login');
@@ -45,7 +45,7 @@ describe('Logout Page', () => {
     });
 
     it('Should redirect a non-existing user to login page', () => {
-        cy.setLocalStorage('token', jwt.sign({ id: 2, email: 'user2@ethibox.fr' }, 'mys3cr3t', { expiresIn: '1d' }));
+        cy.setLocalStorage('token', jwt.sign({ id: 2, email: 'user2@example.com' }, 'mys3cr3t', { expiresIn: '1d' }));
         cy.on('uncaught:exception', () => false);
         cy.visit('/');
         cy.url().should('contain', '/login');

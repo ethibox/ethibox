@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const user = { email: 'user@ethibox.fr', password: 'myp@ssw0rd' };
+const user = { email: 'user@example.com', password: 'myp@ssw0rd' };
 
 describe('Settings Page', () => {
     before(() => {

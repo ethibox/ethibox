@@ -88,9 +88,6 @@ jobs:
         run: |
           docker build \
           --build-arg PREFIX_PATHS=true \
-          --build-arg MATOMO_ENABLED=${{ secrets.MATOMO_ENABLED }} \
-          --build-arg MATOMO_URL=${{ secrets.MATOMO_URL }} \
-          --build-arg MATOMO_SITEID=${{ secrets.MATOMO_SITEID }} \
           --build-arg POSTHOG_ENABLED=${{ secrets.POSTHOG_ENABLED }} \
           --build-arg POSTHOG_URL=${{ secrets.POSTHOG_URL }} \
           --build-arg POSTHOG_APIKEY=${{ secrets.POSTHOG_APIKEY }} \

@@ -4,7 +4,7 @@ import { withPrefix } from 'gatsby';
 
 import { checkStatus, getParameterByName, navigate } from '../utils';
 
-export default () => {
+const ResetPassword = () => {
     const intl = useIntl();
 
     const [state, setState] = useState({ password: '', errors: [], success: false, isLoading: false });
@@ -153,3 +153,5 @@ export default () => {
         </div>
     );
 };
+
+export default ResetPassword;

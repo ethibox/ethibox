@@ -6,7 +6,7 @@ import isEmail from 'validator/lib/isEmail';
 
 import { checkStatus, setToken, isLoggedIn, navigate, redirect } from '../utils';
 
-export default () => {
+const Register = () => {
     const intl = useIntl();
     const [state, updateState] = useImmer({ email: '', password: '', errors: [] });
     const [isLoading, updateLoading] = useImmer(false);
@@ -115,7 +115,7 @@ export default () => {
                                 value={email}
                                 onChange={handleChange}
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:z-10 sm:text-sm sm:leading-5"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:z-10 focus:border-gray-300 focus:ring-0 sm:text-sm sm:leading-5"
                                 placeholder={intl.formatMessage({ id: 'Email address' })}
                             />
                         </div>
@@ -126,7 +126,7 @@ export default () => {
                                 value={password}
                                 onChange={handleChange}
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:z-10 sm:text-sm sm:leading-5"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:z-10 focus:border-gray-300 focus:ring-0 sm:text-sm sm:leading-5"
                                 placeholder={intl.formatMessage({ id: 'Password' })}
                             />
                         </div>
@@ -155,10 +155,12 @@ export default () => {
                     </div>
 
                     <p className="mt-2 text-sm leading-5 text-gray-600 text-center">
-                        {intl.formatMessage({ id: 'By creating an account, you agree to the' })} <a href="https://ethibox.fr/cgu" target="_blank" className="underline">{intl.formatMessage({ id: 'Terms of Service' })}</a>
+                        {intl.formatMessage({ id: 'By creating an account, you agree to the' })} <a href="/cgu" target="_blank" className="underline">{intl.formatMessage({ id: 'Terms of Service' })}</a>
                     </p>
                 </form>
             </div>
         </div>
     );
 };
+
+export default Register;

@@ -35,7 +35,7 @@ export default ({ title, type, message, onConfirm, onClose }) => {
                                             </button>
                                         </span>
                                         <span className="ml-3 inline-flex rounded-md shadow-sm">
-                                            <button onClick={onClose} type="button" className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                            <button onClick={onClose} type="button" className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-gray-300 focus:shadow-outline-gray active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
                                                 {intl.formatMessage({ id: 'Cancel' })}
                                             </button>
                                         </span>

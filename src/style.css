@@ -2,43 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
-// Fonts
+/* Fonts */
 
 @font-face {
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 300;
-    src: local('Roboto Light'), local('Roboto-Light'), url('../fonts/roboto-light.woff2') format('woff2');
+    src: local('Roboto Light'), local('Roboto-Light'), url('./fonts/roboto-light.woff2') format('woff2');
 }
 
 @font-face {
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 400;
-    src: local('Roboto'), local('Roboto-Regular'), url('../fonts/roboto-regular.woff2') format('woff2');
+    src: local('Roboto'), local('Roboto-Regular'), url('./fonts/roboto-regular.woff2') format('woff2');
 }
 
 @font-face {
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 500;
-    src: local('Roboto Medium'), local('Roboto-Medium'), url('../fonts/roboto-medium.woff2') format('woff2');
+    src: local('Roboto Medium'), local('Roboto-Medium'), url('./fonts/roboto-medium.woff2') format('woff2');
 }
 
 @font-face {
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 700;
-    src: local('Roboto Bold'), local('Roboto-Bold'), url('../fonts/roboto-bold.woff2') format('woff2');
+    src: local('Roboto Bold'), local('Roboto-Bold'), url('./fonts/roboto-bold.woff2') format('woff2');
 }
 
-// Body
+/* Body */
 
 body {
     font-family: 'Roboto';
 }
 
-// Sticky footer
+/* Sticky footer */
 
 #gatsby-focus-wrapper {
     display: flex;
@@ -50,7 +50,7 @@ body {
     flex: 1;
 }
 
-// Spinner
+/* Spinner */
 
 .spinner {
     animation: rotation 1s infinite linear;
@@ -65,7 +65,7 @@ body {
     }
 }
 
-// Menu
+/* Menu */
 
 .active {
     color: white !important;

@@ -1,10 +1,8 @@
-import fs from 'fs';
-import path from 'path';
 import bcrypt from 'bcrypt';
 import Stripe from 'stripe';
-import templates from './templates.json';
+import { templates } from './templates.json';
 import { upsertCustomer } from '../stripe';
-import { getSettings, generateReleaseName, asyncForEach } from '../utils';
+import { getSettings, generateReleaseName } from '../utils';
 
 export const addUser = async (user, prisma) => {
     const { email, password, isAdmin } = user;
@@ -28,25 +26,25 @@ export const addUser = async (user, prisma) => {
 export const addUsers = async (users, prisma) => {
     const results = [];
 
-    await asyncForEach(users, async (user) => {
+    for (const user of users) {
         results.push(await addUser(user, prisma));
-    });
+    }
 
     return results;
 };
 
 export const addApps = async (apps, prisma) => {
-    const rootDomain = 'local.ethibox.fr';
+    const rootDomain = 'localhost';
 
     for await (const app of apps) {
         const { templateId, userId, task, state, error, domain, lastTaskDate } = app;
-        const template = await prisma.template.findOne({ where: { id: templateId } });
+        const template = await prisma.template.findUnique({ where: { id: templateId } });
 
         if (!template) throw new Error('No template found');
 
         const releaseName = await generateReleaseName(template.name, prisma);
 
-        await prisma.application.create({
+        const application = await prisma.application.create({
             data: {
                 task,
                 state,
@@ -58,6 +56,20 @@ export const addApps = async (apps, prisma) => {
                 template: { connect: { id: templateId } },
             },
         });
+
+        if (template.envs) {
+            for (const env of JSON.parse(template.envs)) {
+                const { value } = env;
+
+                await prisma.env.create({
+                    data: {
+                        name: env.name,
+                        value: env.type === 'select' ? env.select[0].value : value,
+                        application: { connect: { id: application.id } },
+                    },
+                });
+            }
+        }
     }
 };
 
@@ -80,7 +92,7 @@ export const deleteApp = async (releaseName, prisma) => {
 };
 
 export const addSettings = async (settings, prisma) => {
-    await asyncForEach(settings, async (setting) => {
+    for (const setting of settings) {
         const { name, value } = setting;
 
         await prisma.setting.upsert({
@@ -88,17 +100,17 @@ export const addSettings = async (settings, prisma) => {
             create: { name, value },
             update: { name, value },
         });
-    });
+    }
 };
 
 export const importTemplates = async (prisma) => {
     for await (const template of templates) {
-        const { name, description, category, logo, auto, repositoryUrl, stackFile, price, adminPath, envs } = template;
+        const { title: name, description, categories: [category], logo, website, auto, repository: { url: repositoryUrl, stackfile: stackFile }, price, trial, adminPath, env: envs } = template;
 
         await prisma.template.upsert({
             where: { name },
-            create: { name, description, category, logo, auto, price, repositoryUrl, stackFile, adminPath, envs: JSON.stringify(envs) },
-            update: { name, description, category, logo, auto, price, repositoryUrl, stackFile, adminPath, envs: JSON.stringify(envs) },
+            create: { name, description, category, logo, website, auto, price, trial, adminPath, repositoryUrl, stackFile, envs: JSON.stringify(envs || []) },
+            update: { name, description, category, logo, website, auto, price, trial, adminPath, repositoryUrl, stackFile, envs: JSON.stringify(envs || []) },
         });
     }
 };
@@ -112,8 +124,6 @@ export const addWebhooks = async (webhooks, prisma) => {
 };
 
 export const reset = async (prisma) => {
-    fs.writeFileSync(path.join(__dirname, '../../.token'), '');
-
     await prisma.setting.deleteMany();
     await prisma.webhook.deleteMany();
     await prisma.env.deleteMany();
@@ -127,5 +137,5 @@ export const reset = async (prisma) => {
     await prisma.$queryRaw('DELETE FROM sqlite_sequence WHERE name="Application";');
     await prisma.$queryRaw('DELETE FROM sqlite_sequence WHERE name="Template";');
 
-    await prisma.$queryRaw(`UPDATE SQLITE_SEQUENCE SET seq = "${Date.now()}";`);
+    await prisma.$queryRaw('UPDATE SQLITE_SEQUENCE SET seq = "1";');
 };

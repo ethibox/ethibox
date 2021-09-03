@@ -71,6 +71,3 @@ yarn-error.log
 # Prisma
 prisma/*.db
 prisma/migrations
-
-# Token
-.token

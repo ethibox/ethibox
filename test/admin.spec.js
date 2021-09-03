@@ -1,21 +1,20 @@
 import jwt from 'jsonwebtoken';
 
-const user = { email: 'admin@ethibox.fr', password: 'myp@ssw0rd', isAdmin: true };
+const user = { email: 'admin@example.com', password: 'myp@ssw0rd', isAdmin: true };
 
 describe('Admin Page', () => {
     before(() => {
         cy.request('POST', 'http://localhost:3000/test/reset');
         cy.request('POST', 'http://localhost:3000/test/users', { users: [
             user,
-            { email: 'user@ethibox.fr', password: 'myp@ssw0rd' },
+            { email: 'user@example.com', password: 'myp@ssw0rd' },
         ] });
         cy.request('POST', 'http://localhost:3000/test/settings', { settings: [
-            { name: 'rootDomain', value: 'local.ethibox.fr' },
-            { name: 'checkDomain', value: 'false' },
-            { name: 'appsUserLimit', value: '10' },
+            { name: 'rootDomain', value: 'localhost' },
             { name: 'stripeEnabled', value: 'false' },
             { name: 'stripePublishableKey', value: '' },
             { name: 'stripeSecretKey', value: '' },
+            { name: 'templatesUrl', value: '' },
         ] });
         cy.request({
             method: 'POST',
@@ -34,7 +33,7 @@ describe('Admin Page', () => {
     });
 
     it('Should display admin page for admin only', () => {
-        cy.setLocalStorage('token', jwt.sign({ email: 'user@ethibox.fr' }, 'mys3cr3t', { expiresIn: '1d' }));
+        cy.setLocalStorage('token', jwt.sign({ email: 'user@example.com' }, 'mys3cr3t', { expiresIn: '1d' }));
         cy.visit('/admin');
         cy.url().should('not.contain', '/admin');
     });
@@ -42,7 +41,6 @@ describe('Admin Page', () => {
     it('Should update admin settings', () => {
         cy.visit('/admin');
         cy.get('#root_domain').clear().type('new.ethibox.fr');
-        cy.get('#apps_user_limit').clear().type('10');
         cy.get('main > div span:last-child button').click();
         cy.contains('.notification', 'Settings save');
     });
@@ -63,11 +61,5 @@ describe('Admin Page', () => {
         cy.get('#stripe_secret_key').clear().type('sk_badkey');
         cy.get('main > div span:last-child button').click();
         cy.contains('.notification', 'Invalid stripe keys');
-    });
-
-    it('Should upload templates', () => {
-        cy.visit('/admin');
-        const templates = 'templates.json';
-        cy.get('input[type=file]').attachFile(templates);
     });
 });

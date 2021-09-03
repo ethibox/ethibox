@@ -9,7 +9,8 @@ import { ModalProvider } from './src/context/ModalContext';
 import Loader from './src/components/loaders/loader';
 import { isLoggedIn, removeToken, redirect } from './src/utils';
 import { stripeState } from './src/atoms';
-import './src/components/layout.scss';
+
+import './src/style.css';
 
 class ErrorBoundary extends React.Component {
     constructor(props) {

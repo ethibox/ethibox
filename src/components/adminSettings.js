@@ -3,14 +3,11 @@ import { withPrefix } from 'gatsby';
 import { useIntl } from 'gatsby-plugin-intl';
 import { useImmer } from 'use-immer';
 import { useRecoilValue } from 'recoil';
-import { GraphQLClient, ClientContext } from 'graphql-hooks';
 
 import { withNotifier } from '../context/NotificationContext';
 import { checkStatus, getToken, navigate } from '../utils';
 import AdminSettingsList from './adminSettingsList';
-import AdminSettingsEnvs from './adminSettingsEnvs';
 import AdminSettingsWebhooks from './adminSettingsWebhooks';
-import AdminSettingsTemplates from './adminSettingsTemplates';
 import { adminSettingsState, userState } from '../atoms';
 
 export default withNotifier((props) => {
@@ -24,7 +21,7 @@ export default withNotifier((props) => {
     }
 
     const [isLoading, updateLoading] = useImmer(false);
-    const { webhooks, settings, globalEnvs } = useRecoilValue(adminSettingsState);
+    const { webhooks, settings } = useRecoilValue(adminSettingsState);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -33,19 +30,20 @@ export default withNotifier((props) => {
         updateLoading(() => true);
 
         const variables = {
-            globalEnvs: globalEnvs.map(({ name, value }) => ({ name, value })),
             settings: settings.map(({ name, value }) => ({ name, value })),
             webhooks: webhooks.map(({ event, targetUrl }) => ({ event, targetUrl })),
+            templatesUrl: (settings.find(({ name }) => name === 'templatesUrl')
+                          && settings.find(({ name }) => name === 'templatesUrl').value) || '',
         };
 
         await fetch(withPrefix('/graphql'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'x-access-token': getToken() },
             body: JSON.stringify({
-                query: `mutation($globalEnvs: [VarInput!]!, $settings: [VarInput!]!, $webhooks: [WebhookInput!]!) {
+                query: `mutation($settings: [VarInput!]!, $webhooks: [WebhookInput!]!, $templatesUrl: String!) {
                     updateSettings(settings: $settings)
-                    updateGlobalEnvs(globalEnvs: $globalEnvs)
                     updateWebhooks(webhooks: $webhooks)
+                    updateTemplates(templatesUrl: $templatesUrl)
                 }`,
                 variables,
             }),
@@ -81,13 +79,8 @@ export default withNotifier((props) => {
                         <div className="mt-5 md:mt-0 md:col-span-2">
                             <div className="grid grid-cols-2 gap-6">
                                 <AdminSettingsList />
-                                <AdminSettingsEnvs />
                                 <AdminSettingsWebhooks />
                             </div>
-
-                            <ClientContext.Provider value={new GraphQLClient({ url: withPrefix('/graphql'), headers: { 'x-access-token': getToken() } })}>
-                                <AdminSettingsTemplates />
-                            </ClientContext.Provider>
                         </div>
                     </div>
                     <div className="mt-8 border-t border-gray-200 pt-5">

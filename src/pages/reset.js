@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { useIntl, Link } from 'gatsby-plugin-intl';
 import isEmail from 'validator/lib/isEmail';
 import { withPrefix } from 'gatsby';
+import { useLocation } from '@reach/router';
 
 import { checkStatus, navigate, isLoggedIn } from '../utils';
 
-export default () => {
+const Reset = () => {
     const intl = useIntl();
+    const location = useLocation();
     const [state, setState] = useState({ email: '', errors: [], success: false, isLoading: false });
 
     const handleChange = (e) => setState({ ...state, [e.target.name]: e.target.value, errors: [], success: false });
@@ -26,11 +28,13 @@ export default () => {
 
             setState({ ...state, isLoading: true });
 
+            const baseUrl = `${location.protocol}//${location.host}${withPrefix('/')}`;
+
             await fetch(withPrefix('/graphql'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query: `mutation {
-                    reset(email: "${email}")
+                    reset(baseUrl: "${baseUrl}", email: "${email}")
                 }` }),
             })
                 .then(checkStatus)
@@ -123,7 +127,7 @@ export default () => {
                                 value={email}
                                 onChange={handleChange}
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:z-10 sm:text-sm sm:leading-5"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:z-10 focus:border-gray-300 focus:ring-0 sm:text-sm sm:leading-5"
                                 placeholder={intl.formatMessage({ id: 'Email address' })}
                             />
                         </div>
@@ -155,3 +159,5 @@ export default () => {
         </div>
     );
 };
+
+export default Reset;

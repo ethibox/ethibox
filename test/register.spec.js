@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const user = { email: 'user@ethibox.fr', password: 'myp@ssw0rd' };
+const user = { email: 'user@example.com', password: 'myp@ssw0rd' };
 
 describe('Register Page', () => {
     before(() => {
@@ -20,21 +20,21 @@ describe('Register Page', () => {
 
     it('Should sign up admin user', () => {
         cy.visit('/register');
-        cy.get('input[name="email"]').type('admin@ethibox.fr');
+        cy.get('input[name="email"]').type('admin@example.com');
         cy.get('input[name="password"]').type('myp@ssw0rd{enter}');
         cy.url().should('not.contain', '/register');
     });
 
     it('Should sign up user', () => {
         cy.visit('/register');
-        cy.get('input[name="email"]').type('user2@ethibox.fr');
+        cy.get('input[name="email"]').type('user2@example.com');
         cy.get('input[name="password"]').type('myp@ssw0rd{enter}');
         cy.url().should('not.contain', '/register');
     });
 
     it('Should not sign up if user already exist', () => {
         cy.visit('/register');
-        cy.get('input[name="email"]').type('user@ethibox.fr');
+        cy.get('input[name="email"]').type('user@example.com');
         cy.get('input[name="password"]').type('myp@ssw0rd{enter}');
         cy.get('.error').should('contain', 'User already exist');
         cy.url().should('contain', '/register');

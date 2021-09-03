@@ -25,7 +25,7 @@ export default ({ actions }) => {
                     onClick={() => setDropdown(!dropdown)}
                     type="button"
                     aria-label="Expand"
-                    className="w-full relative inline-flex justify-between items-center px-4 py-2 rounded-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
+                    className="w-full relative inline-flex justify-between items-center px-4 py-2 rounded-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-gray-300 focus:shadow-outline-gray active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
                 >
                     <span>{intl.formatMessage({ id: actions[0].text })}</span>
                     <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -39,6 +39,7 @@ export default ({ actions }) => {
                                 { actions.slice(1).map(({ icon, text, action }) => {
                                     return (
                                         <button
+                                            key={text}
                                             type="button"
                                             onClick={action}
                                             className="flex items-center w-full text-left px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"

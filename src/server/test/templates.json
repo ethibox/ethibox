@@ -1,226 +1,273 @@
-[
-    {
-        "name": "Wordpress",
-        "description": "WordPress est l'application web la plus utilisé au monde pour créer un beau site web.",
-        "category": "blog",
-        "enabled": true,
-        "price": 19,
-        "trial": 7,
-        "adminPath": "/wp-admin",
-        "logo": "https://i.imgur.com/7WXHj55.png",
-        "repositoryUrl": "https://github.com/johackim/stacks",
-        "stackFile": "wordpress.yml"
-    },
-    {
-        "name": "Flarum",
-        "description": "Flarum est un logiciel de forum nouvelle génération qui rend les discussions en ligne amusantes.",
-        "category": "Forum",
-        "enabled": true,
-        "price": 19,
-        "trial": 7,
-        "logo": "https://i.imgur.com/oUlWx8o.png",
-        "repositoryUrl": "https://github.com/johackim/stacks",
-        "stackFile": "flarum.yml",
-        "envs": [
-            {
-                "name": "ADMIN_USERNAME",
-                "label": "Admin username",
-                "value": "admin",
-                "disabled": true
-            },
-            {
-                "name": "ADMIN_EMAIL",
-                "label": "Admin email",
-                "disabled": true
-            },
-            {
-                "name": "ADMIN_PASSWORD",
-                "label": "Admin password",
-                "type": "password",
-                "disabled": true
-            },
-            {
-                "name": "FLARUM_TITLE",
-                "label": "Flarum Title"
+{
+    "version": "2",
+    "templates": [
+        {
+            "title": "Wordpress",
+            "description": "WordPress est l'application web la plus utilisé au monde pour créer un beau site web.",
+            "categories": [
+                "blog"
+            ],
+            "enabled": true,
+            "price": 19,
+            "trial": 7,
+            "adminPath": "/wp-admin",
+            "logo": "https://i.imgur.com/7WXHj55.png",
+            "repository": {
+                "url": "https://github.com/ethibox/awesome-stacks",
+                "stackfile": "stacks/wordpress.yml"
             }
-        ]
-    },
-    {
-        "name": "Invoice-ninja",
-        "description": "Invoice Ninja est une application libre et open-source pour la facturation de vos clients.",
-        "category": "Billing",
-        "enabled": true,
-        "price": 19,
-        "trial": 7,
-        "logo": "https://i.imgur.com/r6TPGAZ.jpg",
-        "repositoryUrl": "https://github.com/johackim/stacks",
-        "stackFile": "invoiceninja.yml",
-        "envs": [
-            {
-                "name": "REQUIRE_HTTPS",
-                "value": "true",
-                "preset": true
+        },
+        {
+            "title": "Flarum",
+            "description": "Flarum est un logiciel de forum nouvelle génération qui rend les discussions en ligne amusantes.",
+            "categories": [
+                "forum"
+            ],
+            "enabled": true,
+            "price": 19,
+            "trial": 7,
+            "logo": "https://i.imgur.com/oUlWx8o.png",
+            "repository": {
+                "url": "https://github.com/ethibox/awesome-stacks",
+                "stackfile": "stacks/flarum.yml"
             },
-            {
-                "name": "HTTPS",
-                "value": "1",
-                "preset": true
+            "env": [
+                {
+                    "name": "ADMIN_USERNAME",
+                    "label": "Admin username",
+                    "value": "admin",
+                    "disabled": true
+                },
+                {
+                    "name": "ADMIN_EMAIL",
+                    "label": "Admin email",
+                    "disabled": true
+                },
+                {
+                    "name": "ADMIN_PASSWORD",
+                    "label": "Admin password",
+                    "type": "password",
+                    "disabled": true
+                },
+                {
+                    "name": "FLARUM_TITLE",
+                    "label": "Flarum Title"
+                }
+            ]
+        },
+        {
+            "title": "Invoice-ninja",
+            "description": "Invoice Ninja est une application libre et open-source pour la facturation de vos clients.",
+            "categories": [
+                "billing"
+            ],
+            "enabled": true,
+            "price": 19,
+            "trial": 7,
+            "logo": "https://i.imgur.com/r6TPGAZ.jpg",
+            "repository": {
+                "url": "https://github.com/ethibox/awesome-stacks",
+                "stackfile": "stacks/invoiceninja.yml"
             },
-            {
-                "name": "APP_KEY",
-                "value": "S0meR@nd0mStringS0meR@nd0mString",
-                "preset": true
-            },
-            {
-                "name": "SMTP_HOST",
-                "label": "SMTP Host"
-            },
-            {
-                "name": "SMTP_USERNAME",
-                "label": "SMTP Username"
-            },
-            {
-                "name": "SMTP_PASSWORD",
-                "label": "SMTP Password",
-                "type": "password"
-            },
-            {
-                "name": "SMTP_ENCRYPTION",
-                "label": "SMTP Encryption",
-                "type": "select",
-                "select": [
-                    {
-                        "text": "TLS",
-                        "value": "tls"
-                    }
-                ]
-            },
-            {
-                "name": "SMTP_PORT",
-                "label": "SMTP Port",
-                "type": "number"
-            },
-            {
-                "name": "SMTP_FROM_NAME",
-                "label": "SMTP From Name"
-            },
-            {
-                "name": "SMTP_FROM_ADDRESS",
-                "label": "SMTP From Address",
-                "type": "email"
+            "env": [
+                {
+                    "name": "REQUIRE_HTTPS",
+                    "value": "true",
+                    "preset": true
+                },
+                {
+                    "name": "HTTPS",
+                    "value": "1",
+                    "preset": true
+                },
+                {
+                    "name": "APP_KEY",
+                    "value": "S0meR@nd0mStringS0meR@nd0mString",
+                    "preset": true
+                },
+                {
+                    "name": "SMTP_HOST",
+                    "label": "SMTP Host"
+                },
+                {
+                    "name": "SMTP_USERNAME",
+                    "label": "SMTP Username"
+                },
+                {
+                    "name": "SMTP_PASSWORD",
+                    "label": "SMTP Password",
+                    "type": "password"
+                },
+                {
+                    "name": "SMTP_ENCRYPTION",
+                    "label": "SMTP Encryption",
+                    "type": "select",
+                    "select": [
+                        {
+                            "text": "TLS",
+                            "value": "tls"
+                        }
+                    ]
+                },
+                {
+                    "name": "SMTP_PORT",
+                    "label": "SMTP Port",
+                    "type": "number"
+                },
+                {
+                    "name": "SMTP_FROM_NAME",
+                    "label": "SMTP From Name"
+                },
+                {
+                    "name": "SMTP_FROM_ADDRESS",
+                    "label": "SMTP From Address",
+                    "type": "email"
+                }
+            ]
+        },
+        {
+            "title": "Fathom",
+            "description": "Fathom",
+            "categories": [
+                "analytics"
+            ],
+            "enabled": true,
+            "price": 19,
+            "trial": 7,
+            "logo": "https://i.imgur.com/I9vDBEy.png",
+            "repository": {
+                "url": "https://github.com/ethibox/awesome-stacks",
+                "stackfile": "stacks/fathom.yml"
             }
-        ]
-    },
-    {
-        "name": "Fathom",
-        "description": "Fathom",
-        "category": "analytics",
-        "enabled": true,
-        "price": 19,
-        "trial": 7,
-        "logo": "https://i.imgur.com/I9vDBEy.png",
-        "repositoryUrl": "https://github.com/johackim/stacks",
-        "stackFile": "fathom.yml"
-    },
-    {
-        "name": "Ghost",
-        "description": "Ghost",
-        "category": "blog",
-        "enabled": true,
-        "price": 19,
-        "trial": 7,
-        "auto": true,
-        "adminPath": "/ghost",
-        "logo": "https://i.imgur.com/aVvA5ow.png",
-        "repositoryUrl": "https://github.com/johackim/stacks",
-        "stackFile": "ghost.yml"
-    },
-    {
-        "name": "Kanboard",
-        "description": "Kanboard",
-        "category": "project-management",
-        "enabled": true,
-        "price": 19,
-        "trial": 7,
-        "logo": "https://i.imgur.com/u2k4Aip.png",
-        "repositoryUrl": "https://github.com/johackim/stacks",
-        "stackFile": "kanboard.yml"
-    },
-    {
-        "name": "Mattermost",
-        "description": "Mattermost",
-        "category": "chat",
-        "enabled": true,
-        "price": 19,
-        "trial": 7,
-        "logo": "https://i.imgur.com/aWStYef.png",
-        "repositoryUrl": "https://github.com/johackim/stacks",
-        "stackFile": "mattermost.yml"
-    },
-    {
-        "name": "Nextcloud",
-        "description": "Nextcloud",
-        "category": "cloud",
-        "enabled": true,
-        "price": 19,
-        "trial": 7,
-        "logo": "https://i.imgur.com/ecFVnV8.png",
-        "repositoryUrl": "https://github.com/johackim/stacks",
-        "stackFile": "nextcloud.yml"
-    },
-    {
-        "name": "Rocketchat",
-        "description": "Rocket.Chat",
-        "category": "chat",
-        "enabled": true,
-        "price": 19,
-        "trial": 7,
-        "logo": "https://i.imgur.com/mTR06gP.png",
-        "repositoryUrl": "https://github.com/johackim/stacks",
-        "stackFile": "rocketchat.yml"
-    },
-    {
-        "name": "Wekan",
-        "description": "Wekan",
-        "category": "project-management",
-        "enabled": true,
-        "price": 19,
-        "trial": 7,
-        "logo": "https://i.imgur.com/CGvMmHR.png",
-        "repositoryUrl": "https://github.com/johackim/stacks",
-        "stackFile": "wekan.yml"
-    },
-    {
-        "name": "Prestashop",
-        "description": "PrestaShop est un logiciel de e-commerce libre et open-source.",
-        "category": "E-commerce",
-        "enabled": true,
-        "price": 19,
-        "trial": 7,
-        "logo": "https://i.imgur.com/qhLnwBy.png",
-        "repositoryUrl": "https://github.com/johackim/stacks",
-        "stackFile": "prestashop.yml",
-        "envs": [
-            {
-                "name": "ADMIN_EMAIL",
-                "label": "Admin email",
-                "disabled": true
-            },
-            {
-                "name": "ADMIN_PASSWORD",
-                "label": "Admin password",
-                "disabled": true
-            },
-            {
-                "name": "HTTPS",
-                "value": "1",
-                "preset": true
-            },
-            {
-                "name": "PS_ENABLE_SSL",
-                "value": "1",
-                "preset": true
+        },
+        {
+            "title": "Ghost",
+            "description": "Ghost",
+            "categories": [
+                "blog"
+            ],
+            "enabled": true,
+            "price": 19,
+            "trial": 7,
+            "auto": true,
+            "adminPath": "/ghost",
+            "logo": "https://i.imgur.com/aVvA5ow.png",
+            "repository": {
+                "url": "https://github.com/ethibox/awesome-stacks",
+                "stackfile": "stacks/ghost.yml"
             }
-        ]
-    }
-]
+        },
+        {
+            "title": "Kanboard",
+            "description": "Kanboard",
+            "categories": [
+                "project-management"
+            ],
+            "enabled": true,
+            "price": 19,
+            "trial": 7,
+            "logo": "https://i.imgur.com/u2k4Aip.png",
+            "repository": {
+                "url": "https://github.com/ethibox/awesome-stacks",
+                "stackfile": "stacks/kanboard.yml"
+            }
+        },
+        {
+            "title": "Mattermost",
+            "description": "Mattermost",
+            "categories": [
+                "chat"
+            ],
+            "enabled": true,
+            "price": 19,
+            "trial": 7,
+            "logo": "https://i.imgur.com/aWStYef.png",
+            "repository": {
+                "url": "https://github.com/ethibox/awesome-stacks",
+                "stackfile": "stacks/mattermost.yml"
+            }
+        },
+        {
+            "title": "Nextcloud",
+            "description": "Nextcloud",
+            "categories": [
+                "cloud"
+            ],
+            "enabled": true,
+            "price": 19,
+            "trial": 7,
+            "logo": "https://i.imgur.com/ecFVnV8.png",
+            "repository": {
+                "url": "https://github.com/ethibox/awesome-stacks",
+                "stackfile": "stacks/nextcloud.yml"
+            }
+        },
+        {
+            "title": "Rocketchat",
+            "description": "Rocket.Chat",
+            "categories": [
+                "chat"
+            ],
+            "enabled": true,
+            "price": 19,
+            "trial": 7,
+            "logo": "https://i.imgur.com/mTR06gP.png",
+            "repository": {
+                "url": "https://github.com/ethibox/awesome-stacks",
+                "stackfile": "stacks/rocketchat.yml"
+            }
+        },
+        {
+            "title": "Wekan",
+            "description": "Wekan",
+            "categories": [
+                "project-management"
+            ],
+            "enabled": true,
+            "price": 19,
+            "trial": 7,
+            "logo": "https://i.imgur.com/CGvMmHR.png",
+            "repository": {
+                "url": "https://github.com/ethibox/awesome-stacks",
+                "stackfile": "stacks/wekan.yml"
+            }
+        },
+        {
+            "title": "Prestashop",
+            "description": "PrestaShop est un logiciel de e-commerce libre et open-source.",
+            "categories": [
+                "E-commerce"
+            ],
+            "enabled": true,
+            "price": 19,
+            "trial": 7,
+            "logo": "https://i.imgur.com/qhLnwBy.png",
+            "repository": {
+                "url": "https://github.com/ethibox/awesome-stacks",
+                "stackfile": "stacks/prestashop.yml"
+            },
+            "env": [
+                {
+                    "name": "ADMIN_EMAIL",
+                    "label": "Admin email",
+                    "disabled": true
+                },
+                {
+                    "name": "ADMIN_PASSWORD",
+                    "label": "Admin password",
+                    "disabled": true
+                },
+                {
+                    "name": "HTTPS",
+                    "value": "1",
+                    "preset": true
+                },
+                {
+                    "name": "PS_ENABLE_SSL",
+                    "value": "1",
+                    "preset": true
+                }
+            ]
+        }
+    ]
+}

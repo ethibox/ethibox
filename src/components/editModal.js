@@ -12,7 +12,7 @@ import { withNotifier } from '../context/NotificationContext';
 export default withNotifier(({ application, onClose, notify }) => {
     const intl = useIntl();
     const [applicationEnvs, setApplicationEnvs] = useRecoilState(applicationEnvsSelector(application.releaseName));
-    const [app, updateApp] = useImmer({ ...application, envs: applicationEnvs, domain: application.domain, ip: null, error: false, success: false });
+    const [app, updateApplication] = useImmer({ ...application, envs: applicationEnvs, domain: application.domain, ip: null, error: false, success: false });
     const [isLoading, updateLoading] = useImmer(false);
     const [passwordDisplayed, updatePassword] = useState(false);
 
@@ -29,7 +29,7 @@ export default withNotifier(({ application, onClose, notify }) => {
             updateLoading(() => false);
             const error = 'Nom de domaine invalide';
             notify({ type: 'error', title: intl.formatMessage({ id: error }) });
-            updateApp((draft) => { draft.error = error; });
+            updateApplication((draft) => { draft.error = error; });
             return;
         }
 
@@ -42,7 +42,7 @@ export default withNotifier(({ application, onClose, notify }) => {
             headers: { 'Content-Type': 'application/json', 'x-access-token': getToken() },
             body: JSON.stringify({
                 query: `mutation($envs: [VarInput!]!) {
-                    updateApp(releaseName: "${releaseName}", domain: "${domain}", envs: $envs)
+                    updateApplication(releaseName: "${releaseName}", domain: "${domain}", envs: $envs)
                 }`,
                 variables,
             }),
@@ -58,7 +58,7 @@ export default withNotifier(({ application, onClose, notify }) => {
                 const ip = (extensions && extensions.exception.ip) || null;
                 notify({ type: 'error', title: intl.formatMessage({ id: message }, { domain, ip }) });
                 updateLoading(() => false);
-                updateApp((draft) => {
+                updateApplication((draft) => {
                     draft.error = message;
                     draft.ip = ip;
                 });
@@ -99,11 +99,11 @@ export default withNotifier(({ application, onClose, notify }) => {
                                     type="text"
                                     name="domain"
                                     value={domain}
-                                    className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md focus:ring-gray-300 focus:border-gray-300 sm:text-sm border border-gray-300"
+                                    className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md focus:ring-gray-300 focus:border-gray-300 sm:text-sm border border-gray-300 focus:outline-none focus:shadow-outline-none focus:ring-0 focus:border-gray-300"
                                     placeholder="mondomaine.fr"
                                     onChange={(e) => {
                                         const { value } = e.target;
-                                        updateApp((draft) => {
+                                        updateApplication((draft) => {
                                             draft.error = false;
                                             draft.domain = value;
                                         });
@@ -120,11 +120,11 @@ export default withNotifier(({ application, onClose, notify }) => {
                                             id={env.name}
                                             name={env.name}
                                             value={env.value}
-                                            className="mt-1 block form-select w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 appearance-none"
+                                            className="mt-1 w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5 rounded appearance-none border-gray-300 focus:outline-none focus:shadow-outline-none focus:ring-0 focus:border-gray-300"
                                             style={{ WebkitAppearance: 'none' }}
                                             onChange={(e) => {
                                                 const { value } = e.target;
-                                                updateApp((draft) => {
+                                                updateApplication((draft) => {
                                                     draft.envs[index].value = value;
                                                     draft.error = false;
                                                 });
@@ -143,10 +143,10 @@ export default withNotifier(({ application, onClose, notify }) => {
                                                         disabled={env.disabled}
                                                         value={env.value}
                                                         type={passwordDisplayed ? 'text' : 'password'}
-                                                        className={`form-input block w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5 ${env.disabled && 'bg-gray-200'}`}
+                                                        className={`w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5 border-gray-300 focus:outline-none focus:shadow-outline-none focus:ring-0 focus:border-gray-300 ${env.disabled && 'bg-gray-200'}`}
                                                         onChange={(e) => {
                                                             const { value } = e.target;
-                                                            updateApp((draft) => {
+                                                            updateApplication((draft) => {
                                                                 draft.envs[index].value = value;
                                                                 draft.error = false;
                                                             });
@@ -171,10 +171,10 @@ export default withNotifier(({ application, onClose, notify }) => {
                                                     disabled={env.disabled}
                                                     value={env.value}
                                                     type={env.type || 'text'}
-                                                    className={`form-input block w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5 ${env.disabled && 'bg-gray-200 cursor-not-allowed'}`}
+                                                    className={`w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5 border-gray-300 focus:outline-none focus:shadow-outline-none focus:ring-0 focus:border-gray-300 ${env.disabled && 'bg-gray-200 cursor-not-allowed'}`}
                                                     onChange={(e) => {
                                                         const { value } = e.target;
-                                                        updateApp((draft) => {
+                                                        updateApplication((draft) => {
                                                             draft.envs[index].value = value;
                                                             draft.error = false;
                                                         });
@@ -199,7 +199,7 @@ export default withNotifier(({ application, onClose, notify }) => {
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+                                className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-gray-300 focus:shadow-outline-gray transition ease-in-out duration-150 sm:text-sm sm:leading-5"
                             >
                                 {intl.formatMessage({ id: 'Cancel' })}
                             </button>

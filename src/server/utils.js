@@ -3,9 +3,13 @@ import dns from 'dns';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
-export const secret = process.env.SECRET || crypto.randomBytes(32).toString('hex');
-
-export const tokenExpiration = process.env.TOKEN_EXPIRATION || '30d';
+export const SECRET = process.env.SECRET || crypto.randomBytes(32).toString('hex');
+export const TEMPLATES_URL = process.env.TEMPLATES_URL || 'https://raw.githubusercontent.com/ethibox/awesome-stacks/master/templates.json';
+export const ROOT_DOMAIN = process.env.ROOT_DOMAIN || 'localhost';
+export const STRIPE_ENABLED = process.env.STRIPE_ENABLED || 'false';
+export const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY || '';
+export const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
+export const TOKEN_EXPIRATION = process.env.TOKEN_EXPIRATION || '30d';
 
 export const checkStatus = (response) => new Promise((resolve, reject) => {
     if (response.status !== 200) {
@@ -49,19 +53,19 @@ export const timeout = (ms, promise) => new Promise((resolve, reject) => {
     });
 });
 
-export const checkUrl = (url) => new Promise((resolve, reject) => {
+export const checkUrl = (url) => new Promise((resolve) => {
     timeout(10000, fetch(url, { redirect: 'follow' })).then(({ status }) => {
         if (status === 200) {
             resolve(true);
         } else {
-            reject(new Error('Status code error'));
+            resolve(false);
         }
     }).catch((e) => {
         if (e.code === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' || e.code === 'DEPTH_ZERO_SELF_SIGNED_CERT') {
-            reject(new Error('Certificate error'));
+            resolve(false);
         }
 
-        reject(new Error('Error'));
+        resolve(false);
     });
 });
 
@@ -70,7 +74,7 @@ export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 export const isValidToken = (token) => {
     try {
         if (token) {
-            return jwt.verify(token, secret);
+            return jwt.verify(token, SECRET);
         }
 
         return false;
@@ -120,68 +124,67 @@ export const getIp = (domain) => new Promise((resolve) => dns.lookup(domain, (er
     resolve(ip);
 }));
 
-export const asyncForEach = async (array, callback) => {
-    for (let index = 0; index < array.length; index += 1) {
-        await callback(array[index], index, array);
+export const updateTemplates = async (templatesUrl, prisma) => {
+    if (!templatesUrl) return;
+
+    const { templates } = await fetch(templatesUrl).then((res) => res.json());
+
+    if (!templates.length) {
+        throw new Error('Not a valid template URL');
+    }
+
+    const existingTemplates = await prisma.template.findMany();
+
+    for (const { id, title: name } of existingTemplates) {
+        const existingTemplate = templates.find((t) => t.name === name);
+
+        if (!existingTemplate) {
+            await prisma.template.update({ where: { id }, data: { enabled: false } });
+        }
+    }
+
+    for (const template of templates) {
+        const { title: name, description, enabled, logo, website, auto, price, trial, adminPath } = template;
+        const { categories: [category], repository: { url: repositoryUrl, stackfile: stackFile }, env: envs } = template;
+
+        await prisma.template.upsert({
+            where: { name },
+            create: { name, description, category, logo, website, auto, enabled, price, trial, adminPath, repositoryUrl, stackFile, envs: JSON.stringify(envs || []) },
+            update: { name, description, category, logo, website, auto, enabled, price, trial, adminPath, repositoryUrl, stackFile, envs: JSON.stringify(envs || []) },
+        });
     }
 };
 
-export const initSettings = async (prisma) => {
+export const init = async (prisma) => {
     const settings = await prisma.setting.findMany();
 
-    if (!settings.length) {
-        const defaultSettings = [
-            { name: 'rootDomain', value: 'local.ethibox.fr' },
-            { name: 'checkDomain', value: 'false' },
-            { name: 'appsUserLimit', value: '10' },
-            { name: 'stripeEnabled', value: process.env.STRIPE_ENABLED || 'false' },
-            { name: 'stripePublishableKey', value: process.env.STRIPE_PUBLISHABLE_KEY || '' },
-            { name: 'stripeSecretKey', value: process.env.STRIPE_SECRET_KEY || '' },
-        ];
+    const defaultSettings = [
+        { name: 'rootDomain', value: ROOT_DOMAIN },
+        { name: 'stripeEnabled', value: STRIPE_ENABLED },
+        { name: 'stripePublishableKey', value: STRIPE_PUBLISHABLE_KEY },
+        { name: 'stripeSecretKey', value: STRIPE_SECRET_KEY },
+        { name: 'templatesUrl', value: TEMPLATES_URL },
+    ];
 
-        await asyncForEach(defaultSettings, async ({ name, value }) => {
+    if (!settings.length) {
+        for (const { name, value } of defaultSettings) {
             await prisma.setting.upsert({
                 where: { name },
                 create: { name, value },
                 update: { name, value },
             }).then(true);
-        });
-    }
-};
-
-export const checkPortainer = async (endpoint, username, password) => {
-    if (!endpoint) {
-        console.error('No portainer endpoint');
-        process.exit(1);
-    }
-
-    await fetch(`${endpoint}/api/auth`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-    })
-        .then(checkStatus)
-        .catch(() => {
-            console.error('Bad portainer logins');
-            process.exit(1);
-        });
-};
-
-export const init = (prisma) => {
-    (async () => {
-        const { PORTAINER_ENDPOINT: endpoint, PORTAINER_USERNAME: username, PORTAINER_PASSWORD: password } = process.env;
-
-        if (!process.env.CI) {
-            await checkPortainer(endpoint, username, password);
         }
+    }
 
-        await initSettings(prisma);
-    })();
+    const templatesUrl = settings.find((s) => s.name === 'templatesUrl')
+        && settings.find((s) => s.name === 'templatesUrl').value;
+
+    await updateTemplates(templatesUrl || TEMPLATES_URL, prisma);
 };
 
 export const generateReleaseName = async (appName, prisma, number = 1) => {
     const releaseName = `${appName}${number}`.toLowerCase();
-    const application = await prisma.application.findOne({ where: { releaseName } });
+    const application = await prisma.application.findUnique({ where: { releaseName } });
 
     if (application) {
         number += 1;
@@ -212,40 +215,17 @@ export const validStripe = async (publishableKey, stripeSecretKey) => new Promis
     });
 });
 
-export const fileToJson = async (createReadStream) => {
-    const result = await new Promise((resolve) => {
-        const stream = createReadStream();
-        stream.setEncoding('utf8');
-
-        let data = '';
-
-        stream.on('data', (chunk) => { data += chunk; });
-
-        stream.on('end', () => {
-            const json = JSON.parse(data);
-
-            if (!Array.isArray(json)) {
-                resolve([]);
-            }
-
-            resolve(json);
-        });
-    });
-
-    return result;
-};
-
 export const webhookRequest = async (targetUrl, body, retry = 1) => {
     const res = await fetch(targetUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
     }).catch(() => {
-        throw new Error('Webhook endpoint error');
+        throw new Error('Internal error');
     });
 
     if (retry >= 3) {
-        throw new Error('Webhook endpoint error');
+        throw new Error('Internal error');
     }
 
     if (res.status !== 200) {
@@ -262,23 +242,17 @@ export const sendWebhooks = async (event, data, prisma) => {
 };
 
 export const STATES = {
-    INSTALLING: 'installing',
-    UNINSTALLING: 'uninstalling',
-    EDITING: 'editing',
-    RUNNING: 'running',
+    ONLINE: 'online',
+    STANDBY: 'standby',
+    OFFLINE: 'offline',
     DELETED: 'deleted',
-};
-
-export const TASKS = {
-    INSTALL: 'install',
-    UNINSTALL: 'uninstall',
-    EDIT: 'edit',
 };
 
 export const EVENTS = {
     REGISTER: 'register',
     UNSUBSCRIBE: 'unsubscribe',
-    INSTALL: 'install',
-    UNINSTALL: 'uninstall',
-    UPDATE: 'update',
+    INSTALL: 'install application',
+    UNINSTALL: 'uninstall application',
+    UPDATE: 'update application',
+    RESETPASSWORD: 'reset password',
 };

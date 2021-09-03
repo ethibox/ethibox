@@ -14,7 +14,6 @@ import './cron';
 import {
     userQuery,
     stripeQuery,
-    summaryQuery,
     settingsQuery,
     webhooksQuery,
     applicationEnvsQuery,
@@ -29,17 +28,14 @@ import {
     resetPasswordMutation,
     removePaymentMethodMutation,
     uninstallApplicationMutation,
+    createSessionCheckoutMutation,
     updateDefaultPaymentMethodMutation,
     installApplicationMutation,
-    updateAppMutation,
+    updateApplicationMutation,
     updateUserMutation,
     updateSettingsMutation,
-    updateGlobalEnvsMutation,
     updateWebhooksMutation,
-    upgradeStripeSubscriptionMutation,
-    downgradeStripeSubscriptionMutation,
-    uploadTemplatesMutation,
-    globalEnvsQuery,
+    updateTemplatesMutation,
 } from './resolvers';
 
 const prisma = new PrismaClient();
@@ -72,7 +68,6 @@ const resolvers = {
     Query: {
         user: userQuery,
         stripe: stripeQuery,
-        summary: summaryQuery,
         applicationEnvs: applicationEnvsQuery,
         applications: applicationsQuery,
         application: applicationQuery,
@@ -80,7 +75,6 @@ const resolvers = {
         invoices: invoicesQuery,
         settings: settingsQuery,
         webhooks: webhooksQuery,
-        globalEnvs: globalEnvsQuery,
     },
     Mutation: {
         register: registerMutation,
@@ -90,16 +84,14 @@ const resolvers = {
         resetpassword: resetPasswordMutation,
         installApplication: installApplicationMutation,
         removePaymentMethod: removePaymentMethodMutation,
+        createSessionCheckout: createSessionCheckoutMutation,
         updateDefaultPaymentMethod: updateDefaultPaymentMethodMutation,
         uninstallApplication: uninstallApplicationMutation,
-        updateApp: updateAppMutation,
+        updateApplication: updateApplicationMutation,
         updateUser: updateUserMutation,
         updateSettings: updateSettingsMutation,
-        updateGlobalEnvs: updateGlobalEnvsMutation,
         updateWebhooks: updateWebhooksMutation,
-        upgradeStripeSubscription: upgradeStripeSubscriptionMutation,
-        downgradeStripeSubscription: downgradeStripeSubscriptionMutation,
-        uploadTemplates: uploadTemplatesMutation,
+        updateTemplates: updateTemplatesMutation,
     },
 };
 
@@ -113,7 +105,7 @@ const server = new ApolloServer({
         if (isValidToken(token)) {
             const data = decodeToken(token);
 
-            const user = await prisma.user.findOne({ where: { email: data.email } });
+            const user = await prisma.user.findUnique({ where: { email: data.email } });
 
             return { prisma, user };
         }

@@ -1,19 +1,19 @@
 import 'babel-polyfill';
 import express from 'express';
-import Prometheus from 'prom-client';
+import { Gauge, register } from 'prom-client';
 import { PrismaClient } from '@prisma/client';
 import { IpFilter, IpDeniedError } from 'express-ipfilter';
 import { STATES } from './utils';
 
 const prisma = new PrismaClient();
 
-const gauge1 = new Prometheus.Gauge({
+const gauge1 = new Gauge({
     name: 'ethibox_success',
     help: 'Displays whether or not domain was a success',
     labelNames: ['domain'],
 });
 
-const gauge2 = new Prometheus.Gauge({
+const gauge2 = new Gauge({
     name: 'ethibox_response_time',
     help: 'Displays domain response time',
     labelNames: ['domain'],
@@ -22,8 +22,8 @@ const gauge2 = new Prometheus.Gauge({
 const fetchDomains = async () => {
     const applications = await prisma.application.findMany({ where: { NOT: { state: STATES.DELETED } } });
     applications.forEach((app) => {
-        const { domain, responseTime, error } = app;
-        gauge1.set({ domain }, error ? 1 : 0);
+        const { domain, responseTime, state } = app;
+        gauge1.set({ domain }, state === STATES.OFFLINE ? 1 : 0);
         gauge2.set({ domain }, responseTime);
     });
 };
@@ -31,11 +31,12 @@ const fetchDomains = async () => {
 const app = express();
 
 const clientIp = (req) => {
-    return req.headers['x-forwarded-for'] ? (req.headers['x-forwarded-for']).split(',')[0] : req.socket.remoteAddress;
+    const ip = req.headers['x-forwarded-for'] ? (req.headers['x-forwarded-for']).split(',')[0] : req.socket.remoteAddress;
+    return ip.replace('::ffff:', '');
 };
 
 const ips = ['172.17.0.0/16', '10.10.0.0/16', '127.0.0.1', '::1'];
-app.use(IpFilter(ips, { mode: 'allow', detectIp: clientIp }));
+app.use(IpFilter(ips, { mode: 'allow', logLevel: 'deny', detectIp: clientIp }));
 
 app.use((err, req, res, next) => {
     if (err instanceof IpDeniedError) {
@@ -47,12 +48,13 @@ app.use((err, req, res, next) => {
 });
 
 app.get('/', async (req, res) => {
-    Prometheus.register.resetMetrics();
-
+    await register.resetMetrics();
     await fetchDomains();
 
-    res.set('Content-Type', Prometheus.register.contentType);
-    res.end(Prometheus.register.metrics());
+    const metrics = await register.metrics();
+
+    res.set('Content-Type', register.contentType);
+    res.end(metrics);
 });
 
 export default app;

@@ -13,7 +13,7 @@ import {
     invoicesQuery,
     deleteAccountMutation,
     updateUserMutation,
-    updateAppMutation,
+    updateApplicationMutation,
 } from '../resolvers';
 
 const prisma = new PrismaClient();
@@ -21,7 +21,7 @@ const prisma = new PrismaClient();
 test('Should register admin user', async () => {
     await reset(prisma);
 
-    const email = 'admin@ethibox.fr';
+    const email = 'admin@example.com';
     const password = 'myp@ssw0rd';
 
     const { user } = await registerMutation(null, { email, password }, { prisma });
@@ -31,7 +31,7 @@ test('Should register admin user', async () => {
 });
 
 test('Should register user', async () => {
-    const email = 'user@ethibox.fr';
+    const email = 'user@example.com';
     const password = 'myp@ssw0rd';
 
     const { user } = await registerMutation(null, { email, password }, { prisma });
@@ -41,7 +41,7 @@ test('Should register user', async () => {
 });
 
 test('Should not register an existing user', async () => {
-    const email = 'user@ethibox.fr';
+    const email = 'user@example.com';
     const password = 'myp@ssw0rd';
 
     await expect(registerMutation(null, { email, password }, { prisma })).rejects.toThrow('User already exist');
@@ -49,7 +49,7 @@ test('Should not register an existing user', async () => {
 
 test('Should install application', async () => {
     await reset(prisma);
-    const user = await addUser({ email: 'user@ethibox.fr', password: 'myp@ssw0rd', isAdmin: false }, prisma);
+    const user = await addUser({ email: 'user@example.com', password: 'myp@ssw0rd', isAdmin: false }, prisma);
     await importTemplates(prisma);
 
     const ctx = { user, prisma };
@@ -58,15 +58,15 @@ test('Should install application', async () => {
 
 test('Should install application with envs variables', async () => {
     await reset(prisma);
-    const user = await addUser({ email: 'user@ethibox.fr', password: 'myp@ssw0rd', isAdmin: false }, prisma);
+    const user = await addUser({ email: 'user@example.com', password: 'myp@ssw0rd', isAdmin: false }, prisma);
     await importTemplates(prisma);
 
-    const template = await prisma.template.findOne({ where: { name: 'Invoice-ninja' } });
+    const template = await prisma.template.findUnique({ where: { name: 'Invoice-ninja' } });
 
     const ctx = { user, prisma };
     expect(await installApplicationMutation(null, { templateId: template.id }, ctx)).toEqual(true);
 
-    const { envs } = await prisma.application.findOne({ where: { releaseName: 'invoice-ninja1' }, include: { envs: true } });
+    const { envs } = await prisma.application.findUnique({ where: { releaseName: 'invoice-ninja1' }, include: { envs: true } });
     const { value: smtpEncryption } = envs.find((env) => env.name === 'SMTP_ENCRYPTION');
 
     expect(envs.length).toEqual(10);
@@ -75,94 +75,76 @@ test('Should install application with envs variables', async () => {
 
 test('Should set ADMIN_EMAIL & ADMIN_PASSWORD envs variables', async () => {
     await reset(prisma);
-    const user = await addUser({ email: 'user@ethibox.fr', password: 'myp@ssw0rd', isAdmin: false }, prisma);
+    const user = await addUser({ email: 'user@example.com', password: 'myp@ssw0rd', isAdmin: false }, prisma);
     await importTemplates(prisma);
 
-    const template = await prisma.template.findOne({ where: { name: 'Flarum' } });
+    const template = await prisma.template.findUnique({ where: { name: 'Flarum' } });
 
     const ctx = { user, prisma };
     expect(await installApplicationMutation(null, { templateId: template.id }, ctx)).toEqual(true);
 
-    const { envs } = await prisma.application.findOne({ where: { releaseName: 'flarum1' }, include: { envs: true } });
+    const { envs } = await prisma.application.findUnique({ where: { releaseName: 'flarum1' }, include: { envs: true } });
     const { value: adminEmail } = envs.find((env) => env.name === 'ADMIN_EMAIL');
     const { value: adminPassword } = envs.find((env) => env.name === 'ADMIN_PASSWORD');
 
-    expect(adminEmail).toEqual('user@ethibox.fr');
+    expect(adminEmail).toEqual('user@example.com');
     expect(adminPassword.length).toEqual(15);
 });
 
 test('Should uninstall application', async () => {
     await reset(prisma);
-    const user = await addUser({ email: 'user@ethibox.fr', password: 'myp@ssw0rd', isAdmin: false }, prisma);
+    const user = await addUser({ email: 'user@example.com', password: 'myp@ssw0rd', isAdmin: false }, prisma);
     await importTemplates(prisma);
-    await addApps([{ templateId: 1, userId: user.id, state: STATES.RUNNING }], prisma);
+    await addApps([{ templateId: 1, userId: user.id, state: STATES.ONLINE }], prisma);
 
-    const { releaseName } = await prisma.application.findOne({ where: { id: 1 } });
+    const { releaseName } = await prisma.application.findUnique({ where: { id: 1 } });
 
     const ctx = { user, prisma };
     expect(await uninstallApplicationMutation(null, { releaseName }, ctx)).toEqual(true);
 
-    const { state } = await prisma.application.findOne({ where: { id: 1 } });
+    const { state } = await prisma.application.findUnique({ where: { id: 1 } });
 
-    expect(state).toEqual(STATES.UNINSTALLING);
+    expect(state).toEqual(STATES.DELETED);
 });
 
 test('Should not uninstall application with bad user', async () => {
     await reset(prisma);
-    const user = await addUser({ email: 'user2@ethibox.fr', password: 'myp@ssw0rd', isAdmin: false }, prisma);
+    const user = await addUser({ email: 'user2@example.com', password: 'myp@ssw0rd', isAdmin: false }, prisma);
     await importTemplates(prisma);
-    await addApps([{ templateId: 1, userId: user.id, state: STATES.RUNNING }], prisma);
+    await addApps([{ templateId: 1, userId: user.id, state: STATES.ONLINE }], prisma);
 
-    const ctx = { user: { ...user, id: 2 }, prisma };
-    const { releaseName } = await prisma.application.findOne({ where: { id: 1 } });
+    const ctx = { user: { ...user, id: 999 }, prisma };
+    const { releaseName } = await prisma.application.findUnique({ where: { id: 1 } });
     expect(await uninstallApplicationMutation(null, { releaseName }, ctx)).toEqual(true);
 
-    const { state } = await prisma.application.findOne({ where: { id: 1 } });
+    const { state } = await prisma.application.findUnique({ where: { id: 1 } });
 
-    expect(state).toEqual(STATES.RUNNING);
+    expect(state).toEqual(STATES.ONLINE);
 });
 
 test('Should update admin settings', async () => {
-    const ctx = { user: { email: 'admin@ethibox.fr', isAdmin: true }, prisma };
+    const ctx = { user: { email: 'admin@example.com', isAdmin: true }, prisma };
 
     const settings = [
-        { name: 'rootDomain', value: 'local.ethibox.fr' },
-        { name: 'checkDomain', value: 'false' },
-        { name: 'appsUserLimit', value: '' },
+        { name: 'rootDomain', value: 'localhost' },
     ];
 
     expect(await updateSettingsMutation(null, { settings }, ctx)).toEqual(true);
 });
 
 test('Should not update admin settings if user', async () => {
-    const ctx = { user: { email: 'user@ethibox.fr' }, prisma };
+    const ctx = { user: { email: 'user@example.com' }, prisma };
 
     const settings = [
-        { name: 'rootDomain', value: 'local.ethibox.fr' },
-        { name: 'checkDomain', value: 'false' },
-        { name: 'appsUserLimit', value: '' },
+        { name: 'rootDomain', value: 'localhost' },
     ];
 
     await expect(updateSettingsMutation(null, { settings }, ctx)).rejects.toThrow('Not authorized');
 });
 
-test('Should not install application if apps user limit is exceeded', async () => {
-    await reset(prisma);
-    await importTemplates(prisma);
-    const user = await addUser({ email: 'user@ethibox.fr', password: 'myp@ssw0rd', isAdmin: false }, prisma);
-    await addApps([{ templateId: 1, userId: user.id }, { templateId: 1, userId: user.id }], prisma);
-    await addSettings([{ name: 'appsUserLimit', value: '2' }], prisma);
-
-    const templates = await prisma.template.findMany();
-    const templateId = templates[0].id;
-
-    const ctx = { user, prisma };
-    await expect(installApplicationMutation(null, { templateId }, ctx)).rejects.toThrow('Your apps number limit is exceeded');
-});
-
 test('Should not install unexisting application', async () => {
     await reset(prisma);
-    const user = await addUser({ email: 'user@ethibox.fr', password: 'myp@ssw0rd', isAdmin: false }, prisma);
+    const user = await addUser({ email: 'user@example.com', password: 'myp@ssw0rd', isAdmin: false }, prisma);
 
     const ctx = { user, prisma };
     await expect(installApplicationMutation(null, { templateId: 9999 }, ctx)).rejects.toThrow('Not existing application');
@@ -171,9 +153,9 @@ test('Should not install unexisting application', async () => {
 test('Should return application envs', async () => {
     await reset(prisma);
     await importTemplates(prisma);
-    const user = await addUser({ email: 'user@ethibox.fr', password: 'myp@ssw0rd', isAdmin: false }, prisma);
+    const user = await addUser({ email: 'user@example.com', password: 'myp@ssw0rd', isAdmin: false }, prisma);
 
-    const template = await prisma.template.findOne({ where: { name: 'Flarum' } });
+    const template = await prisma.template.findUnique({ where: { name: 'Flarum' } });
 
     const ctx = { user, prisma };
     expect(await installApplicationMutation(null, { templateId: template.id }, ctx)).toEqual(true);
@@ -182,24 +164,24 @@ test('Should return application envs', async () => {
     const { value: adminEmail } = envs.find((env) => env.name === 'ADMIN_EMAIL');
     const { value: adminPassword } = envs.find((env) => env.name === 'ADMIN_PASSWORD');
 
-    expect(adminEmail).toEqual('user@ethibox.fr');
+    expect(adminEmail).toEqual('user@example.com');
     expect(adminPassword.length).toEqual(15);
 });
 
 test('Should delete account', async () => {
     await reset(prisma);
     await importTemplates(prisma);
-    const user = await addUser({ email: 'user@ethibox.fr', password: 'myp@ssw0rd', isAdmin: false }, prisma);
+    const user = await addUser({ email: 'user@example.com', password: 'myp@ssw0rd', isAdmin: false }, prisma);
 
     const ctx = { user, prisma };
     await addApps([
-        { templateId: 1, userId: user.id, state: STATES.RUNNING },
-        { templateId: 1, userId: user.id, state: STATES.RUNNING },
+        { templateId: 1, userId: user.id, state: STATES.ONLINE },
+        { templateId: 1, userId: user.id, state: STATES.ONLINE },
     ], prisma);
 
     expect(await deleteAccountMutation(null, null, ctx)).toEqual(true);
 
-    const applications = await prisma.application.findMany({ where: { userId: ctx.user.id, state: STATES.RUNNING } });
+    const applications = await prisma.application.findMany({ where: { userId: ctx.user.id, state: STATES.ONLINE } });
 
     expect(applications.length).toEqual(0);
     expect(await prisma.user.count({ where: { enabled: true } })).toEqual(0);
@@ -207,7 +189,7 @@ test('Should delete account', async () => {
 
 test('Should update first name\'s user', async () => {
     await reset(prisma);
-    const user = await addUser({ email: 'user@ethibox.fr', password: 'myp@ssw0rd', isAdmin: false }, prisma);
+    const user = await addUser({ email: 'user@example.com', password: 'myp@ssw0rd', isAdmin: false }, prisma);
 
     const firstName = 'Marty';
     const lastName = 'Mcfly';
@@ -215,7 +197,7 @@ test('Should update first name\'s user', async () => {
     const ctx = { user, prisma };
     expect(await updateUserMutation(null, { firstName, lastName }, ctx)).toEqual(true);
 
-    const userUpdated = await prisma.user.findOne({ where: { id: ctx.user.id } });
+    const userUpdated = await prisma.user.findUnique({ where: { id: ctx.user.id } });
 
     expect(userUpdated.firstName).toEqual(firstName);
     expect(userUpdated.lastName).toEqual(lastName);
@@ -230,7 +212,7 @@ test('Should update first name\'s user on stripe', async () => {
         { name: 'stripeSecretKey', value: process.env.STRIPE_SECRET_KEY },
     ], prisma);
 
-    const user = await addUser({ email: 'user@ethibox.fr', password: 'myp@ssw0rd', isAdmin: false }, prisma);
+    const user = await addUser({ email: 'user@example.com', password: 'myp@ssw0rd', isAdmin: false }, prisma);
 
     const ctx = { user, prisma };
 
@@ -238,7 +220,7 @@ test('Should update first name\'s user on stripe', async () => {
     const lastName = 'mcfly';
     expect(await updateUserMutation(null, { firstName, lastName }, ctx)).toEqual(true);
 
-    const userUpdated = await prisma.user.findOne({ where: { id: ctx.user.id } });
+    const userUpdated = await prisma.user.findUnique({ where: { id: ctx.user.id } });
 
     expect(userUpdated.firstName).toEqual(firstName);
     expect(userUpdated.lastName).toEqual(lastName);
@@ -253,7 +235,7 @@ test('Should return invoice list', async () => {
         { name: 'stripeSecretKey', value: process.env.STRIPE_SECRET_KEY },
     ], prisma);
 
-    const user = await addUser({ email: 'user@ethibox.fr', password: 'myp@ssw0rd', isAdmin: false }, prisma);
+    const user = await addUser({ email: 'user@example.com', password: 'myp@ssw0rd', isAdmin: false }, prisma);
 
     const ctx = { user, prisma };
     const invoices = await invoicesQuery(null, null, ctx);
@@ -263,35 +245,14 @@ test('Should return invoice list', async () => {
 
 test('Should update application', async () => {
     await reset(prisma);
-    const user = await addUser({ email: 'user@ethibox.fr', password: 'myp@ssw0rd', isAdmin: false }, prisma);
+    const user = await addUser({ email: 'user@example.com', password: 'myp@ssw0rd', isAdmin: false }, prisma);
     await importTemplates(prisma);
-    await addApps([{ templateId: 1, userId: user.id, state: STATES.RUNNING }], prisma);
+    await addApps([{ templateId: 1, userId: user.id, state: STATES.ONLINE }], prisma);
 
-    const { releaseName, domain } = await prisma.application.findOne({ where: { id: 1 } });
+    const { releaseName, domain } = await prisma.application.findUnique({ where: { id: 1 } });
 
     const envs = [{ name: 'MAIL_PORT', value: '25' }];
 
     const ctx = { user, prisma };
-    expect(await updateAppMutation(null, { releaseName, envs, domain }, ctx)).toEqual(true);
-});
-
-test.skip('Should not install application if there is already a trial period in progress', async () => {
-    await reset(prisma);
-    await importTemplates(prisma);
-    const user = await addUser({ email: 'user@ethibox.fr', password: 'myp@ssw0rd', isAdmin: false }, prisma);
-    await addApps([{ templateId: 1, userId: user.id }, { templateId: 1, userId: user.id }], prisma);
-
-    const templates = await prisma.template.findMany();
-    const templateId = templates[0].id;
-
-    const ctx = { user, prisma };
-    await expect(installApplicationMutation(null, { templateId }, ctx)).rejects.toThrow('You cannot have more than one application with free trial period.');
-});
-
-test.skip('Should not update email if already exist', () => {
-    expect(true).toEqual(false);
-});
-
-test.skip('Should not install applications if no payment method', () => {
-    expect(true).toEqual(false);
+    expect(await updateApplicationMutation(null, { releaseName, envs, domain }, ctx)).toEqual(true);
 });

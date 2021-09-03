@@ -1,5 +1,6 @@
 module.exports = {
     purge: false,
+    darkMode: 'class',
     theme: {
         maxHeight: {
             80: '80%',
@@ -7,6 +8,6 @@ module.exports = {
     },
     variants: {},
     plugins: [
-        require('@tailwindcss/ui'), // eslint-disable-line
+        require('@tailwindcss/forms'), // eslint-disable-line
     ],
 };

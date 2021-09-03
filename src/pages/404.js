@@ -2,7 +2,7 @@ import React from 'react';
 import Helmet from 'react-helmet';
 import { injectIntl, Link } from 'gatsby-plugin-intl';
 
-import './404.scss';
+import './404.css';
 
 export default injectIntl(({ intl }) => (
     <>

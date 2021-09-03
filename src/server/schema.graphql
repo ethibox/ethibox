@@ -53,7 +53,6 @@ type Application {
     id: Int
     name: String
     description: String
-    price: Int
     adminPath: String
     releaseName: String
     domain: String
@@ -63,16 +62,6 @@ type Application {
     state: String
     error: String
     lastTaskDate: Date
-}
-
-type Subscription {
-    id: Int
-    price: Int
-}
-
-type UserSubscription {
-    updateUrl: String
-    cancelUrl: String
 }
 
 input WebhookInput {
@@ -101,19 +90,9 @@ type Envs {
     select: [Select]
 }
 
-type Summary {
-    templates: [Template]
-    applications: Int
-    priceAvg: Int
-    total: Int
-}
-
 type Query {
     user: User
     stripe: Stripe
-    summary: Summary
-    userSubscription: UserSubscription
-    subscription: Subscription
     applicationEnvs(releaseName: String): [Envs]
     applications: [Application]
     application(releaseName: String): Application
@@ -121,7 +100,6 @@ type Query {
     invoices: [Invoice]
     webhooks: [Webhook]
     settings: [Vars]
-    globalEnvs: [Vars]
 }
 
 type LoginResponse {
@@ -132,19 +110,17 @@ type LoginResponse {
 type Mutation {
     register(email: String!, password: String!): LoginResponse!
     login(email: String!, password: String!, remember: Boolean): LoginResponse!
-    reset(email: String!): Boolean
+    reset(baseUrl: String!, email: String!): Boolean
     resetpassword(token: String!, password: String!): Boolean
     removePaymentMethod: Boolean
     deleteAccount: Boolean
-    installApplication(templateId: Int): Boolean
+    installApplication(templateId: Int, sessionId: String): Boolean
+    createSessionCheckout(templateId: Int, baseUrl: String): String
     uninstallApplication(releaseName: String!): Boolean
     updateUser(firstName: String, lastName: String, email: String): Boolean
     updateSettings(settings: [VarInput]): Boolean
-    updateGlobalEnvs(globalEnvs: [VarInput]): Boolean
     updateDefaultPaymentMethod(paymentMethodId: String): Boolean
     updateWebhooks(webhooks: [WebhookInput]): Boolean
-    updateApp(releaseName: String, domain: String, envs: [VarInput]): Boolean
-    upgradeStripeSubscription(appId: Int, price: Int): Boolean
-    downgradeStripeSubscription(appId: Int): Boolean
-    uploadTemplates(file: Upload!): Boolean
+    updateApplication(releaseName: String, domain: String, envs: [VarInput]): Boolean
+    updateTemplates(templatesUrl: String): Boolean
 }
