@@ -64,7 +64,7 @@ export const resetMutation = async (_, { baseUrl, email }, ctx) => {
     if (!user) return null;
 
     const token = jwt.sign({ id: user.id, email: user.email }, SECRET, { expiresIn: '10m' });
-    const link = `${baseUrl}/app/resetpassword?token=${token}`;
+    const link = `${baseUrl}/resetpassword?token=${token}`;
 
     await sendWebhooks(EVENTS.RESETPASSWORD, { email: user.email, token, link }, ctx.prisma);
 
