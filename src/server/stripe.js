@@ -1,5 +1,5 @@
 export const upsertProduct = async (stripe, appName, description = '', images = []) => {
-    const { data: products } = await stripe.products.list();
+    const { data: products } = await stripe.products.list({ limit: 100 });
 
     let product = products.find((p) => p.name === appName);
 
