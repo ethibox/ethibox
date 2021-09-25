@@ -99,7 +99,7 @@ export default withNotifier(({ template, notify }) => {
                                     {intl.formatMessage({ id: 'Loading...' })}
                                 </>
                             ) : (
-                                <span>{intl.formatMessage({ id: 'Install application' })}</span>
+                                intl.formatMessage({ id: 'Install application' })
                             ) }
                         </button>
                     </div>
