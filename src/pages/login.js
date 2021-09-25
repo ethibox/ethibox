@@ -52,12 +52,18 @@ const Login = () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query: `mutation {
-                    login(email: "${email}", password: "${password}", remember: ${remember}) { token }
+                    login(email: "${email}", password: "${password}", remember: ${remember}) { token, user { id } }
                 }` }),
             })
                 .then(checkStatus)
                 .then(({ data }) => {
                     setToken(data.login.token);
+
+                    if (window.posthog) {
+                        window.posthog.identify(data.login.user.id);
+                        window.posthog.people.set({ email });
+                    }
+
                     setTimeout(() => {
                         redirect('/');
                     }, 2000);

@@ -39,15 +39,21 @@ const Register = () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query: `mutation {
-                    register(email: "${email}", password: "${password}") { token }
+                    register(email: "${email}", password: "${password}") { token, user { id } }
                 }` }),
             })
                 .then(checkStatus)
                 .then(({ data }) => {
                     setToken(data.register.token);
+
+                    if (window.posthog) {
+                        window.posthog.identify(data.register.user.id);
+                        window.posthog.people.set({ email });
+                    }
+
                     setTimeout(() => {
                         redirect('/');
-                    }, 1000);
+                    }, 2000);
                 })
                 .catch(({ message }) => {
                     setTimeout(() => {
