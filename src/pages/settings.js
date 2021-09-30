@@ -4,6 +4,7 @@ import { useIntl } from 'gatsby-plugin-intl';
 import Layout from '../components/layout';
 import Loader from '../components/loaders/panelLoader';
 import SettingsPanel from '../components/settingsPanel';
+import AdminSettings from '../components/adminSettings';
 
 const Settings = () => {
     const intl = useIntl();
@@ -16,6 +17,10 @@ const Settings = () => {
 
             <React.Suspense fallback={<Loader />}>
                 <SettingsPanel />
+            </React.Suspense>
+
+            <React.Suspense fallback={<Loader />}>
+                <AdminSettings />
             </React.Suspense>
         </Layout>
     );

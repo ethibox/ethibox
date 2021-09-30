@@ -5,7 +5,7 @@ import { useImmer } from 'use-immer';
 import { useRecoilValue } from 'recoil';
 
 import { withNotifier } from '../context/NotificationContext';
-import { checkStatus, getToken, navigate } from '../utils';
+import { checkStatus, getToken } from '../utils';
 import AdminSettingsList from './adminSettingsList';
 import AdminSettingsWebhooks from './adminSettingsWebhooks';
 import { adminSettingsState, userState } from '../atoms';
@@ -16,7 +16,6 @@ export default withNotifier((props) => {
     const { isAdmin } = useRecoilValue(userState);
 
     if (!isAdmin) {
-        navigate('/');
         return false;
     }
 
