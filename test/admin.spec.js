@@ -34,32 +34,32 @@ describe('Admin Page', () => {
 
     it('Should display admin page for admin only', () => {
         cy.setLocalStorage('token', jwt.sign({ email: 'user@example.com' }, 'mys3cr3t', { expiresIn: '1d' }));
-        cy.visit('/admin');
-        cy.url().should('not.contain', '/admin');
+        cy.visit('/settings');
+        cy.get('body').should('not.contain', 'Admin settings');
     });
 
     it('Should update admin settings', () => {
-        cy.visit('/admin');
+        cy.visit('/settings');
         cy.get('#root_domain').clear().type('new.ethibox.fr');
-        cy.get('main > div span:last-child button').click();
+        cy.get('main > div:last-child button[type=submit]').click();
         cy.contains('.notification', 'Settings save');
     });
 
     it('Should enable stripe', () => {
-        cy.visit('/admin');
+        cy.visit('/settings');
         cy.get('#stripe_enabled').select('true');
         cy.get('#stripe_publishable_key').clear().type(Cypress.env('STRIPE_PUBLISHABLE_KEY'));
         cy.get('#stripe_secret_key').clear().type(Cypress.env('STRIPE_SECRET_KEY'));
-        cy.get('main > div span:last-child button').click();
+        cy.get('main > div:last-child button[type=submit]').click();
         cy.contains('.notification', 'Settings save');
     });
 
     it('Should not enable stripe if invalid keys', () => {
-        cy.visit('/admin');
+        cy.visit('/settings');
         cy.get('#stripe_enabled').select('true');
         cy.get('#stripe_publishable_key').clear().type('pk_badkey');
         cy.get('#stripe_secret_key').clear().type('sk_badkey');
-        cy.get('main > div span:last-child button').click();
+        cy.get('main > div:last-child button[type=submit]').click();
         cy.contains('.notification', 'Invalid stripe keys');
     });
 });
