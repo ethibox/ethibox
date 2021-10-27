@@ -7,6 +7,10 @@ import { upsertProduct, upsertPrice, upsertCustomer } from '../stripe';
 
 const prisma = new PrismaClient();
 
+afterEach(async () => {
+    await new Promise((r) => setTimeout(r, 2000));
+});
+
 beforeAll(async () => {
     await reset(prisma);
 

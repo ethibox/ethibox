@@ -40,20 +40,17 @@ export const upsertPrice = async (stripe, productId, productPrice) => {
     return price;
 };
 
-export const upsertCustomer = async (stripe, userId, email, name) => {
-    let customer = await stripe.customers.retrieve(`${userId}`).catch(() => false);
-
-    if (customer) {
+export const upsertCustomer = async (stripe, userId, email, name = '') => {
+    let customer = await stripe.customers.create({
+        id: userId,
+        name,
+        email,
+        metadata: { application: 'ethibox' },
+        preferred_locales: ['fr'],
+    }).catch(async () => {
         customer = await stripe.customers.update(`${userId}`, { name, email });
-    } else {
-        customer = await stripe.customers.create({
-            id: userId,
-            name,
-            email,
-            metadata: { application: 'ethibox' },
-            preferred_locales: ['fr'],
-        });
-    }
+        return customer;
+    });
 
     return customer;
 };
