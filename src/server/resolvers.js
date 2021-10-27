@@ -488,6 +488,8 @@ export const deleteAccountMutation = async (_, __, ctx) => {
             where: { id: application.id },
             data: { state: STATES.DELETED, lastTaskDate: new Date() },
         });
+
+        await sendWebhooks(EVENTS.UNINSTALL, { application, user: ctx.user }, ctx.prisma);
     }
 
     await ctx.prisma.user.update({
