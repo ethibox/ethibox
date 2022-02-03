@@ -53,7 +53,7 @@ export const timeout = (ms, promise) => new Promise((resolve, reject) => {
     });
 });
 
-export const checkUrl = (url) => new Promise((resolve) => {
+export const checkUrl = (url, retry = 1) => new Promise((resolve) => {
     timeout(10000, fetch(url, { redirect: 'follow' })).then(({ status }) => {
         if (status === 200) {
             resolve(true);
@@ -67,6 +67,15 @@ export const checkUrl = (url) => new Promise((resolve) => {
 
         resolve(false);
     });
+}).then(async (response) => {
+    if (retry >= 3) return false;
+
+    if (!response) {
+        const newCheck = await checkUrl(url, retry + 1);
+        return newCheck;
+    }
+
+    return true;
 });
 
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

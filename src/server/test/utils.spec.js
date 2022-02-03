@@ -4,6 +4,7 @@ import { reset, addUser, addApps, addSettings, importTemplates } from './fixture
 import {
     getSettings,
     generateReleaseName,
+    checkUrl,
     getIp,
     STATES,
 } from '../utils';
@@ -47,4 +48,20 @@ test('Should return DNS ip', async () => {
 
     const ip2 = await getIp('unknowdomain.com');
     expect(ip2).toEqual(false);
+});
+
+test('Should check good url status', async () => {
+    const url = 'https://ethibox.fr';
+
+    const isOnline = await checkUrl(url);
+
+    expect(isOnline).toEqual(true);
+});
+
+test('Should check bad url status', async () => {
+    const url = 'https://bad.ethibox.fr';
+
+    const isOnline = await checkUrl(url);
+
+    expect(isOnline).toEqual(false);
 });
