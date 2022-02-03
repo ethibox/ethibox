@@ -77,7 +77,7 @@ export default withNotifier(({ application, onClose, notify }) => {
                 <div className="p-6">
                     <div className="grid grid-cols-3">
                         <div className="col-span-2">
-                            <h3 className="text-lg font-medium leading-6 text-gray-900">{app.name}</h3>
+                            <h3 className="text-lg font-medium leading-6 text-gray-900">{intl.formatMessage({ id: 'Manage your application' })} {app.name}</h3>
                             <p className="mt-1 text-sm leading-5 text-gray-500">{description}</p>
                         </div>
                         <div className="text-right">
