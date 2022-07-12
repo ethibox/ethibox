@@ -27,7 +27,7 @@ describe('Settings Page', () => {
         cy.setLocalStorage('token', jwt.sign(user, 'mys3cr3t', { expiresIn: '1d' }));
     });
 
-    it('Should add & remove payment card if stripe is enabled', () => {
+    it('Should add payment card if stripe is enabled', () => {
         const token = jwt.sign(user, 'mys3cr3t', { expiresIn: '1d' });
 
         cy.request({
@@ -49,9 +49,12 @@ describe('Settings Page', () => {
 
         cy.get('main > div:nth-child(2) button:last').click();
         cy.contains('.notification', 'Account informations saved successfully');
+    });
 
-        cy.get('#change_card').click();
-        cy.get('#confirm').click();
+    it('Should redirect to stripe portal if stripe is enabled', () => {
+        cy.visit('/settings');
+        cy.get('#redirect_portal').click();
+        cy.url().should('contain', 'billing.stripe.com');
     });
 
     it('Should display error if payment card is bad', () => {

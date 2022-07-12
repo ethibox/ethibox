@@ -90,9 +90,14 @@ type Envs {
     select: [Select]
 }
 
+type Url {
+    url: String
+}
+
 type Query {
     user: User
     stripe: Stripe
+    stripePortalUrl(baseUrl: String!): Url
     applicationEnvs(releaseName: String): [Envs]
     applications: [Application]
     application(releaseName: String): Application
