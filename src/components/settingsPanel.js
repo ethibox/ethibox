@@ -4,6 +4,7 @@ import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useIntl } from 'gatsby-plugin-intl';
 import { useImmer } from 'use-immer';
+import { useLocation } from '@reach/router';
 
 import { checkStatus, getToken, redirect, autocast } from '../utils';
 import { withNotifier } from '../context/NotificationContext';
@@ -14,6 +15,7 @@ export default withNotifier(withModal(({ notify, openModal }) => {
     const intl = useIntl();
     const stripe = useStripe();
     const elements = useElements();
+    const location = useLocation();
 
     const { email, firstName, lastName } = useRecoilValue(userState);
     const updateUser = useSetRecoilState(userState);
@@ -95,18 +97,24 @@ export default withNotifier(withModal(({ notify, openModal }) => {
             });
     };
 
-    const removePaymentMethod = async () => {
-        updateLoading(() => true);
+    const redirectToPortal = async () => {
+        const baseUrl = `${location.protocol}//${location.host}${withPrefix('/')}`;
 
         await fetch(withPrefix('/graphql'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'x-access-token': getToken() },
-            body: JSON.stringify({ query: `mutation {
-                removePaymentMethod
+            body: JSON.stringify({ query: `{
+                stripePortalUrl(baseUrl: "${baseUrl}") { url }
             }` }),
-        }).then(() => {
-            redirect('/settings');
-        });
+        })
+            .then(checkStatus)
+            .then(({ data }) => {
+                const { url } = data.stripePortalUrl;
+                redirect(url);
+            })
+            .catch(({ message }) => {
+                throw new Error(message);
+            });
     };
 
     const modalContent = (
@@ -199,8 +207,8 @@ export default withNotifier(withModal(({ notify, openModal }) => {
                                                     </div>
                                                     <div className="mt-4 sm:mt-0 sm:ml-6 sm:flex-shrink-0">
                                                         <span className="inline-flex rounded-md shadow-sm">
-                                                            <button onClick={() => notify({ type: 'confirm', title: 'Confirmation', message: intl.formatMessage({ id: 'Are you sure ?' }), onConfirm: () => removePaymentMethod() })} type="button" id="change_card" className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-gray-300 focus:shadow-outline-gray active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
-                                                                {intl.formatMessage({ id: 'Change card' })}
+                                                            <button onClick={() => redirectToPortal()} type="button" id="redirect_portal" className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-gray-300 focus:shadow-outline-gray active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                                                {intl.formatMessage({ id: 'Update payment informations' })}
                                                             </button>
                                                         </span>
                                                     </div>

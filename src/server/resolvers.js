@@ -283,6 +283,24 @@ export const removePaymentMethodMutation = async (_, __, ctx) => {
     return true;
 };
 
+export const stripePortalUrlQuery = async (_, { baseUrl }, ctx) => {
+    if (!ctx.user) throw new Error('Not authorized');
+
+    const user = await ctx.prisma.user.findUnique({ where: { id: ctx.user.id } });
+
+    if (!user) throw new Error('Not authorized');
+
+    const { stripeSecretKey } = await getSettings(null, ctx.prisma);
+    const stripe = Stripe(stripeSecretKey);
+
+    const { url } = await stripe.billingPortal.sessions.create({
+        customer: user.id,
+        return_url: `${baseUrl}settings`,
+    }).catch(() => false);
+
+    return { url };
+};
+
 export const userQuery = async (_, __, ctx) => {
     if (!ctx.user) throw new Error('Not authorized');
 
