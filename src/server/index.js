@@ -107,7 +107,7 @@ const server = new ApolloServer({
         if (isValidToken(token)) {
             const data = decodeToken(token);
 
-            const user = await prisma.user.findUnique({ where: { email: data.email } });
+            const user = await prisma.user.findUnique({ where: { id: data.id } });
 
             return { prisma, user };
         }
