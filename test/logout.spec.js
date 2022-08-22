@@ -45,7 +45,7 @@ describe('Logout Page', () => {
     });
 
     it('Should redirect a non-existing user to login page', () => {
-        cy.setLocalStorage('token', jwt.sign({ id: 2, email: 'user2@example.com' }, 'mys3cr3t', { expiresIn: '1d' }));
+        cy.setLocalStorage('token', jwt.sign({ id: 99, email: 'user99@example.com' }, 'mys3cr3t', { expiresIn: '1d' }));
         cy.on('uncaught:exception', () => false);
         cy.visit('/');
         cy.url().should('contain', '/login');
