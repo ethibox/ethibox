@@ -55,7 +55,7 @@ export default withNotifier(({ application, onClose, notify }) => {
                 onClose();
             })
             .catch(({ message, extensions }) => {
-                const ip = (extensions && extensions.exception.ip) || null;
+                const ip = extensions?.exception?.ip || null;
                 notify({ type: 'error', title: intl.formatMessage({ id: message }, { domain, ip }) });
                 updateLoading(() => false);
                 updateApplication((draft) => {
