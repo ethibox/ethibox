@@ -332,7 +332,7 @@ export const stripeQuery = async (_, __, ctx) => {
 
         await upsertCustomer(stripe, ctx.user.id, ctx.user.email);
 
-        const intent = await stripe.setupIntents.create({ customer: ctx.user.id, payment_method_types: ['card'] }).catch(() => false);
+        const intent = await stripe.setupIntents.create({ customer: ctx.user.id }).catch(() => false);
         const stripeClientSecret = intent.client_secret;
 
         data = { ...data, stripeClientSecret, stripeLast4: '', stripePaymentMethod: '' };
@@ -562,7 +562,6 @@ export const createSessionCheckoutMutation = async (_, { templateId, baseUrl }, 
     const { url } = await stripe.checkout.sessions.create({
         success_url: `${baseUrl}apps?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: baseUrl,
-        payment_method_types: ['card'],
         line_items: [{ price: priceId, quantity: 1 }],
         allow_promotion_codes: true,
         customer: ctx.user.id,
