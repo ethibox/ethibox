@@ -1,0 +1,57 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true,
+        "node": true
+    },
+    "extends": [
+        "plugin:react/recommended",
+        "airbnb"
+    ],
+    "settings": {
+        "import/resolver": {
+            "eslint-import-resolver-custom-alias": {
+                "alias": {
+                    "@lib": "./lib",
+                    "@api": "./pages/api",
+                    "@styles": "./styles",
+                    "@components": "./components"
+                }
+            }
+        }
+    },
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react"
+    ],
+    "rules": {
+        "indent": [2, 4, { "SwitchCase": 1 }],
+        "max-len": [0],
+        "object-curly-newline": [0],
+        "import/no-extraneous-dependencies": [0],
+        "import/prefer-default-export": [0],
+        "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+        "react/jsx-props-no-spreading": [0],
+        "react/jsx-indent-props": [2, 4],
+        "react/jsx-indent": [2, 4],
+        "react/prop-types": [0],
+        "react/no-unescaped-entities": [0],
+        "react/function-component-definition": [0],
+        "react/react-in-jsx-scope": [0],
+        "no-restricted-syntax": [0],
+        "complexity": [2, 6],
+        "max-depth": [2, 2],
+        "max-lines-per-function": [2, 30]
+    },
+    "overrides": [
+        {
+            "files": ["components/*.js", "pages/*.js"],
+            "rules": {
+                "max-lines-per-function": [2, { "max": 200 }]
+            }
+        }
+    ]
+}

@@ -1,49 +1,40 @@
-# Build
+FROM node:18 AS build
 
-FROM node:12.20 AS build
-
-ENV GATSBY_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED 1
 
 WORKDIR /app
 
 COPY . /app
 
-ARG PREFIX_PATHS
+ARG NEXT_PUBLIC_BASE_PATH
 
-ARG POSTHOG_ENABLED
+RUN yarn install \
+    && yarn build \
+    && rm -rf node_modules \
+    && yarn install --prod --ignore-optional
 
-ARG POSTHOG_URL
-
-ARG POSTHOG_APIKEY
-
-RUN yarn install
-
-RUN npm run build
-
-RUN npm install -g node-pre-gyp
-
-RUN yarn install --prod --modules-folder public/node_modules
-
-# Production
-
-FROM node:12.20-buster-slim
-
-COPY --from=build /app/public /app/package.json /app/
-
-COPY --from=build /app/prisma /app/prisma
-
-COPY --from=build /app/prisma/schema.prisma /app/schema.prisma
-
-COPY docker-entrypoint.sh /usr/local/bin/
-
-RUN apt-get -qy update && apt-get -qy install openssl && rm -rf /var/lib/apt/lists/*
+FROM gcr.io/distroless/nodejs:18
 
 WORKDIR /app
 
+COPY --from=build /app/.next/ ./.next/
+
+COPY --from=build /app/.env ./.env
+
+COPY --from=build /app/public ./public
+
+COPY --from=build /app/lib ./lib
+
+COPY --from=build /app/next.config.js ./next.config.js
+
+COPY --from=build /app/package.json ./package.json
+
+COPY --from=build /app/node_modules/ ./node_modules/
+
 ENV NODE_ENV=production
 
-CMD ["node", "index.js"]
-
-ENTRYPOINT ["docker-entrypoint.sh"]
+VOLUME /app/data
 
 EXPOSE 3000
+
+CMD ["node_modules/.bin/next", "start"]

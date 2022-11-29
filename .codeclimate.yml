@@ -1,16 +1,7 @@
----
 engines:
   duplication:
-    enabled: false
-  eslint:
     enabled: true
-    channel: "eslint-4"
-  fixme:
-    enabled: true
-ratings:
-  paths:
-    - "**.js"
 exclude_paths:
+  - .next/
+  - __tests__/
   - node_modules/
-  - test/
-  - .github/

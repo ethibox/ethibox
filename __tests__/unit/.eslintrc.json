@@ -1,0 +1,9 @@
+{
+    "env": {
+        "jest/globals": true
+    },
+    "plugins": ["jest"],
+    "rules": {
+        "max-lines-per-function": [0]
+    }
+}

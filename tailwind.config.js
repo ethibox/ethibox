@@ -1,13 +1,9 @@
 module.exports = {
-    purge: false,
-    darkMode: 'class',
+    content: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
     theme: {
-        maxHeight: {
-            80: '80%',
-        },
+        extend: {},
     },
-    variants: {},
     plugins: [
-        require('@tailwindcss/forms'), // eslint-disable-line
+        import('@tailwindcss/forms'),
     ],
 };
