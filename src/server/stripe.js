@@ -56,7 +56,7 @@ export const upsertCustomer = async (stripe, userId, email, name = '') => {
 };
 
 export const invoiceList = async (stripe, userId) => {
-    const { data: invoices } = await stripe.invoices.list({ customer: userId });
+    const { data: invoices } = await stripe.invoices.list({ customer: userId, limit: 100 });
 
     return invoices;
 };
