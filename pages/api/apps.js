@@ -180,9 +180,10 @@ const putQuery = async (req, res, user) => {
 
     for await (const { name, value } of envs) {
         const [env] = await app.getEnvs({ where: { name }, raw: false });
-        env.value = value;
         await env.update({ value }, { where: { name } });
     }
+
+    const allEnvs = await app.getEnvs({ raw: true });
 
     const { repository } = template;
     const { stackfile: stackFile, url: repositoryUrl } = repository;
@@ -191,7 +192,7 @@ const putQuery = async (req, res, user) => {
         const customEnvStartName = `CUSTOM_ENV_${app.name.toUpperCase().replace(/-/g, '_')}_`;
 
         if (key.startsWith('CUSTOM_ENV_ALL_') || key.startsWith(customEnvStartName)) {
-            envs.push({
+            allEnvs.push({
                 name: key.replace('CUSTOM_ENV_ALL_', '').replace(customEnvStartName, ''),
                 value: decodeUnicode(process.env[key]),
             });
@@ -205,7 +206,7 @@ const putQuery = async (req, res, user) => {
         domain,
         email: user.email,
         envs: JSON.stringify(
-            envs.concat([
+            allEnvs.concat([
                 { name: 'DOMAIN', value: domain },
                 { name: 'NUMBER', value: `${app.id}` },
             ]),

@@ -237,6 +237,27 @@ describe('Given the apps API', () => {
                 }),
             );
         });
+
+        it('Should send webhook with envs from the database', async () => {
+            const req = { method: 'PUT', body: { releaseName: 'peertube1', envs: [{ name: 'SMTP_PORT', value: '465' }] } };
+            const app = await App.findOne({ where: { releaseName: 'peertube1' }, raw: false });
+            await app.createEnv({ name: 'POSTGRES_PASSWORD', value: 'cust0mp@ssword' });
+            const sendWebhook = jest.spyOn(utils, 'sendWebhook').mockImplementation(async () => {});
+
+            await appsEndpoint(req, mockApi(user), user);
+
+            expect(sendWebhook).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    envs: expect.stringContaining('POSTGRES_PASSWORD'),
+                }),
+            );
+
+            expect(sendWebhook).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    envs: expect.stringContaining('cust0mp@ssword'),
+                }),
+            );
+        });
     });
 
     describe('When a call to /api/apps is made with a DELETE method', () => {
