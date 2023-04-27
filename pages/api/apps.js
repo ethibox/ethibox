@@ -143,7 +143,7 @@ const putQuery = async (req, res, user) => {
     const app = apps.find((a) => a.releaseName === releaseName);
 
     if (apps.find((a) => a.domain === domain && a.releaseName !== releaseName)) {
-        return res.status(400).send({ message: 'Domain already exist' });
+        return res.status(400).send({ message: 'Domain already exists' });
     }
 
     const { templates } = await fetch(process.env.TEMPLATES_URL).then((r) => r.json());

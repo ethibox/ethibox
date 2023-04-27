@@ -180,7 +180,7 @@ describe('Given the apps API', () => {
 
             const res = await appsEndpoint(req, mockApi(user), user);
 
-            expect(res.message).toBe('Domain already exist');
+            expect(res.message).toBe('Domain already exists');
             expect(res.status).toBe(400);
         });
 
