@@ -63,4 +63,4 @@ jobs:
           docker push registry.ethibox.fr/ethibox:latest
           docker push registry.ethibox.fr/ethibox:${{ env.VERSION }}
 
-          curl -X POST https://portainer.ethibox.fr/api/stacks/webhooks/beb70b37-ab30-4d32-a06a-6bc5bca792e0
+          curl -X POST https://portainer.ethibox.fr/api/stacks/webhooks/23863b0b-7690-4015-b34d-5a81132ed6ef
