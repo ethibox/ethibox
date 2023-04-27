@@ -9,7 +9,7 @@
 > It allows you to get paid for hosting popular open-source web apps.
 > It is based on Docker and is compatible with any hosting provider.
 
-![screenshot](https://raw.githubusercontent.com/ethibox/ethibox/master/static/screenshot.jpg)
+![screenshot](https://i.imgur.com/m8SyBAh.png)
 
 ## ✨ Features
 
