@@ -1,7 +1,3 @@
 **/node_modules
-prisma/migrations
-prisma/*.db
-public
 .git
-.cache
-.env
+.next
