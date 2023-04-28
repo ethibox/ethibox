@@ -8,17 +8,19 @@ import { useTranslation } from 'react-i18next';
 export default ({ children, className }) => {
     const router = useRouter();
     const { notifications } = useNotification();
-    const { isLoggedIn } = useAuth();
+    const { isLoggedIn, logout } = useAuth();
     const { t } = useTranslation();
 
     useEffect(() => {
         if (notifications.find((n) => n.text === t('You are not authenticated'))) {
+            logout();
             router.push('/login');
         }
     }, [notifications]);
 
     useEffect(() => {
         if (!isLoggedIn) {
+            logout();
             router.push('/login');
         }
     }, []);
