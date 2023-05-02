@@ -86,6 +86,7 @@ export const postQuery = async (req, res) => {
     });
 
     await sendWebhook({
+        name,
         stackFile,
         repositoryUrl,
         ...app.dataValues,
