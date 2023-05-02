@@ -78,10 +78,15 @@ export const postQuery = async (req, res) => {
         const customEnvStartName = `CUSTOM_ENV_${name.toUpperCase().replace(/-/g, '_')}_`;
 
         if (key.startsWith('CUSTOM_ENV_ALL_') || key.startsWith(customEnvStartName)) {
-            envs.push({
-                name: key.replace('CUSTOM_ENV_ALL_', '').replace(customEnvStartName, ''),
-                value: decodeUnicode(process.env[key]),
-            });
+            const envName = key.replace('CUSTOM_ENV_ALL_', '').replace(customEnvStartName, '');
+            const envValue = decodeUnicode(process.env[key]);
+            const env = envs.find((e) => e.name === envName);
+
+            if (env) {
+                env.value = envValue;
+            } else {
+                envs.push({ name: envName, value: envValue });
+            }
         }
     });
 

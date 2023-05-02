@@ -153,6 +153,22 @@ describe('Given the apps API', () => {
                 }),
             );
         });
+
+        it('Should not duplicate custom envs with preset envs', async () => {
+            process.env.CUSTOM_ENV_NEXTCLOUD_OBJECTSTORE_S3_HOST = 's3.ethibox.fr';
+            const session = await createStripeCheckoutSession({ name: 'nextcloud' }, user);
+            const req = { method: 'POST', body: { sessionId: session.id } };
+            const sendWebhook = jest.spyOn(utils, 'sendWebhook').mockImplementation(async () => {});
+
+            await appsEndpoint(req, mockApi(user), user);
+
+            const hasDuplicates = (arr) => arr.length !== new Set(arr.map((obj) => obj.name)).size;
+            const webhook = sendWebhook.mock.calls[0][0];
+            const envs = JSON.parse(webhook.envs);
+            expect(hasDuplicates(envs)).toBe(false);
+            expect(envs.some((e) => e.name === 'OBJECTSTORE_S3_HOST')).toBe(true);
+            expect(envs.some((e) => e.value === 's3.ethibox.fr')).toBe(true);
+        });
     });
 
     describe('When a call to /api/apps is made with a PUT method', () => {
