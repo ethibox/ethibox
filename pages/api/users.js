@@ -33,7 +33,13 @@ const deleteQuery = async (_, res, user) => {
 
     for await (const app of apps) {
         await app.update({ state: 'deleted' });
-        await sendWebhook({ ...user, ...app, type: 'uninstall-app' });
+
+        await sendWebhook({
+            releaseName: app.releaseName,
+            name: app.name,
+            email: user.email,
+            type: 'uninstall-app',
+        });
     }
 
     return res.status(200).send({ message: 'User deleted' });
