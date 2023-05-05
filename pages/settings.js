@@ -155,9 +155,9 @@ export default () => {
                             </div>
 
                             <div className="my-4">
-                                <p className="capitalize block text-sm font-medium leading-5 text-gray-700 dark:text-gray-300 mb-1">{t('Payment method')}</p>
-                                <Button onClick={redirectToStripe} data-test="add-payment-method" loading={isRedirecting} secondary>
-                                    {t('Update payment method')}
+                                <p className="capitalize block text-sm font-medium leading-5 text-gray-700 dark:text-gray-300 mb-1">{t('Payment informations')}</p>
+                                <Button onClick={redirectToStripe} data-test="update-payment-informations" loading={isRedirecting} secondary>
+                                    {t('Update payment informations')}
                                 </Button>
                             </div>
                         </Panel>

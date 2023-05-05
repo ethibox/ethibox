@@ -17,7 +17,7 @@ describe('Given a user on the settings page', () => {
         it('Should add the payment method', () => {
             cy.visit('/settings');
 
-            cy.get('[data-test="add-payment-method"]').click();
+            cy.get('[data-test="update-payment-informations"]').click();
 
             cy.url().should('contain', 'billing.stripe.com');
         });
