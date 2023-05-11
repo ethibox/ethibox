@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
-import Stripe from 'stripe';
 import { protectRoute, sendWebhook, isValidPassword } from '@lib/utils';
 import { upsertCustomer } from '@lib/stripe';
 
@@ -20,9 +19,7 @@ const putQuery = async (body, res, user) => {
     }
 
     await user.update({ firstName, lastName });
-
-    const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-    await upsertCustomer(stripe, user.email, user.id, `${firstName} ${lastName}`);
+    await upsertCustomer(user.email, user.id, `${firstName} ${lastName}`);
 
     return res.status(200).send({ message: 'User updated' });
 };

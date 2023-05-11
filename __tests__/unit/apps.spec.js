@@ -1,6 +1,13 @@
 import puppeteer from 'puppeteer';
-import { resetDatabase, initDatabase, App, User } from '@lib/orm';
-import { createStripeCheckoutSession, getCustomerSubscriptions } from '@lib/stripe';
+import { resetDatabase, initDatabase, App, User, Env } from '@lib/orm';
+import {
+    createStripeCheckoutSession,
+    getCustomerSubscriptions,
+    createSubscription,
+    upsertPrice,
+    upsertProduct,
+    upsertCustomer,
+} from '@lib/stripe';
 import { mockApi } from '@lib/utils';
 import * as utils from '@lib/utils';
 import appsEndpoint from '@api/apps';
@@ -8,14 +15,14 @@ import appsEndpoint from '@api/apps';
 describe('Given the apps API', () => {
     let user;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         await resetDatabase();
         user = await initDatabase();
     });
 
     describe('When a call to /api/apps is made with a GET method', () => {
         it('Should return a list of apps', async () => {
-            const req = { method: 'GET', body: { name: 'wordpress' } };
+            const req = { method: 'GET' };
 
             const res = await appsEndpoint(req, mockApi(user), user);
 
@@ -26,6 +33,57 @@ describe('Given the apps API', () => {
             expect(apps[0].category).toBeDefined();
             expect(apps[0].domain).toBeDefined();
             expect(res.status).toBe(200);
+        });
+
+        it('Should return envs from templates.json', async () => {
+            const req = { method: 'GET' };
+            await Env.destroy({ where: { appId: 2 } });
+
+            const res = await appsEndpoint(req, mockApi(user), user);
+
+            const { envs } = res.apps[1];
+            expect(envs).toEqual(expect.arrayContaining([
+                expect.objectContaining({ name: 'SMTP_HOSTNAME' }),
+            ]));
+        });
+
+        it('Should not return preset envs', async () => {
+            await App.create({ releaseName: 'invoice-ninja1', domain: 'invoice-ninja1.localhost', userId: user.id });
+            const req = { method: 'GET' };
+
+            const res = await appsEndpoint(req, mockApi(user), user);
+
+            const { envs } = res.apps[2];
+            expect(envs).toEqual(expect.not.arrayContaining([
+                expect.objectContaining({ name: 'APP_KEY' }),
+            ]));
+            expect(envs).toEqual(expect.arrayContaining([
+                expect.objectContaining({ name: 'LOCK_SENT_INVOICES' }),
+            ]));
+        });
+
+        it('Should not return envs outside templates.json', async () => {
+            await Env.create({ appId: 2, name: 'POSTGRES_VERSION', value: '11-alpine' });
+            const req = { method: 'GET' };
+
+            const res = await appsEndpoint(req, mockApi(user), user);
+
+            const { envs } = res.apps[1];
+            expect(envs).toEqual(expect.not.arrayContaining([
+                expect.objectContaining({ name: 'POSTGRES_VERSION' }),
+            ]));
+        });
+
+        it('Should return env with the correct select option', async () => {
+            await Env.update({ value: 'true' }, { where: { appId: 2, name: 'SMTP_TLS' } });
+            const req = { method: 'GET' };
+
+            const res = await appsEndpoint(req, mockApi(user), user);
+
+            const { envs } = res.apps[1];
+            expect(envs).toEqual(expect.arrayContaining([
+                expect.objectContaining({ name: 'SMTP_TLS', value: 'true' }),
+            ]));
         });
     });
 
@@ -288,13 +346,17 @@ describe('Given the apps API', () => {
         });
 
         it('Should delete stripe subscription', async () => {
+            await App.create({ releaseName: 'ghost1', domain: 'ghost1.localhost', userId: user.id });
+            const product = await upsertProduct('Ghost');
+            const price = await upsertPrice(product, 19);
+            const customer = await upsertCustomer(user.email, user.id);
+            await createSubscription(customer.id, price.id, 7, { releaseName: 'ghost1' });
             const req = { method: 'DELETE', body: { releaseName: 'ghost1' } };
 
             await appsEndpoint(req, mockApi(user), user);
 
             const subscriptions = await getCustomerSubscriptions(user.id);
-            const subscription = subscriptions.find((s) => s.metadata.releaseName === 'ghost1');
-            expect(subscription).toBeUndefined();
-        });
+            expect(subscriptions.filter((s) => s.metadata.releaseName === 'ghost1').length).toBe(0);
+        }, 30000);
     });
 });
