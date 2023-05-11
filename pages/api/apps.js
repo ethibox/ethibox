@@ -116,7 +116,11 @@ const getQuery = async (req, res, user) => {
     apps = await Promise.all(apps.map(async (app) => {
         const template = templates.find((t) => t.title.toLowerCase() === app.name);
 
-        const envs = template?.env?.filter(({ preset }) => !preset) || [];
+        const envs = template?.env?.map((env) => ({
+            ...env,
+            select: (env.select || []).map((s) => ({ name: s.text, value: s.value || s.default })),
+        })).filter((env) => !env.preset) || [];
+
         const appEnvs = await app.getEnvs({ raw: true });
 
         appEnvs.forEach((env) => {
