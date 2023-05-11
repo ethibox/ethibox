@@ -11,6 +11,7 @@ import {
     protectRoute,
     sendWebhook,
     generateReleaseName,
+    generatePassword,
     checkDnsRecord,
     checkDomain,
     getDomainIp,
@@ -66,7 +67,7 @@ export const postQuery = async (req, res) => {
         }
 
         if (env.name === 'ADMIN_PASSWORD') {
-            value = Math.random().toString(36).slice(-8);
+            value = generatePassword();
         }
 
         env.value = value;

@@ -1,4 +1,4 @@
-import { getDomainIp, checkDnsRecord, checkDomain, decodeUnicode } from '@lib/utils';
+import { getDomainIp, checkDnsRecord, checkDomain, decodeUnicode, generatePassword } from '@lib/utils';
 
 describe('Given utils', () => {
     describe('When getDomainIp() is executed', () => {
@@ -91,6 +91,23 @@ describe('Given utils', () => {
             const result = decodeUnicode(str);
 
             expect(result).toBe('&');
+        });
+    });
+
+    describe('When generatePassword() is executed', () => {
+        it('Should return a password with 12 characters', () => {
+            const password = generatePassword();
+
+            expect(password).toHaveLength(12);
+        });
+
+        it('Should return a password with symbols', () => {
+            const password = generatePassword();
+            const symbols = '!@%&*_+';
+
+            const hasSymbol = symbols.split('').some((s) => password.includes(s));
+
+            expect(hasSymbol).toBe(true);
         });
     });
 });
