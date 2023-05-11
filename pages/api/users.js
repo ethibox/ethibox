@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
 import { protectRoute, sendWebhook, isValidPassword } from '@lib/utils';
-import { upsertCustomer } from '@lib/stripe';
+import { upsertCustomer, getCustomerSubscriptions, deleteSubscription } from '@lib/stripe';
 
 const getQuery = (_, res, user) => res.status(200).send({ user });
 
@@ -27,6 +27,12 @@ const putQuery = async (body, res, user) => {
 const deleteQuery = async (_, res, user) => {
     await user.update({ email: `deleted+${user.email}` }, { where: { id: user.id } });
     const apps = await user.getApps({ raw: false });
+
+    const subscriptions = await getCustomerSubscriptions(user.id);
+
+    for await (const subscription of subscriptions) {
+        await deleteSubscription(subscription.id);
+    }
 
     for await (const app of apps) {
         await app.update({ state: 'deleted' });
