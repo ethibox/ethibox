@@ -149,6 +149,8 @@ const putQuery = async (req, res, user) => {
     const apps = await user.getApps({ raw: false });
     const app = apps.find((a) => a.releaseName === releaseName);
 
+    if (!app) return res.status(400).send({ message: 'App not found' });
+
     if (apps.find((a) => a.domain === domain && a.releaseName !== releaseName)) {
         return res.status(400).send({ message: 'Domain already exists' });
     }
