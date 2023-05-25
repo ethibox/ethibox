@@ -12,7 +12,7 @@ export default protectRoute(async (req, res, user) => {
         url: invoice.hosted_invoice_url,
         total: invoice.amount_paid / 100,
         date: new Date(invoice.created * 1000),
-        description: invoice.lines.data[0].description,
+        description: invoice.lines.data[0]?.description,
         year: new Date(invoice.created * 1000).getFullYear(),
         status: `${invoice.status.charAt(0).toUpperCase()}${invoice.status.slice(1)}`,
         month: new Date(invoice.created * 1000).toLocaleString('default', { month: 'long' }),
