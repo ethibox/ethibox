@@ -212,6 +212,26 @@ describe('Given the apps API', () => {
             );
         });
 
+        it('Should send webhook with the first value of a select env type', async () => {
+            const session = await createStripeCheckoutSession({ name: 'nextcloud' }, user);
+            const req = { method: 'POST', body: { sessionId: session.id } };
+            const sendWebhook = jest.spyOn(utils, 'sendWebhook').mockImplementation(async () => {});
+
+            await appsEndpoint(req, mockApi(user), user);
+
+            expect(sendWebhook).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    envs: expect.stringContaining('FORCE_LANGUAGE'),
+                }),
+            );
+
+            expect(sendWebhook).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    envs: expect.stringContaining('fr'),
+                }),
+            );
+        });
+
         it('Should not duplicate custom envs with preset envs', async () => {
             process.env.CUSTOM_ENV_NEXTCLOUD_OBJECTSTORE_S3_HOST = 's3.ethibox.fr';
             const session = await createStripeCheckoutSession({ name: 'nextcloud' }, user);

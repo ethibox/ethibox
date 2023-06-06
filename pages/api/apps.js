@@ -60,19 +60,21 @@ export const postQuery = async (req, res) => {
     const app = await App.create({ releaseName, domain, userId: user.id, createdAt });
 
     for await (const env of envs) {
-        let { value } = env;
+        const { select } = env;
 
         if (env.name === 'ADMIN_EMAIL') {
-            value = user.email;
+            env.value = user.email;
         }
 
         if (env.name === 'ADMIN_PASSWORD') {
-            value = generatePassword();
+            env.value = generatePassword();
         }
 
-        env.value = value;
+        if (env.type === 'select') {
+            env.value = select[0].value;
+        }
 
-        await Env.create({ name: env.name, value, appId: app.id });
+        await Env.create({ name: env.name, value: env.value, appId: app.id });
     }
 
     Object.keys(process.env).forEach((key) => {
