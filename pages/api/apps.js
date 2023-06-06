@@ -203,10 +203,15 @@ const putQuery = async (req, res, user) => {
         const customEnvStartName = `CUSTOM_ENV_${app.name.toUpperCase().replace(/-/g, '_')}_`;
 
         if (key.startsWith('CUSTOM_ENV_ALL_') || key.startsWith(customEnvStartName)) {
-            allEnvs.push({
-                name: key.replace('CUSTOM_ENV_ALL_', '').replace(customEnvStartName, ''),
-                value: decodeUnicode(process.env[key]),
-            });
+            const envName = key.replace('CUSTOM_ENV_ALL_', '').replace(customEnvStartName, '');
+            const envValue = decodeUnicode(process.env[key]);
+            const env = allEnvs.find((e) => e.name === envName);
+
+            if (env) {
+                env.value = envValue;
+            } else {
+                allEnvs.push({ name: envName, value: envValue });
+            }
         }
     });
 
