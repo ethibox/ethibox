@@ -23,7 +23,7 @@ export default async (req) => {
 
     const user = await isAuthenticated(token, process.env.JWT_SECRET);
 
-    if (!process.env.STRIPE_SECRET_KEY) {
+    if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === 'sk_test_1234') {
         return new NextResponse(
             JSON.stringify({ success: false, message: 'Stripe secret key is not set' }),
             { status: 500, headers: { 'Content-Type': 'application/json' } },
