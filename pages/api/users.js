@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
+import { Op } from '@lib/orm';
 import { protectRoute, sendWebhook, isValidPassword } from '@lib/utils';
 import { upsertCustomer, getCustomerSubscriptions, deleteSubscription } from '@lib/stripe';
 
@@ -26,7 +27,7 @@ const putQuery = async (body, res, user) => {
 
 const deleteQuery = async (_, res, user) => {
     await user.update({ email: `deleted+${user.email}` }, { where: { id: user.id } });
-    const apps = await user.getApps({ raw: false });
+    const apps = await user.getApps({ where: { [Op.not]: { state: 'deleted' } }, raw: false });
 
     const subscriptions = await getCustomerSubscriptions(user.id);
 
