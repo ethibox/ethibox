@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { Card, Button, Link, useNotification } from '@johackim/design-system';
-import { ExternalLinkIcon } from '@heroicons/react/solid';
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid';
 import { useAuth } from '@lib/contexts';
 import { useTranslation } from 'react-i18next';
 import SidebarLayout from '@components/sidebarLayout';
@@ -60,7 +60,7 @@ export default (props) => {
                                 small
                             >
                                 <div className="flex">
-                                    <ExternalLinkIcon className="w-4 h-4 text-gray-500 mr-1" />
+                                    <ArrowTopRightOnSquareIcon className="w-4 h-4 text-gray-500 mr-1" />
                                     <Link href={website} target="_blank" className="text-xs underline">{t('More infos')}</Link>
                                 </div>
                                 <div className="mt-10">

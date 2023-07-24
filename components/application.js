@@ -1,8 +1,8 @@
 import { Card, Button, Link, Dropdown, Input, Select, useModal, useNotification } from '@johackim/design-system';
 import { useRouter } from 'next/router';
 import { useAuth, useForm, FormContext } from '@lib/contexts';
-import { ExternalLinkIcon } from '@heroicons/react/solid';
-import { TrashIcon } from '@heroicons/react/outline';
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid';
+import { TrashIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';
 import Percentage from '@components/percentage';
 
@@ -189,7 +189,7 @@ export default (app) => {
         >
             <Percentage updatedAt={updatedAt} />
             <div className="flex">
-                <ExternalLinkIcon className="w-4 h-4 text-gray-500 mr-1" />
+                <ArrowTopRightOnSquareIcon className="w-4 h-4 text-gray-500 mr-1" />
                 <Link href={`https://${domain}`} target="_blank" className="text-xs underline">{`https://${domain}`}</Link>
             </div>
             <div className="mt-8">

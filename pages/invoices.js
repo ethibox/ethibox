@@ -2,7 +2,7 @@ import { Empty, Button, Table, Loading } from '@johackim/design-system';
 import { useRouter } from 'next/router';
 import { useApi } from '@lib/contexts';
 import { useTranslation } from 'react-i18next';
-import { DocumentTextIcon } from '@heroicons/react/outline';
+import { DocumentTextIcon } from '@heroicons/react/24/outline';
 import SidebarLayout from '@components/sidebarLayout';
 
 export default () => {

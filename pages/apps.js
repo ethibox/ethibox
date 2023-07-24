@@ -8,7 +8,7 @@ import { postQuery } from '@api/apps';
 import { Button, Empty, Loading } from '@johackim/design-system';
 import { useApi } from '@lib/contexts';
 import { useTranslation } from 'react-i18next';
-import { ViewGridIcon } from '@heroicons/react/outline';
+import { Squares2X2Icon } from '@heroicons/react/24/outline';
 
 export default ({ confetti }) => {
     const router = useRouter();
@@ -33,7 +33,7 @@ export default ({ confetti }) => {
                 <Empty
                     title={t('No applications yet')}
                     subtitle={t('You can create your first application by clicking the button below')}
-                    icon={<ViewGridIcon className="w-20 m-auto text-gray-600" fille="none" />}
+                    icon={<Squares2X2Icon className="w-20 m-auto text-gray-600" fille="none" />}
                     button={<Button onClick={() => router.push('/')} type="button">{t('Go to the store')}</Button>}
                 />
             </SidebarLayout>
