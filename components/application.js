@@ -49,7 +49,8 @@ export default (app) => {
                     }
                 }).catch((e) => {
                     notification.add({ title: t('Error'), text: t(e.message), type: 'error' });
-                }).finally(() => {
+                })
+                .finally(() => {
                     setLoading(false);
                 });
 
