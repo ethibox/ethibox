@@ -47,6 +47,8 @@ export default (app) => {
                     } else {
                         notification.add({ title: t('Error'), text: t(message), type: 'error', timeout: 30 });
                     }
+                }).catch((e) => {
+                    notification.add({ title: t('Error'), text: t(e.message), type: 'error' });
                 }).finally(() => {
                     setLoading(false);
                 });
