@@ -6,3 +6,23 @@ module.exports = {
         locales: ['fr', 'en'],
     },
 };
+
+const { withSentryConfig } = require('@sentry/nextjs');
+
+module.exports = withSentryConfig(
+    module.exports,
+    {
+        silent: true,
+        org: 'ethibox',
+        project: 'ethibox',
+        url: 'https://glitchtip.ethibox.fr/',
+    },
+    {
+        widenClientFileUpload: true,
+        transpileClientSDK: true,
+        tunnelRoute: '/monitoring',
+        hideSourceMaps: true,
+        disableLogger: true,
+        automaticVercelMonitors: true,
+    },
+);

@@ -58,7 +58,11 @@ jobs:
           cp .env.dist .env
 
           docker build -t ethibox/ethibox:${{ env.VERSION }} -t ethibox/ethibox:latest .
-          docker build --build-arg NEXT_PUBLIC_BASE_PATH=/app -t registry.ethibox.fr/ethibox:${{ env.VERSION }} -t registry.ethibox.fr/ethibox:latest .
+          docker build \
+            --build-arg NEXT_PUBLIC_BASE_PATH=/app \
+            --build-arg SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} \
+            -t registry.ethibox.fr/ethibox:${{ env.VERSION }} \
+            -t registry.ethibox.fr/ethibox:latest .
 
           docker push ethibox/ethibox:latest
           docker push ethibox/ethibox:${{ env.VERSION }}
