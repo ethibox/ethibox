@@ -34,7 +34,7 @@ describe('Given the users endpoint', () => {
             const res = await usersEndpoint(req, mockApi(user), user);
 
             const deletedUser = await User.findOne({ where: { id: user.id }, raw: false });
-            expect(deletedUser.email).toEqual(`deleted+${user.email}`);
+            expect(deletedUser.email).toEqual(`deleted-${user.id}+${user.email}`);
             expect(res.message).toBe('User deleted');
             expect(res.status).toBe(200);
         });

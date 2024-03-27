@@ -26,7 +26,7 @@ const putQuery = async (body, res, user) => {
 };
 
 const deleteQuery = async (_, res, user) => {
-    await user.update({ email: `deleted+${user.email}` }, { where: { id: user.id } });
+    await user.update({ email: `deleted-${user.id}+${user.email}` }, { where: { id: user.id } });
     const apps = await user.getApps({ where: { [Op.not]: { state: 'deleted' } }, raw: false });
 
     const subscriptions = await getCustomerSubscriptions(user.id);

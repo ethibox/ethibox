@@ -31,12 +31,18 @@ export default () => {
         await fetch(`${router.basePath}/api/users`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${auth?.user?.token}` },
-        });
+        }).then(async (res) => {
+            if (res.status !== 200) {
+                throw new Error('An error occurred while deleting your account');
+            }
 
-        localStorage.removeItem('user');
-        router.push('/login');
-        notification.add({ title: t('Delete account'), text: t('Your account has been deleted'), timeout: 5 });
-        modal.remove('confirm-delete-account');
+            notification.add({ title: t('Delete account'), text: t('Your account has been deleted'), timeout: 5 });
+            modal.remove('confirm-delete-account');
+            auth.logout();
+            router.push('/login');
+        }).catch(({ message }) => {
+            notification.add({ title: t('Error'), text: t(message), type: 'error', timeout: 5 });
+        });
     };
 
     const openModal = () => {
