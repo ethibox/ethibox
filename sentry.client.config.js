@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 
 Sentry.init({
-    dsn: 'https://780ad3ea6f3246649198ce9eb00cdda5@glitchtip.ethibox.fr/1',
+    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
     tracesSampleRate: 1,
     debug: false,
     replaysOnErrorSampleRate: 1.0,

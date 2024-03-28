@@ -65,6 +65,7 @@ jobs:
           docker build \
             --build-arg NEXT_PUBLIC_BASE_PATH=/app \
             --build-arg SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} \
+            --build-arg NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }} \
             -t registry.ethibox.fr/ethibox:${{ env.VERSION }} \
             -t registry.ethibox.fr/ethibox:latest .
 
