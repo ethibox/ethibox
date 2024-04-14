@@ -9,20 +9,20 @@ const getQuery = (_, res, user) => res.status(200).send({ user });
 const putQuery = async (body, res, user) => {
     const { firstName = '', lastName = '', password } = body || {};
 
-    if (!firstName && !lastName && !password) {
-        return res.status(400).send({ message: 'Missing required parameters' });
+    if (firstName && lastName) {
+        await user.update({ firstName, lastName });
+        await upsertCustomer(user.email, user.id, `${firstName} ${lastName}`);
+        return res.status(200).send({ message: 'User updated' });
     }
 
     if (password) {
         await isValidPassword(password).catch((err) => res.status(401).send({ message: err.message }));
         const hashPassword = await bcrypt.hash(password, 10);
         await user.update({ password: hashPassword });
+        return res.status(200).send({ message: 'Password updated' });
     }
 
-    await user.update({ firstName, lastName });
-    await upsertCustomer(user.email, user.id, `${firstName} ${lastName}`);
-
-    return res.status(200).send({ message: 'User updated' });
+    return res.status(400).send({ message: 'Missing required parameters' });
 };
 
 const deleteQuery = async (_, res, user) => {
