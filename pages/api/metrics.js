@@ -21,7 +21,7 @@ export default async (req, res) => {
     await register.resetMetrics();
 
     const ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress).replace('::ffff:', '');
-    const authorizedIps = ['172.17.0.0/16', '10.0.0.0/16', '10.10.0.0/16', '127.0.0.1', '::1'];
+    const authorizedIps = ['172.17.0.0/16', '10.0.0.0/16', '10.10.0.0/16', '127.0.0.1', '::1', process.env.AUTHORIZED_IP];
 
     const isAuthorized = authorizedIps.some((range) => ipRangeCheck(ip, range));
 
