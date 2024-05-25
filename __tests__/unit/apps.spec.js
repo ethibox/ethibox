@@ -126,7 +126,7 @@ describe('Given the apps API', () => {
 
             if (await page.evaluate(() => !!document.querySelector('#cardNumber'))) {
                 await page.type('#cardNumber', '4242 4242 4242 4242');
-                await page.type('#cardExpiry', '0424');
+                await page.type('#cardExpiry', '1234');
                 await page.type('#cardCvc', '123');
                 await page.type('#billingName', 'John Doe');
             }
