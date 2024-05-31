@@ -5,19 +5,9 @@
 [![Build](https://img.shields.io/github/actions/workflow/status/ethibox/ethibox/deploy.yml?label=Build&style=flat&colorA=2B323B&colorB=1e2329)](https://github.com/ethibox/ethibox/actions)
 [![Code Climate](https://img.shields.io/codeclimate/maintainability/ethibox/ethibox.svg?label=Maintainability&style=flat&colorA=2B323B&colorB=1e2329)](https://codeclimate.com/github/ethibox/ethibox)
 
-> Ethibox is an open-source web apps hoster.
-> It allows you to get paid for hosting popular open-source web apps.
-> It is based on Docker and is compatible with any hosting provider.
+> Ethibox is an open-source web app hoster
 
 ![screenshot](https://i.imgur.com/m8SyBAh.png)
-
-## ✨ Features
-
-- **Open-source**: Ethibox is an open-source project, you can contribute to it and make it better.
-- **Easy to use**: Ethibox is easy to use, you can install it in less than 5 minutes.
-- **Secure**: Ethibox is secure, it uses Docker to isolate apps and it is compatible with any hosting provider.
-- **Compatible**: Ethibox is compatible with any hosting provider, you can host it on your own server.
-- **Stripe integration**: Ethibox is integrated with Stripe, you can get paid for hosting apps.
 
 ## 📦 Installation
 
