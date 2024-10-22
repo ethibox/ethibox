@@ -82,8 +82,7 @@ export const getStaticProps = async () => {
 
     const templates = ((await fetch(TEMPLATES_URL).then((res) => res.json())).templates || [])
         .map(({ title, categories, ...rest }) => ({ name: title, category: categories[0], ...rest }))
-        .filter(({ enabled }) => enabled)
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .filter(({ enabled }) => enabled);
 
     return {
         props: { templates },
