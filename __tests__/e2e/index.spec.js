@@ -29,6 +29,7 @@ describe('Given a user on the home page', () => {
             cy.get('[data-test="install-app"]:first').click();
             cy.wait('@getStripe').then(() => {
                 cy.visit(stripeCheckoutUrl);
+                cy.get('[data-testid="card-accordion-item"]').click();
                 cy.get('#cardNumber').type('4242424242424242');
                 cy.get('#cardExpiry').type('1234');
                 cy.get('#cardCvc').type('424');

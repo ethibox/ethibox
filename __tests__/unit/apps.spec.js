@@ -124,6 +124,10 @@ describe('Given the apps API', () => {
             await page.goto(session.url);
             await page.waitForSelector('.SubmitButton');
 
+            if (await page.evaluate(() => !!document.querySelector('[data-testid="card-accordion-item"]'))) {
+                await page.click('[data-testid="card-accordion-item"]');
+            }
+
             if (await page.evaluate(() => !!document.querySelector('#cardNumber'))) {
                 await page.type('#cardNumber', '4242 4242 4242 4242');
                 await page.type('#cardExpiry', '1234');
