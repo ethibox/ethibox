@@ -1,113 +1,80 @@
-import { getDomainIp, checkDnsRecord, checkDomain, decodeUnicode, generatePassword } from '@lib/utils';
+import dns from 'dns';
+import { jest } from '@jest/globals';
+import { isDisposableDomain, triggerWebhook, getDomainIp, isValidDomain, getCustomEnvs } from '../../lib/utils';
 
-describe('Given utils', () => {
-    describe('When getDomainIp() is executed', () => {
-        it('Should return the IP of the domain', async () => {
-            const domain = 'ethibox.fr';
+test('Should get domain IP', async () => {
+    const ip = await getDomainIp('localhost');
 
-            const ip = await getDomainIp(domain);
+    expect(ip).toBe('127.0.0.1');
+});
 
-            expect(ip).toBeDefined();
-        });
+test('Should check disposable email domains', async () => {
+    const isDisposable = await isDisposableDomain('yopmail.com');
+    expect(isDisposable).toBe(true);
+});
+
+test('Should not trigger webhook without URL', async () => {
+    delete process.env.WEBHOOK_URL;
+
+    const res = await triggerWebhook('APP_INSTALLED', { name: 'nextcloud' });
+
+    expect(res).toBe(false);
+});
+
+test('Should trigger webhook successfully', async () => {
+    process.env.WEBHOOK_URL = 'https://ethibox.fr';
+
+    const res = await triggerWebhook('APP_INSTALLED', { name: 'nextcloud' });
+
+    expect(res.ok).toBe(true);
+});
+
+test('Should fail webhook on invalid URL', async () => {
+    process.env.WEBHOOK_URL = 'http://localhost:1234';
+
+    const res = await triggerWebhook('APP_INSTALLED', { name: 'nextcloud' });
+
+    expect(res).toBe(false);
+});
+
+test('Should reject invalid domain format', async () => {
+    await expect(isValidDomain('invalid-domain', '127.0.0.1')).rejects.toThrow('domain_invalid');
+    await expect(isValidDomain('http://example.com', '127.0.0.1')).rejects.toThrow('domain_invalid');
+});
+
+test('Should reject domain with wrong IP', async () => {
+    await expect(isValidDomain('example.com', '127.0.0.1')).rejects.toThrow('domain_dns_error');
+});
+
+test('Should validate domain with correct IP', async () => {
+    expect(await isValidDomain('ethibox.fr', '51.210.159.184')).toBe(true);
+});
+
+test('Should allow custom domain names', async () => {
+    expect(await isValidDomain('custom.localhost', '127.0.0.1')).toBe(true);
+});
+
+test('Should reject domains with app names and numbers', async () => {
+    await expect(isValidDomain('wordpress.localhost', '127.0.0.1')).rejects.toThrow('domain_reserved');
+    await expect(isValidDomain('wordpress1.localhost', '127.0.0.1')).rejects.toThrow('domain_reserved');
+});
+
+test('Should allow custom domain names with app name and numbers from other root domains', async () => {
+    const originalLookup = dns.lookup;
+    dns.lookup = jest.fn((_, __, callback) => {
+        callback(null, '127.0.0.1');
     });
 
-    describe('When getDomainIp() is executed with localhost', () => {
-        it('Should return 127.0.0.1', async () => {
-            const domain = 'localhost';
+    expect(await isValidDomain('nextcloud1.example.com', '127.0.0.1')).toBe(true);
 
-            const ip = await getDomainIp(domain);
+    dns.lookup = originalLookup;
+});
 
-            expect(ip).toBe('127.0.0.1');
-        });
-    });
+test('Should get custom envs only for corresponding apps', () => {
+    process.env.CUSTOM_ENV_WEKAN_SMTP_HOST = 'smtp.example.com';
+    process.env.CUSTOM_ENV_NEXTCLOUD_OBJECTSTORE_S3_HOST = 's3.example.com';
 
-    describe('When getDomainIp() is executed with an invalid domain', () => {
-        it('Should return false', async () => {
-            const domain = 'bad.domain';
+    const envs = getCustomEnvs('nextcloud');
 
-            const ip = await getDomainIp(domain);
-
-            expect(ip).toBe(false);
-        });
-    });
-
-    describe('When checkDnsRecord() is executed', () => {
-        it('Should return true', async () => {
-            const domain = 'ethibox.fr';
-            const ip = await getDomainIp(domain);
-
-            const result = await checkDnsRecord(domain, ip);
-
-            expect(result).toBe(true);
-        });
-    });
-
-    describe('When checkDnsRecord() is executed with an invalid domain', () => {
-        it('Should return error', async () => {
-            const domain = 'bad.domain';
-            const ip = await getDomainIp(domain);
-
-            await checkDnsRecord(domain, ip).catch(({ message }) => {
-                expect(message).toBe('DNS record not found');
-            });
-        });
-    });
-
-    describe('When checkDnsRecord() is executed with a localhost domain', () => {
-        it('Should not return error', async () => {
-            const domain = 'localhost';
-            const ip = await getDomainIp(domain);
-
-            const result = await checkDnsRecord(domain, ip);
-
-            expect(result).toBe(true);
-        });
-    });
-
-    describe('When checkDomain() is executed with a valid domain', () => {
-        it('Should return true', async () => {
-            const domain = 'custom.localhost';
-
-            const result = await checkDomain(domain);
-
-            expect(result).toBe(true);
-        });
-    });
-
-    describe('When checkDomain() is executed with an invalid domain', () => {
-        it('Should return false', async () => {
-            const check1 = await checkDomain('wordpress.localhost');
-            const check2 = await checkDomain('wordpress1.localhost');
-
-            expect(check1).toBe(false);
-            expect(check2).toBe(false);
-        });
-    });
-
-    describe('When decodeUnicode() is executed', () => {
-        it('Should return the decoded string', () => {
-            const str = '\\u0026';
-
-            const result = decodeUnicode(str);
-
-            expect(result).toBe('&');
-        });
-    });
-
-    describe('When generatePassword() is executed', () => {
-        it('Should return a password with 12 characters', () => {
-            const password = generatePassword();
-
-            expect(password).toHaveLength(12);
-        });
-
-        it('Should return a password with symbols', () => {
-            const password = generatePassword();
-            const symbols = '!@%&*_+';
-
-            const hasSymbol = symbols.split('').some((s) => password.includes(s));
-
-            expect(hasSymbol).toBe(true);
-        });
-    });
+    expect(envs).toEqual([{ name: 'OBJECTSTORE_S3_HOST', value: 's3.example.com' }]);
 });

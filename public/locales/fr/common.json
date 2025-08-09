@@ -1,0 +1,253 @@
+{
+    "settings": {
+        "title": "Paramètres",
+        "description": "Gérez les paramètres de votre compte",
+        "language": {
+            "title": "Langue",
+            "description": "Changez la langue d'affichage de l'application.",
+            "label": "Langue"
+        },
+        "account": {
+            "title": "Informations du compte",
+            "description": "Gérez les informations associées à votre compte",
+            "email": "Adresse e-mail",
+            "firstName": "Prénom",
+            "lastName": "Nom de famille",
+            "deleteAccount": "Supprimer mon compte",
+            "modal": {
+                "title": "Supprimer le compte",
+                "description": "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.",
+                "confirm": "Supprimer mon compte",
+                "cancel": "Annuler"
+            },
+            "save": "Enregistrer",
+            "success": {
+                "title": "Paramètres enregistrés",
+                "description": "Les paramètres de votre compte ont été enregistrés avec succès."
+            }
+        },
+        "payment": {
+            "title": "Moyen de paiement",
+            "description": "Gérez votre moyen de paiement via Stripe.",
+            "currentMethod": {
+                "text1": "Votre moyen de paiement actuel est une carte",
+                "text2": "se terminant par"
+            },
+            "manage": "Gérer",
+            "noMethod": "Vous n'avez pas de moyen de paiement enregistré.",
+            "addMethod": "Ajouter un moyen de paiement"
+        }
+    },
+    "index": {
+        "title": "Boutique d'applications",
+        "description": "Une sélection des meilleures applications open-source",
+        "moreInfos": "Plus d'infos",
+        "install": "Installer l'application",
+        "loading": "Chargement...",
+        "notifications": {
+            "payment": {
+                "title": "Moyen de paiement requis",
+                "description": "Votre compte nécessite un moyen de paiement pour installer cette application.",
+                "button": "Ajouter un moyen de paiement"
+            },
+            "failed": {
+                "title": "L'installation a échoué",
+                "description": "Une erreur inconnue est survenue."
+            }
+        }
+    },
+    "invoices": {
+        "loading": "Chargement...",
+        "empty": {
+            "title": "Aucune facture",
+            "subtitle": "Vous n'avez pas encore de facture",
+            "button": "Aller à la boutique"
+        },
+        "title": "Factures",
+        "description": "La liste de toutes vos factures",
+        "table": {
+            "number": "Numéro",
+            "date": "Date",
+            "description": "Description",
+            "total": "Total",
+            "status": "Statut",
+            "view": "Voir la facture",
+            "invoiceSR": " la facture"
+        },
+        "status": {
+            "paid": "Payée",
+            "open": "Ouverte",
+            "uncollectible": "Non recouvrable",
+            "void": "Annulée"
+        }
+    },
+    "navigation": {
+        "home": "Accueil",
+        "applications": "Applications",
+        "invoices": "Factures", 
+        "settings": "Paramètres",
+        "signOut": "Se déconnecter",
+        "openSidebar": "Ouvrir le menu",
+        "closeSidebar": "Fermer le menu"
+    },
+    "apps": {
+        "loading": "Chargement...",
+        "progress": "Action en cours",
+        "title": "Vos applications",
+        "description": "Gérez facilement vos applications",
+        "empty": {
+            "title": "Aucune application pour le moment",
+            "subtitle": "Vous pouvez créer votre première application en cliquant sur le bouton ci-dessous",
+            "button": "Aller à la boutique"
+        },
+        "settings": {
+            "button": "Paramètres",
+            "modal": {
+                "title": "Gérez votre application {{name}}",
+                "description": "Vous pouvez modifier les paramètres de votre application ici",
+                "domainLabel": "Nom de domaine",
+                "update": "Mettre à jour",
+                "back": "Retour",
+                "uninstall": "Désinstaller l'application"
+            }
+        },
+        "delete": {
+            "modal": {
+                "title": "Confirmer la suppression de l'application",
+                "description": "En supprimant votre application, vous supprimerez également toutes les données de votre application et annulerez votre facturation associée.",
+                "question": "Êtes-vous sûr de vouloir désinstaller votre application ?",
+                "uninstall": "Désinstaller",
+                "cancel": "Annuler"
+            }
+        },
+        "notifications": {
+            "updated": {
+                "title": "Application mise à jour",
+                "description": "Les paramètres de votre application ont été enregistrés avec succès."
+            },
+            "uninstalled": {
+                "title": "Application désinstallée",
+                "description": "Votre application a été désinstallée avec succès."
+            }
+        },
+        "loadingStates": {
+            "default": "Chargement...",
+            "updating": "Mise à jour...",
+            "deleting": "Suppression...",
+            "saving": "Enregistrement..."
+        },
+        "error": {
+            "title": "Erreur"
+        }
+    },
+    "login": {
+        "title": "Connectez-vous à votre compte",
+        "email": {
+            "label": "Adresse e-mail",
+            "placeholder": "vous@exemple.com"
+        },
+        "password": {
+            "label": "Mot de passe",
+            "placeholder": "Mot de passe",
+            "forgot": "Mot de passe oublié ?"
+        },
+        "submit": "Se connecter",
+        "submitting": "Connexion...",
+        "notMember": "Pas encore membre ?",
+        "createAccount": "Créer un nouveau compte",
+        "error": {
+            "title": "Erreur",
+            "defaultMessage": "Échec de la connexion"
+        }
+    },
+    "forgot": {
+        "title": "Mot de passe oublié ?",
+        "description": "Entrez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+        "email": {
+            "label": "Adresse e-mail",
+            "placeholder": "vous@exemple.com"
+        },
+        "submit": "Envoyer l'e-mail de réinitialisation",
+        "submitting": "Envoi...",
+        "remembered": "Vous vous souvenez de votre mot de passe ?",
+        "signIn": "Se connecter",
+        "success": {
+            "title": "Succès",
+            "message": "Si votre adresse email est associée à un compte, vous recevrez un email sous peu."
+        },
+        "error": {
+            "title": "Erreur",
+            "defaultMessage": "Échec de l'envoi de l'e-mail de réinitialisation",
+            "invalidEmail": "Votre adresse e-mail est invalide"
+        }
+    },
+    "register": {
+        "title": "Créer un nouveau compte",
+        "email": {
+            "label": "Adresse e-mail",
+            "placeholder": "vous@exemple.com"
+        },
+        "password": {
+            "label": "Mot de passe",
+            "placeholder": "Mot de passe"
+        },
+        "submit": "S'inscrire",
+        "submitting": "Inscription...",
+        "alreadyMember": "Déjà membre ?",
+        "signIn": "Connectez-vous à votre compte",
+        "error": {
+            "title": "Erreur",
+            "defaultMessage": "Échec de l'inscription",
+            "invalidEmail": "Votre adresse e-mail est invalide"
+        }
+    },
+    "resetPassword": {
+        "title": "Réinitialiser votre mot de passe",
+        "newPassword": {
+            "label": "Nouveau mot de passe",
+            "placeholder": "Nouveau mot de passe"
+        },
+        "confirmPassword": {
+            "label": "Confirmer le nouveau mot de passe",
+            "placeholder": "Confirmer le nouveau mot de passe"
+        },
+        "submit": "Réinitialiser le mot de passe",
+        "submitting": "Réinitialisation...",
+        "backToSignIn": "Retour à la connexion",
+        "success": {
+            "title": "Succès",
+            "message": "Votre mot de passe a été réinitialisé. Vous pouvez maintenant vous connecter."
+        },
+        "error": {
+            "title": "Erreur",
+            "passwordMismatch": "Les mots de passe ne correspondent pas.",
+            "defaultMessage": "Échec de la réinitialisation du mot de passe."
+        }
+    },
+    "logout": {
+        "loading": "Déconnexion..."
+    },
+    "api": {
+        "template_not_found": "Modèle non trouvé",
+        "no_payment_method": "Aucun moyen de paiement trouvé",
+        "app_not_found": "Application non trouvée",
+        "domain_already_exists": "Le domaine existe déjà",
+        "unauthorized": "Non autorisé",
+        "method_not_allowed": "Méthode non autorisée",
+        "invalid_credentials": "Identifiants invalides",
+        "not_authorized": "Vous n'êtes pas autorisé",
+        "user_with_email_exists": "Un utilisateur avec cet email existe déjà",
+        "missing_token": "Jeton manquant",
+        "invalid_or_expired_token": "Jeton invalide ou expiré",
+        "stripe_not_enabled": "Stripe n'est pas activé",
+        "user_not_found": "Utilisateur non trouvé",
+        "invalid_password": "Le mot de passe doit comporter au moins 8 caractères et contenir au moins un chiffre, une lettre minuscule et une lettre majuscule.",
+        "invalid_email": "Adresse e-mail invalide",
+        "password_too_short": "Votre mot de passe doit contenir au moins 6 caractères",
+        "password_no_symbol": "Votre mot de passe doit contenir un symbole",
+        "email_disposable": "Les adresses e-mail jetables ne sont pas autorisées",
+        "domain_invalid": "Nom de domaine invalide",
+        "domain_reserved": "{{domain}} est un nom de domaine réservé.",
+        "domain_dns_error": "Veuillez configurer une zone DNS de type A correcte pour votre domaine {{domain}} avec l'ip {{ip}} chez votre registraire (ex: Gandi, OVH, Online, 1&1)"
+    }
+} 

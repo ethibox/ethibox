@@ -1,7 +1,0 @@
-engines:
-  duplication:
-    enabled: true
-exclude_paths:
-  - .next/
-  - __tests__/
-  - node_modules/

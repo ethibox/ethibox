@@ -1,91 +1,115 @@
-import { useState } from 'react';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Card, Button, Link, useNotification } from '@johackim/design-system';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid';
-import { useAuth } from '@lib/contexts';
-import { useTranslation } from 'react-i18next';
-import SidebarLayout from '@components/sidebarLayout';
+import { Notification, Button, Layout } from '../components';
+import { fetchTemplates } from '../lib/utils';
+import nextI18nextConfig from '../next-i18next.config.mjs';
 
-export default (props) => {
-    const auth = useAuth();
-    const notification = useNotification();
-    const [templates, setTemplates] = useState(props.templates); // eslint-disable-line
-    const { basePath, locale } = useRouter();
-    const { t } = useTranslation();
+export default ({ templates, appName = null, stripeEnabled = false }) => {
+    const { t } = useTranslation('common');
+    const router = useRouter();
+    const [isLoading, setLoading] = useState(appName);
+    const [notification, setNotification] = useState({ show: false, title: '', description: '', icon: null });
 
-    const install = (name) => {
-        if (templates.find((temp) => temp.isLoading)) return;
+    const handleInstall = async (name) => {
+        if (isLoading && isLoading !== name) return;
 
-        setTemplates(templates.map((temp) => (temp.name === name ? { ...temp, isLoading: true } : temp)));
+        setLoading(name);
 
-        const baseUrl = `${window.location.protocol}//${window.location.host}${basePath}/${locale}`;
+        const returnUrl = `${window.location.origin}${router.basePath}/${router.locale}`;
 
-        fetch(`${basePath}/api/stripe`, {
+        fetch(`${router.basePath}/api/apps`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${auth?.user?.token}` },
-            body: JSON.stringify({ baseUrl, name, locale }),
+            headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
+            body: JSON.stringify({ name, returnUrl }),
         })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.url && window.Cypress === undefined) {
-                    window.location.replace(data.url);
-                } else {
-                    notification.add({ title: t('Error'), text: t(data.message), type: 'error', timeout: 5 });
-                    setTemplates(templates.map((temp) => (temp.name === name ? { ...temp, isLoading: false } : temp)));
+            .then(async (res) => {
+                const { url, message } = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(message);
                 }
+
+                router.push(url);
+            })
+            .catch(({ message }) => {
+                setNotification({
+                    show: true,
+                    title: t('index.notifications.failed.title'),
+                    description: message || t('index.notifications.failed.description'),
+                    icon: Notification.XCircleIcon,
+                });
+                setLoading(false);
             });
     };
 
-    return (
-        <SidebarLayout>
-            <div className="py-6">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-2xl font-semibold text-gray-900">{t('Application Store')}</h1>
-                    <h2 className="mt-1 text-sm text-gray-500">{t('A selection of the best open-source applications')}</h2>
-                </div>
+    useEffect(() => {
+        if (!appName) return;
+        router.replace('/', undefined, { shallow: true });
+        handleInstall(appName);
+    }, [appName]);
 
-                <div className="container px-4 sm:px-6 md:px-8 my-10">
-                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 items-stretch">
-                        {templates.map(({ name, logo, category, website, isLoading }) => (
-                            <Card
-                                key={name}
-                                name={name}
-                                value={category}
-                                data-test="app"
-                                header={(
-                                    <span className="text-sm text-gray-700 dark:text-gray-300 float-right">
-                                        <img src={logo} className="w-14 h-14" alt="logo" />
-                                    </span>
-                                )}
-                                small
-                            >
-                                <div className="flex">
+    return (
+        <Layout stripeEnabled={stripeEnabled}>
+            <Notification
+                show={notification.show}
+                icon={notification.icon}
+                title={notification.title}
+                button={notification.button}
+                description={notification.description}
+                onClose={() => setNotification((s) => ({ ...s, show: false }))}
+            />
+
+            <h1 className="text-2xl font-semibold text-gray-900">{t('index.title')}</h1>
+            <h2 className="mt-1 text-sm text-gray-500">{t('index.description')}</h2>
+
+            <div className="container my-10">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {templates.map(({ name, category, website, logo }) => (
+                        <div key={name} data-test="app" className="overflow-hidden rounded-lg bg-white shadow-sm">
+                            <div className="px-4 py-5">
+                                <span className="text-sm text-gray-700 float-right">
+                                    <img src={logo} className="w-14 h-14" alt={name} />
+                                </span>
+                                <p className="text-sm font-semibold block">{name}</p>
+                                <p className="text-sm text-gray-500">{category}</p>
+
+                                <div className="flex mt-4">
                                     <ArrowTopRightOnSquareIcon className="w-4 h-4 text-gray-500 mr-1" />
-                                    <Link href={website} target="_blank" className="text-xs underline">{t('More infos')}</Link>
+                                    <Link href={website} target="_blank" className="text-xs underline" rel="noreferrer">{t('index.moreInfos')}</Link>
                                 </div>
-                                <div className="mt-10">
-                                    <Button onClick={() => install(name)} data-test="install-app" className="w-full" loading={isLoading} secondary>
-                                        {t('Install application')}
-                                    </Button>
-                                </div>
-                            </Card>
-                        ))}
-                    </div>
+                            </div>
+
+                            <div className="p-4">
+                                <Button className="w-full" onClick={() => handleInstall(name)} loading={isLoading === name} loadingText={t('index.loading')} secondary>{t('index.install')}</Button>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
-        </SidebarLayout>
+        </Layout>
     );
 };
 
-export const getStaticProps = async () => {
-    const { TEMPLATES_URL } = process.env;
-
-    const templates = ((await fetch(TEMPLATES_URL).then((res) => res.json())).templates || [])
-        .map(({ title, categories, ...rest }) => ({ name: title, category: categories[0], ...rest }))
-        .filter(({ enabled }) => enabled);
-
-    return {
-        props: { templates },
-        revalidate: 86400,
+export const getServerSideProps = async ({ query, locale }) => {
+    const props = {
+        templates: await fetchTemplates(),
+        stripeEnabled: !!process.env.STRIPE_SECRET_KEY,
+        ...(await serverSideTranslations(locale, ['common'], nextI18nextConfig)),
     };
+
+    const sessionId = query.session_id || null;
+
+    if (!process.env.STRIPE_SECRET_KEY || !sessionId) return { props };
+
+    const { getStripeCheckoutSession } = await import('../lib/stripe');
+
+    const session = await getStripeCheckoutSession(sessionId);
+
+    if (!session) return { props };
+
+    return { props: { ...props, appName: session?.metadata?.appName } };
 };

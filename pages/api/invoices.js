@@ -1,22 +1,23 @@
-import 'dotenv/config';
-import Stripe from 'stripe';
-import { protectRoute } from '@lib/utils';
+import { User } from '../../lib/orm';
+import { useTranslation } from '../../lib/utils';
+import { getStripeInvoices } from '../../lib/stripe';
 
-export default protectRoute(async (req, res, user) => {
-    const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+export default async (req, res) => {
+    const t = useTranslation(req?.headers?.['accept-language']);
+    const email = req.headers['x-user-email'];
 
-    const { data } = await stripe.invoices.list({ customer: user.id, limit: 100 }).catch(() => ({ data: [] }));
+    const user = await User.findOne({ where: { email }, raw: false }).catch(() => false);
 
-    const invoices = data.map((invoice) => ({
-        ...invoice,
-        url: invoice.hosted_invoice_url,
-        total: invoice.amount_paid / 100,
-        date: new Date(invoice.created * 1000),
-        description: invoice.lines.data[0]?.description,
-        year: new Date(invoice.created * 1000).getFullYear(),
-        status: `${invoice.status.charAt(0).toUpperCase()}${invoice.status.slice(1)}`,
-        month: new Date(invoice.created * 1000).toLocaleString('default', { month: 'long' }),
-    }));
+    if (!user) {
+        res.setHeader('Set-Cookie', 'token=; HttpOnly; Path=/; Max-Age=-1');
+        return res.status(401).json({ message: t('unauthorized') });
+    }
 
-    return res.status(200).send({ invoices });
-});
+    if (req.method === 'GET') {
+        const invoices = process.env.STRIPE_SECRET_KEY ? await getStripeInvoices(user) : [];
+        return res.status(200).json(invoices || []);
+    }
+
+    res.setHeader('Allow', ['GET']);
+    return res.status(405).end(t('method_not_allowed'));
+};

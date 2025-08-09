@@ -1,57 +1,63 @@
-import 'dotenv/config';
-import registerEndpoint from '@api/register';
-import { resetDatabase, User } from '@lib/orm';
-import { mockApi } from '@lib/utils';
+import { jest } from '@jest/globals';
+import handler from '../../pages/api/register';
+import { User } from '../../lib/orm';
 
-describe('Given the register API', () => {
-    beforeEach(async () => {
-        await resetDatabase();
-    });
+test('should register with valid credentials', async () => {
+    const email = `test+${Date.now()}@example.com`;
+    const password = 'myp@ssw0rd';
 
-    describe('When a call to /api/register is made with valid credentials', () => {
-        it('Should return a token and a 200 status code', async () => {
-            const req = { body: { email: 'contact+test@ethibox.fr', password: 'myp@ssw0rd' } };
+    const req = { body: { email, password } };
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis(),
+        setHeader: jest.fn().mockReturnThis(),
+    };
 
-            const res = await registerEndpoint(req, mockApi());
+    await handler(req, res);
 
-            const user = await User.findOne({ where: { email: req.body.email } });
-            expect(user.email).toBe(req.body.email);
-            expect(res.token).toBeDefined();
-            expect(res.status).toBe(200);
-        });
-    });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ ok: true });
+    expect(res.setHeader).toHaveBeenCalledWith(
+        'Set-Cookie',
+        expect.stringContaining('token='),
+    );
+});
 
-    describe('When a call to /api/register is made with invalid email', () => {
-        it('Should return a 401 status code', async () => {
-            const req = { body: { email: 'bademail@@example.com', password: 'myp@ssw0rd' } };
+test('should reject user that already exists', async () => {
+    const email = `existing+${Date.now()}@example.com`;
+    const password = 'myp@ssw0rd';
 
-            const res = await registerEndpoint(req, mockApi());
+    await User.create({ email, password: 'hashedpassword' });
 
-            expect(res.message).toBe('Your email is invalid');
-            expect(res.status).toBe(401);
-        });
-    });
+    const req = { body: { email, password } };
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis(),
+        setHeader: jest.fn().mockReturnThis(),
+    };
 
-    describe('When a call to /api/register is made with invalid password', () => {
-        it('Should return a 401 status code', async () => {
-            const req = { body: { email: 'contact+test@ethibox.fr', password: 'pass' } };
+    await handler(req, res);
 
-            const res = await registerEndpoint(req, mockApi());
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.send).toHaveBeenCalledWith({ message: 'A user with that email already exists' });
+});
 
-            expect(res.message).toBe('Your password must be at least 6 characters');
-            expect(res.status).toBe(401);
-        });
-    });
+test('should reject invalid email', async () => {
+    const email = 'invalid-email';
+    const password = 'myp@ssw0rd';
 
-    describe('When a call to /api/register is made with existing email', () => {
-        it('Should return a 401 status code', async () => {
-            User.create({ email: 'contact+test@ethibox.fr', password: 'myp@ssw0rd' });
-            const req = { body: { email: 'contact+test@ethibox.fr', password: 'myp@ssw0rd' } };
+    const req = { body: { email, password } };
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis(),
+        setHeader: jest.fn().mockReturnThis(),
+    };
 
-            const res = await registerEndpoint(req, mockApi());
+    await handler(req, res);
 
-            expect(res.message).toBe('A user with that email already exists');
-            expect(res.status).toBe(401);
-        });
-    });
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.send).toHaveBeenCalledWith({ message: 'Invalid email address' });
 });

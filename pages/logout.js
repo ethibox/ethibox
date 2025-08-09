@@ -1,20 +1,39 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useAuth } from '@lib/contexts';
-import { useNotification } from '@johackim/design-system';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import nextI18nextConfig from '../next-i18next.config.mjs';
+import Loading from '../components/loading';
 
 export default () => {
-    const auth = useAuth();
     const router = useRouter();
-    const notification = useNotification();
     const { t } = useTranslation();
 
     useEffect(() => {
-        auth.logout();
-        router.push('/login');
-        notification.add({ title: t('Logged out'), text: t('You have been logged out'), type: 'info', timeout: 5 });
+        const doLogout = async () => {
+            fetch(`${router.basePath}/api/logout`, {
+                method: 'POST',
+            }).then(() => {
+                setTimeout(() => {
+                    router.push('/login');
+                }, 2000);
+            });
+        };
+
+        doLogout();
     }, []);
 
-    return <p>Redirect...</p>;
+    return (
+        <div className="flex justify-center items-center min-h-screen">
+            <div className="flex justify-center items-center">
+                <Loading text={t('logout.loading')} size="xl" />
+            </div>
+        </div>
+    );
 };
+
+export const getStaticProps = async ({ locale }) => ({
+    props: {
+        ...(await serverSideTranslations(locale, ['common'], nextI18nextConfig)),
+    },
+});

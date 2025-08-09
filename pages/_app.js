@@ -1,8 +1,7 @@
-import '@styles/globals.css';
-import Providers from '@lib/contexts';
+import '../styles/globals.css';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { Roboto } from 'next/font/google';
+import { appWithTranslation } from 'next-i18next';
 
 const roboto = Roboto({
     weight: ['300', '400', '500', '700'],
@@ -10,24 +9,21 @@ const roboto = Roboto({
     subsets: ['latin'],
 });
 
-export default ({ Component, pageProps }) => {
-    const router = useRouter();
+const App = ({ Component, pageProps }) => (
+    <>
+        {/* eslint-disable react/no-unknown-property */}
+        <style jsx global>
+            {`
+                html {
+                    font-family: ${roboto.style.fontFamily};
+                }
+            `}
+        </style>
+        <Head>
+            <title>Ethibox</title>
+        </Head>
+        <Component {...pageProps} />
+    </>
+);
 
-    return (
-        <Providers>
-            { /* eslint-disable react/no-unknown-property */}
-            <style jsx global>
-                {`
-                    html {
-                        font-family: ${roboto.style.fontFamily};
-                    }
-                `}
-            </style>
-            <Head>
-                <title>Ethibox</title>
-                <link rel="shortcut icon" href={`${router.basePath}/favicon.ico`} />
-            </Head>
-            <Component {...pageProps} />
-        </Providers>
-    );
-};
+export default appWithTranslation(App);

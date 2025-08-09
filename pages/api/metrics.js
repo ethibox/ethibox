@@ -1,6 +1,7 @@
 import ipRangeCheck from 'ip-range-check';
 import { register, Gauge } from 'prom-client';
-import { Op, App } from '@lib/orm';
+import { Op, App } from '../../lib/orm';
+import { STATE } from '../../lib/constants';
 
 register.clear();
 const gauge = new Gauge({ name: 'metric_name', help: 'metric_help' });
@@ -17,24 +18,26 @@ const gauge2 = new Gauge({
     labelNames: ['domain'],
 });
 
+const isAuthorized = (ip) => {
+    const authorizedIps = ['127.0.0.1', '::1', '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'];
+    return authorizedIps.some((range) => ipRangeCheck(ip, range));
+};
+
 export default async (req, res) => {
-    await register.resetMetrics();
+    register.resetMetrics();
 
-    const ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress).replace('::ffff:', '');
-    const authorizedIps = ['172.17.0.0/16', '10.0.0.0/16', '10.10.0.0/16', '127.0.0.1', '::1', process.env.AUTHORIZED_IP];
+    const ip = req.connection.remoteAddress.replace('::ffff:', '');
 
-    const isAuthorized = authorizedIps.some((range) => ipRangeCheck(ip, range));
-
-    if (!isAuthorized) {
+    if (!isAuthorized(ip)) {
         return res.status(401).send({ success: false, message: 'You are not authorized' });
     }
 
     gauge.set(10);
 
-    const applications = await App.findAll({ where: { [Op.not]: { state: 'deleted' } } });
+    const apps = await App.findAll({ where: { [Op.not]: { state: STATE.DELETED } } });
 
-    for (const { domain, state, responseTime = 0 } of applications) {
-        gauge1.set({ domain }, state === 'online' ? 1 : 0);
+    for (const { domain, state, responseTime = 0 } of apps) {
+        gauge1.set({ domain }, state === STATE.ONLINE ? 1 : 0);
         gauge2.set({ domain }, responseTime);
     }
 

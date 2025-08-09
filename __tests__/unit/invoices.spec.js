@@ -1,24 +1,39 @@
-import 'dotenv/config';
-import invoicesEndpoint from '@api/invoices';
-import { resetDatabase, initDatabase } from '@lib/orm';
-import { mockApi } from '@lib/utils';
+import { jest } from '@jest/globals';
+import handler from '../../pages/api/invoices';
+import { User } from '../../lib/orm';
+import stripe, { upsertStripeSubscription, upsertStripeCustomer } from '../../lib/stripe';
 
-describe('Given the invoices API', () => {
-    let user;
+const setupCustomer = async (id, email) => {
+    await upsertStripeCustomer({ id, email });
+    const pm = await stripe.paymentMethods.create({ type: 'card', card: { number: '4242424242424242', exp_month: 12, exp_year: 2030, cvc: '123' } });
+    await stripe.paymentMethods.attach(pm.id, { customer: `${id}` });
+    await stripe.customers.update(`${id}`, { invoice_settings: { default_payment_method: pm.id } });
+};
 
-    beforeAll(async () => {
-        await resetDatabase();
-        user = await initDatabase();
-    });
+test('should retrieve stripe invoices', async () => {
+    const email = `test+${Date.now()}@example.com`;
+    const [user] = await User.findOrCreate({ where: { email }, defaults: { password: 'password123' } });
 
-    describe('When a call to /api/invoices is made with valid credentials', () => {
-        it('Should return invoices and a 200 status code', async () => {
-            const req = { body: { email: 'contact+test@ethibox.fr', password: 'myp@ssw0rd' } };
+    await setupCustomer(user.id, email);
+    await upsertStripeSubscription({ id: user.id, email }, 'Wordpress');
 
-            const res = await invoicesEndpoint(req, mockApi(user), user);
+    const req = {
+        method: 'GET',
+        headers: { 'x-user-email': email },
+    };
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+    };
 
-            expect(res.invoices).toBeDefined();
-            expect(res.status).toBe(200);
-        });
-    });
-});
+    await handler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+
+    const invoicesData = res.json.mock.calls[0][0];
+    expect(Array.isArray(invoicesData)).toBe(true);
+    expect(invoicesData.length).toBeGreaterThan(0);
+    expect(invoicesData[0]).toHaveProperty('id');
+    expect(invoicesData[0]).toHaveProperty('total');
+    expect(invoicesData[0]).toHaveProperty('status');
+}, 20000);

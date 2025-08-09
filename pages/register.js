@@ -1,102 +1,125 @@
+import Link from 'next/link';
 import { useState } from 'react';
-import { Link, Input, Button, Heading, useNotification } from '@johackim/design-system';
-import { useAuth } from '@lib/contexts';
 import { useRouter } from 'next/router';
-import { useTranslation } from 'react-i18next';
-import DefaultLayout from '@components/defaultLayout';
+import isEmail from 'validator/lib/isEmail';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { Notification, Input } from '../components';
+import nextI18nextConfig from '../next-i18next.config.mjs';
 
 export default () => {
-    const [state, setState] = useState({ email: '', password: '' });
-    const [isLoading, setLoading] = useState(false);
-    const notification = useNotification();
-    const router = useRouter();
-    const auth = useAuth();
     const { t } = useTranslation();
-
-    const handleChange = (e) => {
-        setState({ ...state, [e.target.name]: e.target.value });
-    };
+    const router = useRouter();
+    const [isLoading, setLoading] = useState(false);
+    const [notification, setNotification] = useState({ show: false, title: '', description: '', icon: null });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { email, password } = state;
-
-        if (!email) {
-            notification.add({ title: t('Error'), text: t('Email is required'), type: 'error', timeout: 5 });
-            return;
-        }
-
-        if (!password) {
-            notification.add({ title: t('Error'), text: t('Password is required'), type: 'error', timeout: 5 });
-            return;
-        }
-
         setLoading(true);
+
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+        const email = String(formData.get('email') || '');
+        const password = String(formData.get('password') || '');
+
+        if (!isEmail(email)) {
+            setNotification({
+                show: true,
+                title: t('register.error.title'),
+                description: t('register.error.invalidEmail'),
+                icon: Notification.XCircleIcon,
+            });
+            setLoading(false);
+            return;
+        }
 
         fetch(`${router.basePath}/api/register`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(state),
+            headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
+            body: JSON.stringify({ email, password }),
         })
             .then((res) => res.json())
-            .then(({ token, message }) => {
-                if (token) {
-                    auth.login(token);
+            .then(({ ok, message }) => {
+                if (ok) {
                     router.push('/');
-                    notification.add({ title: t('Registration'), text: t('You are now registered'), timeout: 5 });
                 } else {
-                    notification.add({ title: t('Error'), text: t(message), type: 'error', timeout: 5 });
+                    setNotification({
+                        show: true,
+                        title: t('register.error.title'),
+                        description: message || t('register.error.defaultMessage'),
+                        icon: Notification.XCircleIcon,
+                    });
+
+                    setTimeout(() => {
+                        setNotification((s) => ({ ...s, show: false }));
+                    }, 5000);
+
                     setLoading(false);
                 }
             });
     };
 
-    const { email, password } = state;
-
     return (
-        <DefaultLayout className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full text-center">
-                <img src={`${router.basePath}/logo.svg`} className="w-14 mx-auto" alt="logo" />
+        <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 bg-gray-50">
+            <Notification
+                show={notification.show}
+                title={notification.title}
+                description={notification.description}
+                icon={notification.icon}
+                onClose={() => setNotification((s) => ({ ...s, show: false }))}
+            />
 
-                <Heading size="h2" className="text-center">{t('Sign up to your account')}</Heading>
+            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+                <img alt="logo" src={`${router.basePath}/logo.svg`} className="mx-auto h-16 w-auto" />
+                <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+                    {t('register.title')}
+                </h2>
+            </div>
 
-                <p>
-                    <span>{`${t('Or')} `}</span>
-                    <Link href="/login">{t('Sign in')}</Link>
-                </p>
-
-                <form onSubmit={handleSubmit}>
+            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <Input
-                        type="email"
-                        placeholder={t('Email address')}
-                        onChange={handleChange}
-                        value={email}
+                        id="email"
                         name="email"
-                        data-test="register-email"
-                        className="w-full my-1"
+                        type="email"
+                        required
+                        placeholder={t('register.email.placeholder')}
+                        label={t('register.email.label')}
                     />
 
                     <Input
-                        type="password"
-                        placeholder={t('Password')}
-                        onChange={handleChange}
-                        value={password}
+                        id="password"
                         name="password"
-                        data-test="register-password"
-                        className="w-full my-1"
+                        type="password"
+                        required
+                        placeholder={t('register.password.placeholder')}
+                        autoComplete="current-password"
+                        label={t('register.password.label')}
                     />
 
-                    <Button type="submit" className="w-full mt-4" data-test="register-button" onClick={handleSubmit} loading={isLoading}>
-                        {t('Register')}
-                    </Button>
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="flex w-full justify-center rounded-md bg-gray-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600 disabled:opacity-60"
+                    >
+                        {isLoading ? t('register.submitting') : t('register.submit')}
+                    </button>
                 </form>
 
-                <p className="mt-2 text-sm leading-5 text-gray-600 text-center">
-                    <span>{t('By creating an account, you agree to the')}</span>
+                <p className="mt-10 text-center text-sm/6 text-gray-500">
+                    {t('register.alreadyMember')}
                     {' '}
-                    <Link href="https://ethibox.fr/cgu" className="underline">{t('Terms of Service')}</Link>
+                    <Link href="/login" className="font-semibold text-gray-600 hover:text-gray-500">
+                        {t('register.signIn')}
+                    </Link>
                 </p>
             </div>
-        </DefaultLayout>
+        </div>
     );
 };
+
+export const getStaticProps = async ({ locale }) => ({
+    props: {
+        ...(await serverSideTranslations(locale, ['common'], nextI18nextConfig)),
+    },
+});

@@ -1,126 +1,118 @@
+import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Link, Input, Button, Heading, useNotification } from '@johackim/design-system';
-import { useTranslation } from 'react-i18next';
 import isEmail from 'validator/lib/isEmail';
-import DefaultLayout from '@components/defaultLayout';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { Input, Notification } from '../components';
+import nextI18nextConfig from '../next-i18next.config.mjs';
 
 export default () => {
-    const [state, setState] = useState({ email: '', password: '', confirmPassword: '' });
-    const notification = useNotification();
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(false);
-    const { token } = router.query;
     const { t } = useTranslation();
+    const [isLoading, setLoading] = useState(false);
+    const [notification, setNotification] = useState({ show: false, title: '', description: '', icon: null });
 
-    const handleChange = (e) => {
-        setState({ ...state, [e.target.name]: e.target.value });
-    };
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        setLoading(true);
 
-    const handleForgot = async () => {
-        const baseUrl = `${window.location.protocol}//${window.location.host}${router.basePath}/${router.locale}`;
+        const form = event.currentTarget;
+        const formData = new FormData(form);
+        const email = String(formData.get('email') || '');
 
-        if (isEmail(state.email)) {
-            setIsLoading(true);
-
-            fetch(`${router.basePath}/api/forgot`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: state.email, baseUrl }),
-            }).then(() => {
-                notification.add({ title: t('Check your inbox'), text: t("If your email address is associated with an account. You'll receive an email shortly."), timeout: 10 });
-            }).finally(() => {
-                setIsLoading(false);
+        if (!isEmail(email)) {
+            setNotification({
+                show: true,
+                title: t('forgot.error.title'),
+                description: t('forgot.error.invalidEmail'),
+                icon: Notification.XCircleIcon,
             });
-        } else {
-            notification.add({ title: t('Forgot password'), text: t('Please enter a valid email'), type: 'error', timeout: 5 });
-        }
-    };
-
-    const handleReset = async () => {
-        if (state.password !== state.confirmPassword) {
-            notification.add({ title: t('Forgot password'), text: t('Passwords do not match'), type: 'error', timeout: 5 });
+            setLoading(false);
             return;
         }
 
-        setIsLoading(true);
-
-        fetch(`${router.basePath}/api/users`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ password: state.password }),
+        fetch(`${router.basePath}/api/forgot`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
+            body: JSON.stringify({ email, baseUrl: window.location.origin }),
         })
-            .then(async (res) => {
-                const { message } = await res.json();
-
-                if (res.status !== 200) {
-                    notification.add({ title: t('Erreur'), text: t(message), type: 'error', timeout: 5 });
-                    return;
+            .then((res) => res.json())
+            .then(({ ok, message }) => {
+                if (ok) {
+                    setNotification({
+                        show: true,
+                        title: t('forgot.success.title'),
+                        description: t('forgot.success.message'),
+                        icon: Notification.CheckCircleIcon,
+                    });
+                } else {
+                    setNotification({
+                        show: true,
+                        title: t('forgot.error.title'),
+                        description: message || t('forgot.error.defaultMessage'),
+                        icon: Notification.XCircleIcon,
+                    });
                 }
-
-                notification.add({ title: t('Forgot password'), text: t('Password updated'), timeout: 5 });
-                router.push('/login');
             }).finally(() => {
-                setIsLoading(false);
+                setLoading(false);
             });
     };
 
-    const { email, password, confirmPassword } = state;
-
     return (
-        <DefaultLayout className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full text-center">
-                <img src={`${router.basePath}/logo.svg`} className="w-14 mx-auto" alt="logo" />
+        <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 bg-gray-50">
+            <Notification
+                show={notification.show}
+                title={notification.title}
+                description={notification.description}
+                icon={notification.icon}
+                onClose={() => setNotification((s) => ({ ...s, show: false }))}
+            />
 
-                {token ? (
-                    <>
-                        <Heading size="h2" className="text-center">{t('Set up a new password')}</Heading>
-
-                        <Input
-                            type="password"
-                            name="password"
-                            data-test="password"
-                            onChange={handleChange}
-                            value={password}
-                            placeholder={t('Password')}
-                            className="w-full my-1"
-                        />
-
-                        <Input
-                            type="password"
-                            placeholder={t('Confirm password')}
-                            data-test="confirm-password"
-                            onChange={handleChange}
-                            value={confirmPassword}
-                            name="confirmPassword"
-                            className="w-full my-1"
-                        />
-
-                        <Button className="w-full mt-2" data-test="reset-button" onClick={handleReset} loading={isLoading}>{t('Update password')}</Button>
-                    </>
-                ) : (
-                    <>
-                        <Heading size="h2" className="text-center">{t('Forgot your password?')}</Heading>
-
-                        <p>
-                            <span>{`${t('Or')} `}</span>
-                            <Link href="/login">{t('Sign in')}</Link>
-                        </p>
-
-                        <Input
-                            type="email"
-                            placeholder={t('Email address')}
-                            onChange={handleChange}
-                            value={email}
-                            name="email"
-                            data-test="forgot-email"
-                            className="w-full my-1"
-                        />
-
-                        <Button className="w-full mt-2" data-test="forgot-button" onClick={handleForgot} loading={isLoading}>{t('Send password reset link')}</Button>
-                    </>
-                )}
+            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+                <img alt="logo" src="/logo.svg" className="mx-auto h-16 w-auto" />
+                <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+                    {t('forgot.title')}
+                </h2>
+                <p className="mt-2 text-center text-sm text-gray-600">
+                    {t('forgot.description')}
+                </p>
             </div>
-        </DefaultLayout>
+
+            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        required
+                        placeholder={t('forgot.email.placeholder')}
+                        label={t('forgot.email.label')}
+                    />
+
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="flex w-full justify-center rounded-md bg-gray-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600 disabled:opacity-60"
+                    >
+                        {isLoading ? t('forgot.submitting') : t('forgot.submit')}
+                    </button>
+                </form>
+
+                <p className="mt-10 text-center text-sm/6 text-gray-500">
+                    {t('forgot.remembered')}
+                    {' '}
+                    <Link href="/login" className="font-semibold text-gray-600 hover:text-gray-500">
+                        {t('forgot.signIn')}
+                    </Link>
+                </p>
+            </div>
+        </div>
     );
 };
+
+export const getStaticProps = async ({ locale }) => ({
+    props: {
+        ...(await serverSideTranslations(locale, ['common'], nextI18nextConfig)),
+    },
+});
