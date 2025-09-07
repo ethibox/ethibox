@@ -1,6 +1,6 @@
-FROM node:20 AS build
+FROM node:22 AS build
 
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 WORKDIR /app
 
@@ -13,23 +13,11 @@ RUN yarn install \
     && rm -rf node_modules \
     && yarn install --prod --ignore-optional
 
-FROM gcr.io/distroless/nodejs20
+FROM gcr.io/distroless/nodejs22
 
 WORKDIR /app
 
-COPY --from=build /app/.next/ ./.next/
-
-COPY --from=build /app/.env ./.env
-
-COPY --from=build /app/public ./public
-
-COPY --from=build /app/lib ./lib
-
-COPY --from=build /app/next.config.js ./next.config.js
-
-COPY --from=build /app/package.json ./package.json
-
-COPY --from=build /app/node_modules/ ./node_modules/
+COPY --from=build /app/ ./
 
 ENV NODE_ENV=production
 

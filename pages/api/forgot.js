@@ -1,25 +1,27 @@
 import jwt from 'jsonwebtoken';
-import { User } from '@lib/orm';
-import { sendWebhook } from '@lib/utils';
+import { User } from '../../lib/orm';
+import { triggerWebhook } from '../../lib/utils';
+import { WEBHOOK_EVENTS, NEXT_PUBLIC_BASE_PATH } from '../../lib/constants';
 
 export default async (req, res) => {
     const { email, baseUrl } = req.body;
 
-    if (!email) {
-        return res.status(400).send({ message: 'Missing parameters' });
-    }
+    const user = await User.findOne({ where: { email } }).catch(() => false);
 
-    const user = await User.findOne({ where: { email } });
-
-    if (!user) {
-        return res.status(404).send({ message: 'User not found' });
-    }
+    if (!user) return res.status(200).json({ ok: true });
 
     const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    const url = `${baseUrl}/forgot?token=${token}`;
+    const resetUrl = `${baseUrl}${NEXT_PUBLIC_BASE_PATH}/reset-password?token=${token}`;
 
-    await sendWebhook({ email, url, token, type: 'forgot-user' });
+    console.log(`Password reset link for ${email}: ${resetUrl}`); // eslint-disable-line no-console
 
-    return res.status(200).send({ message: 'Email sent' });
+    await triggerWebhook(WEBHOOK_EVENTS.PASSWORD_RESET_REQUESTED, {
+        resetUrl,
+        email: user.email,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+    });
+
+    return res.status(200).json({ ok: true });
 };

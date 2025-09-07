@@ -1,33 +1,46 @@
-import jwt from 'jsonwebtoken';
+it('Should redirect to login page when visiting logout', () => {
+    cy.visit('/logout');
 
-describe('Given a connected user', () => {
-    beforeEach(() => {
-        const user = { email: 'contact+test@ethibox.fr' };
-        const token = jwt.sign(user, Cypress.env('JWT_SECRET'), { expiresIn: '1d' });
+    cy.url().should('include', '/login');
+});
 
-        cy.session(user, () => {
-            window.localStorage.setItem('token', token);
-        });
+it('Should show redirection message briefly', () => {
+    cy.visit('/logout');
+
+    cy.get('[data-test="loading"]').should('contain', 'Logout...');
+});
+
+it('Should logout authenticated user', () => {
+    cy.task('generate:jwt').then((token) => {
+        cy.setCookie('token', token);
+        cy.visit('/apps');
     });
 
-    describe('When he click on the logout button', () => {
-        it('Should log the user out', () => {
-            cy.visit('/');
+    cy.url().should('not.include', '/login');
 
-            cy.get('[data-test="logout"]').click();
+    cy.visit('/logout');
 
-            cy.get('[role=alert]').should('contain', 'You have been logged out');
-            cy.visit('/login');
-        });
+    cy.url().should('include', '/login');
+
+    cy.visit('/apps');
+    cy.url().should('include', '/login');
+});
+
+it.skip('Should automatically logout deleted user', () => {
+    cy.task('db:reset');
+    cy.task('generate:jwt').then((token) => {
+        cy.setCookie('token', token);
+        cy.visit('/apps');
     });
 
-    describe.skip('When a user has been deleted', () => {
-        it('Should log the user out', () => {
-            cy.task('db:reset');
+    cy.url().should('not.include', '/login');
+    cy.url().should('include', '/apps');
 
-            cy.visit('/');
+    cy.getCookie('token').should('exist');
 
-            cy.url().should('contain', '/login');
-        });
-    });
+    cy.task('user:delete');
+
+    cy.visit('/apps');
+
+    cy.url().should('include', '/login');
 });

@@ -1,0 +1,253 @@
+{
+    "settings": {
+        "title": "Settings",
+        "description": "Manage your account settings",
+        "language": {
+            "title": "Language",
+            "description": "Change the display language of the application.",
+            "label": "Language"
+        },
+        "account": {
+            "title": "Account informations",
+            "description": "Manage your informations associated with your account",
+            "email": "Email address",
+            "firstName": "First name",
+            "lastName": "Last name",
+            "deleteAccount": "Delete my account",
+            "modal": {
+                "title": "Delete account",
+                "description": "Are you sure you want to delete your account? This cannot be undone.",
+                "confirm": "Delete my account",
+                "cancel": "Cancel"
+            },
+            "save": "Save",
+            "success": {
+                "title": "Settings saved",
+                "description": "Your account settings have been successfully saved."
+            }
+        },
+        "payment": {
+            "title": "Payment Method",
+            "description": "Manage your payment method via Stripe.",
+            "currentMethod": {
+                "text1": "Your current payment method is a",
+                "text2": "card ending in"
+            },
+            "manage": "Manage",
+            "noMethod": "You don't have a payment method on file.",
+            "addMethod": "Add payment method"
+        }
+    },
+    "index": {
+        "title": "Application Store",
+        "description": "A selection of the best open-source applications",
+        "moreInfos": "More infos",
+        "install": "Install application",
+        "loading": "Loading...",
+        "notifications": {
+            "payment": {
+                "title": "Payment method required",
+                "description": "Your account need a payment method to install this application.",
+                "button": "Add a payment method"
+            },
+            "failed": {
+                "title": "Installation failed",
+                "description": "An unknown error occured."
+            }
+        }
+    },
+    "invoices": {
+        "loading": "Loading...",
+        "empty": {
+            "title": "No invoices",
+            "subtitle": "You have no invoices yet",
+            "button": "Go to the store"
+        },
+        "title": "Invoices",
+        "description": "A list of all your invoices",
+        "table": {
+            "number": "Number",
+            "date": "Date",
+            "description": "Description",
+            "total": "Total",
+            "status": "Status",
+            "view": "View invoice",
+            "invoiceSR": " invoice"
+        },
+        "status": {
+            "paid": "Paid",
+            "open": "Open",
+            "uncollectible": "Uncollectible",
+            "void": "Void"
+        }
+    },
+    "navigation": {
+        "home": "Home",
+        "applications": "Applications", 
+        "invoices": "Invoices",
+        "settings": "Settings",
+        "signOut": "Sign out",
+        "openSidebar": "Open sidebar",
+        "closeSidebar": "Close sidebar"
+    },
+    "apps": {
+        "loading": "Loading...",
+        "progress": "Action in progress",
+        "title": "Your applications",
+        "description": "Manage your applications easily",
+        "empty": {
+            "title": "No applications yet",
+            "subtitle": "You can create your first application by clicking the button below",
+            "button": "Go to the store"
+        },
+        "settings": {
+            "button": "Settings",
+            "modal": {
+                "title": "Manage your application {{name}}",
+                "description": "You can change your application settings here",
+                "domainLabel": "Domain Name",
+                "update": "Update",
+                "back": "Back",
+                "uninstall": "Uninstall application"
+            }
+        },
+        "delete": {
+            "modal": {
+                "title": "Confirm Application Deletion",
+                "description": "By deleting your application, you will also delete all your application's data and cancel your billing associated.",
+                "question": "Are you sure you want to uninstall your application?",
+                "uninstall": "Uninstall",
+                "cancel": "Cancel"
+            }
+        },
+        "notifications": {
+            "updated": {
+                "title": "Application updated",
+                "description": "Your application settings have been successfully saved."
+            },
+            "uninstalled": {
+                "title": "Application uninstalled", 
+                "description": "Your application has been successfully uninstalled."
+            }
+        },
+        "loadingStates": {
+            "default": "Loading...",
+            "updating": "Updating...",
+            "deleting": "Deleting...",
+            "saving": "Saving..."
+        },
+        "error": {
+            "title": "Error"
+        }
+    },
+    "login": {
+        "title": "Sign in to your account",
+        "email": {
+            "label": "Email address",
+            "placeholder": "you@example.com"
+        },
+        "password": {
+            "label": "Password",
+            "placeholder": "Password",
+            "forgot": "Forgot password?"
+        },
+        "submit": "Sign in",
+        "submitting": "Signing in...",
+        "notMember": "Not a member?",
+        "createAccount": "Create a new account",
+        "error": {
+            "title": "Error",
+            "defaultMessage": "Failed to sign in"
+        }
+    },
+    "forgot": {
+        "title": "Forgot your password?",
+        "description": "Enter your email address and we'll send you a link to reset your password.",
+        "email": {
+            "label": "Email address",
+            "placeholder": "you@example.com"
+        },
+        "submit": "Send password reset email",
+        "submitting": "Sending...",
+        "remembered": "Remembered your password?",
+        "signIn": "Sign in",
+        "success": {
+            "title": "Success",
+            "message": "If your email address is associated with an account. You'll receive an email shortly."
+        },
+        "error": {
+            "title": "Error",
+            "defaultMessage": "Failed to send password reset email",
+            "invalidEmail": "Your email address is invalid"
+        }
+    },
+    "register": {
+        "title": "Sign up for a new account",
+        "email": {
+            "label": "Email address",
+            "placeholder": "you@example.com"
+        },
+        "password": {
+            "label": "Password",
+            "placeholder": "Password"
+        },
+        "submit": "Sign up",
+        "submitting": "Signing up...",
+        "alreadyMember": "Already a member?",
+        "signIn": "Sign in to your account",
+        "error": {
+            "title": "Error",
+            "defaultMessage": "Failed to sign up",
+            "invalidEmail": "Your email address is invalid"
+        }
+    },
+    "resetPassword": {
+        "title": "Reset your password",
+        "newPassword": {
+            "label": "New password",
+            "placeholder": "New password"
+        },
+        "confirmPassword": {
+            "label": "Confirm new password",
+            "placeholder": "Confirm new password"
+        },
+        "submit": "Reset password",
+        "submitting": "Resetting...",
+        "backToSignIn": "Back to sign in",
+        "success": {
+            "title": "Success",
+            "message": "Your password has been reset. You can now sign in."
+        },
+        "error": {
+            "title": "Error",
+            "passwordMismatch": "Passwords do not match.",
+            "defaultMessage": "Failed to reset password."
+        }
+    },
+    "logout": {
+        "loading": "Logout..."
+    },
+    "api": {
+        "template_not_found": "Template not found",
+        "no_payment_method": "No payment method found",
+        "app_not_found": "App not found",
+        "domain_already_exists": "Domain already exists",
+        "unauthorized": "Unauthorized",
+        "method_not_allowed": "Method Not Allowed",
+        "invalid_credentials": "Invalid credentials",
+        "not_authorized": "You are not authorized",
+        "user_with_email_exists": "A user with that email already exists",
+        "missing_token": "Missing token",
+        "invalid_or_expired_token": "Invalid or expired token",
+        "stripe_not_enabled": "Stripe not enabled",
+        "user_not_found": "User not found",
+        "invalid_password": "Password must be at least 8 characters long and contain at least one number, one lowercase and one uppercase letter.",
+        "invalid_email": "Invalid email address",
+        "password_too_short": "Your password must be at least 6 characters",
+        "password_no_symbol": "Your password must contain a symbol",
+        "email_disposable": "Disposable email addresses are not allowed",
+        "domain_invalid": "Invalid domain name",
+        "domain_reserved": "{{domain}} is a reserved domain name.",
+        "domain_dns_error": "Please setup a correct DNS zone of type A for your domain {{domain}} with the ip {{ip}} on your registrar (ex: Gandi, OVH, Online, 1&1)"
+    }
+} 

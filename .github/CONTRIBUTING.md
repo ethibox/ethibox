@@ -10,6 +10,6 @@ Sometimes we find a project we like but just don't have time to contribute. That
 
 - Star the project
 - Deploy apps from Ethibox
+- Start your Ethibox instance
 - Tell your friends about Ethibox
 - Write a blog article about Ethibox
-- Launch your Ethibox instance

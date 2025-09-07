@@ -1,50 +1,35 @@
-import jwt from 'jsonwebtoken';
+before(() => {
+    cy.register({ email: 'contact+2@ethibox.fr', password: 'myp@ssw0rd' });
+});
 
-describe('Given a user on the settings page', () => {
-    beforeEach(() => {
-        const user = { email: 'contact+test@ethibox.fr' };
-        const token = jwt.sign(user, Cypress.env('JWT_SECRET'), { expiresIn: '1d' });
+beforeEach(() => {
+    cy.login({ email: 'contact+2@ethibox.fr', password: 'myp@ssw0rd' });
+    cy.visit('/settings');
+});
 
-        cy.task('db:reset');
-        cy.task('db:seed');
+it('Should edit settings', () => {
+    cy.get('input[name="firstName"]').clear().type('John');
+    cy.get('input[name="lastName"]').clear().type('Doe');
+    cy.contains('button', 'Save').click();
 
-        cy.session(user, () => {
-            window.localStorage.setItem('token', token);
-        });
+    cy.get('[data-test=notification]').should('contain', 'Settings saved');
+});
+
+it('Should change language', () => {
+    cy.get('select[name="language"]').select('fr');
+    cy.contains('button', 'Save').click();
+
+    cy.get('[data-test=notification]', { timeout: 10000 }).should('contain', 'Paramètres enregistrés');
+    cy.url().should('include', '/fr/');
+});
+
+it('Should delete account', () => {
+    cy.contains('button', 'Delete my account').click();
+
+    cy.get('[role="dialog"]').should('be.visible');
+    cy.get('[role="dialog"]').within(() => {
+        cy.contains('button', 'Delete my account').click();
     });
 
-    describe('When he add a payment method', () => {
-        it('Should add the payment method', () => {
-            cy.visit('/settings');
-
-            cy.get('[data-test="update-payment-informations"]').click();
-
-            cy.url().should('contain', 'billing.stripe.com');
-        });
-    });
-
-    describe('When he change his first and last name', () => {
-        it('Should change the first and last name', () => {
-            cy.visit('/settings');
-
-            cy.get('[data-test="first-name"]').clear().type('John');
-            cy.get('[data-test="last-name"]').clear().type('Doe');
-
-            cy.get('[data-test="save"]').click();
-
-            cy.get('[role=alert]').should('contain', 'Your data has been saved');
-        });
-    });
-
-    describe('When he click on the "detete account" button', () => {
-        it('Should delete the account', () => {
-            cy.visit('/settings');
-
-            cy.get('[data-test="delete-account"]').click();
-            cy.get('[data-test="confirm-delete-account"]').click();
-
-            cy.get('[role=alert]').should('contain', 'Your account has been deleted');
-            cy.visit('/login');
-        });
-    });
+    cy.url().should('include', '/logout');
 });

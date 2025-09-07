@@ -1,11 +1,6 @@
 {
-    "plugins": [
-        "cypress"
-    ],
     "env": {
         "cypress/globals": true
     },
-    "rules": {
-        "max-lines-per-function": [0]
-    }
+    "plugins": ["cypress"]
 }

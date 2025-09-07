@@ -1,35 +1,50 @@
-import 'dotenv/config';
+import { jest } from '@jest/globals';
 import bcrypt from 'bcrypt';
-import { mockApi } from '@lib/utils';
-import loginEndpoint from '@api/login';
-import { resetDatabase, User } from '@lib/orm';
+import handler from '../../pages/api/login';
+import { User } from '../../lib/orm';
 
-describe('Given the login API', () => {
-    beforeAll(async () => {
-        await resetDatabase();
-        const hashPassword = await bcrypt.hash('myp@ssw0rd', 10);
-        await User.create({ email: 'contact+test@ethibox.fr', password: hashPassword });
+test('should login with valid credentials', async () => {
+    const email = `test+${Date.now()}@example.com`;
+    const password = 'myp@ssw0rd';
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await User.findOrCreate({
+        where: { email },
+        defaults: { password: hashedPassword },
     });
 
-    describe('When a call to /api/login is made with valid credentials', () => {
-        it('Should return a token and a 200 status code', async () => {
-            const req = { body: { email: 'contact+test@ethibox.fr', password: 'myp@ssw0rd' } };
+    const req = { body: { email, password } };
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis(),
+        setHeader: jest.fn().mockReturnThis(),
+    };
 
-            const res = await loginEndpoint(req, mockApi());
+    await handler(req, res);
 
-            expect(res.token).toBeDefined();
-            expect(res.status).toBe(200);
-        });
-    });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ ok: true });
+    expect(res.setHeader).toHaveBeenCalledWith(
+        'Set-Cookie',
+        expect.stringContaining('token='),
+    );
+});
 
-    describe('When a call to /api/login is made with invalid credentials', () => {
-        it('Should return a 401 status code', async () => {
-            const req = { body: { email: 'contact+test@ethibox.fr', password: 'badpassword' } };
+test('should reject invalid credentials', async () => {
+    const email = 'nonexistent@example.com';
+    const wrongPassword = 'wrongpassword';
 
-            const res = await loginEndpoint(req, mockApi());
+    const req = { body: { email, password: wrongPassword } };
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis(),
+        setHeader: jest.fn().mockReturnThis(),
+    };
 
-            expect(res.message).toBe('Invalid credentials');
-            expect(res.status).toBe(401);
-        });
-    });
+    await handler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.send).toHaveBeenCalledWith({ message: 'Invalid credentials' });
 });

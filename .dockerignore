@@ -1,3 +1,6 @@
 **/node_modules
+**/data
+.env
 .git
 .next
+.github

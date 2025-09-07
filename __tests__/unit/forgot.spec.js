@@ -1,24 +1,41 @@
-import 'dotenv/config';
-import bcrypt from 'bcrypt';
-import forgotEndpoint from '@api/forgot';
-import { resetDatabase, User } from '@lib/orm';
-import { mockApi } from '@lib/utils';
+import { jest } from '@jest/globals';
+import { User } from '../../lib/orm';
+import handler from '../../pages/api/forgot';
 
-describe('Given the forgot API', () => {
-    beforeAll(async () => {
-        await resetDatabase();
-        const hashPassword = await bcrypt.hash('myp@ssw0rd', 10);
-        await User.create({ email: 'contact+test@ethibox.fr', password: hashPassword });
-    });
+global.fetch = jest.fn(() => Promise.resolve({
+    status: 200,
+    ok: true,
+}));
 
-    describe('When a call to /api/forgot is made with valid email', () => {
-        it('Should send a reset password email', async () => {
-            const req = { body: { email: 'contact+test@ethibox.fr' } };
+const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
 
-            const res = await forgotEndpoint(req, mockApi());
+test('should send webhook when user exists', async () => {
+    process.env.WEBHOOK_URL = 'https://webhook.example.com';
+    const email = 'test@example.com';
 
-            expect(res.status).toBe(200);
-            expect(res.message).toBe('Email sent');
-        });
-    });
+    await User.findOrCreate({ where: { email }, defaults: { password: 'hashedpassword' } });
+
+    const req = { body: { email } };
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+    };
+
+    await handler(req, res);
+
+    expect(global.fetch).toHaveBeenCalledWith(
+        'https://webhook.example.com',
+        expect.objectContaining({
+            method: 'POST',
+            headers: expect.objectContaining({
+                'Content-Type': 'application/json',
+                'X-Ethibox-Event': 'password.reset_requested',
+            }),
+        }),
+    );
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Password reset link for test@example.com'),
+    );
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ ok: true });
 });

@@ -1,30 +1,33 @@
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-import Confetti from 'react-confetti';
 
-export default ({ duration = 4000 }) => {
-    const [{ width, height }, setWindowSize] = useState({ width: 0, height: 0 });
-    const [recycle, setRecycle] = useState(true);
+const Confetti = dynamic(() => import('react-confetti'), { ssr: false });
 
-    const colors = new Array(17).fill('#1f2937');
+export default ({ show, recycle = false, className = '', ...props }) => {
+    const [size, setSize] = useState({ width: 0, height: 0 });
 
     useEffect(() => {
-        setTimeout(() => {
-            setRecycle(false);
-        }, duration);
+        if (typeof window === 'undefined') return undefined;
 
-        const handleResize = () => {
-            setWindowSize({
-                width: window.innerWidth - 20,
-                height: window.innerHeight - 20,
-            });
-        };
+        const update = () => setSize({
+            width: window.innerWidth - 20,
+            height: window.innerHeight - 20,
+        });
 
-        handleResize();
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        update();
+        window.addEventListener('resize', update);
+        return () => window.removeEventListener('resize', update);
     }, []);
 
+    if (!show || size.width === 0) return null;
+
     return (
-        <Confetti width={width} height={height} colors={colors} recycle={recycle} />
+        <Confetti
+            className={`!z-50 ${className}`}
+            width={size.width}
+            height={size.height}
+            recycle={recycle}
+            {...props}
+        />
     );
 };

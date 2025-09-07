@@ -3,11 +3,10 @@
 [![Version](https://img.shields.io/github/tag/ethibox/ethibox.svg?label=Version&style=flat&colorA=2B323B&colorB=1e2329)](https://github.com/ethibox/ethibox/releases)
 [![License](https://img.shields.io/badge/license-GPL%20v3%2B-yellow.svg?label=License&style=flat&colorA=2B323B&colorB=1e2329)](https://raw.githubusercontent.com/ethibox/ethibox/master/LICENSE.txt)
 [![Build](https://img.shields.io/github/actions/workflow/status/ethibox/ethibox/deploy.yml?label=Build&style=flat&colorA=2B323B&colorB=1e2329)](https://github.com/ethibox/ethibox/actions)
-[![Code Climate](https://img.shields.io/codeclimate/maintainability/ethibox/ethibox.svg?label=Maintainability&style=flat&colorA=2B323B&colorB=1e2329)](https://codeclimate.com/github/ethibox/ethibox)
 
 > Ethibox is an open-source web app hoster
 
-![screenshot](https://i.imgur.com/m8SyBAh.png)
+![screenshot](https://i.imgur.com/a7lHFXj.png)
 
 ## 📦 Installation
 

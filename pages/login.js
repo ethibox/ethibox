@@ -1,109 +1,114 @@
-import { useState, useEffect } from 'react';
-import { Link, Input, Button, Heading, Checkbox, useNotification } from '@johackim/design-system';
-import { useAuth } from '@lib/contexts';
+import Link from 'next/link';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { useTranslation } from 'react-i18next';
-import isEmail from 'validator/lib/isEmail';
-import DefaultLayout from '@components/defaultLayout';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { Notification, Input } from '../components';
+import nextI18nextConfig from '../next-i18next.config.mjs';
 
 export default () => {
-    const [state, setState] = useState({ email: '', password: '', rememberMe: false });
-    const [isLoading, setLoading] = useState(false);
-    const notification = useNotification();
-    const router = useRouter();
-    const auth = useAuth();
     const { t } = useTranslation();
-
-    useEffect(() => {
-        if (auth.isLoggedIn) {
-            router.push(`/${router.locale}`);
-            notification.add({ title: t('Login'), text: t('You are already logged in'), type: 'info', timeout: 5 });
-        }
-    }, []);
-
-    const handleChange = (e) => {
-        setState({ ...state, [e.target.name]: e.target.value });
-    };
+    const router = useRouter();
+    const [isLoading, setLoading] = useState(false);
+    const [notification, setNotification] = useState({ show: false, title: '', description: '', icon: null });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { email, password } = state;
-
-        if (!isEmail(email)) {
-            notification.add({ title: t('Error'), type: 'error', text: t('Invalid email') });
-            return;
-        }
-
-        if (!password) {
-            notification.add({ title: t('Error'), type: 'error', text: t('Password is required') });
-            return;
-        }
-
         setLoading(true);
+
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+        const email = String(formData.get('email') || '');
+        const password = String(formData.get('password') || '');
 
         fetch(`${router.basePath}/api/login`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(state),
+            headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
+            body: JSON.stringify({ email, password }),
         })
             .then((res) => res.json())
-            .then(({ token, message }) => {
-                if (token) {
-                    auth.login(token);
+            .then(({ ok, message }) => {
+                if (ok) {
                     router.push('/');
-                    notification.add({ title: t('Login'), text: t('You are now logged in'), timeout: 5 });
                 } else {
-                    notification.add({ title: t('Login'), text: t(message), type: 'error', timeout: 5 });
+                    setNotification({
+                        show: true,
+                        title: t('login.error.title'),
+                        description: message || t('login.error.defaultMessage'),
+                        icon: Notification.XCircleIcon,
+                    });
+
+                    setTimeout(() => {
+                        setNotification((s) => ({ ...s, show: false }));
+                    }, 5000);
+
                     setLoading(false);
                 }
             });
     };
 
-    const { email, password, rememberMe } = state;
-
     return (
-        <DefaultLayout className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full text-center">
-                <img src={`${router.basePath}/logo.svg`} className="w-14 mx-auto" alt="logo" />
+        <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 bg-gray-50">
+            <Notification
+                show={notification.show}
+                title={notification.title}
+                description={notification.description}
+                icon={notification.icon}
+                onClose={() => setNotification((s) => ({ ...s, show: false }))}
+            />
 
-                <Heading size="h2" className="text-center text-[1.8rem]">{t('Sign in to your account')}</Heading>
-
-                <p>
-                    <span>{`${t('Or')} `}</span>
-                    <Link href="/register">{t('Sign up')}</Link>
-                </p>
-
-                <form onSubmit={handleSubmit}>
-                    <Input
-                        type="email"
-                        placeholder={t('Email address')}
-                        onChange={handleChange}
-                        value={email}
-                        name="email"
-                        data-test="login-email"
-                        className="w-full my-1"
-                    />
-
-                    <Input
-                        type="password"
-                        placeholder={t('Password')}
-                        onChange={handleChange}
-                        value={password}
-                        name="password"
-                        data-test="login-password"
-                        className="w-full my-1"
-                    />
-
-                    <div className="flex justify-between mt-2">
-                        <Checkbox label={t('Remember me')} value={rememberMe} />
-                        <Link href="/forgot">{t('Forgot your password?')}</Link>
-                    </div>
-
-                    <Button type="submit" className="w-full mt-4" data-test="login-button" onClick={handleSubmit} loading={isLoading}>
-                        {t('Sign in')}
-                    </Button>
-                </form>
+            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+                <img alt="logo" src={`${router.basePath}/logo.svg`} className="mx-auto h-16 w-auto" />
+                <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+                    {t('login.title')}
+                </h2>
             </div>
-        </DefaultLayout>
+
+            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        required
+                        placeholder={t('login.email.placeholder')}
+                        label={t('login.email.label')}
+                    />
+
+                    <Input
+                        id="password"
+                        name="password"
+                        type="password"
+                        required
+                        placeholder={t('login.password.placeholder')}
+                        autoComplete="current-password"
+                        label={t('login.password.label')}
+                        labelRight={<Link href="/forgot" className="text-sm font-semibold text-gray-600 hover:text-gray-500">{t('login.password.forgot')}</Link>}
+                    />
+
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="flex w-full justify-center rounded-md bg-gray-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600 disabled:opacity-60"
+                    >
+                        {isLoading ? t('login.submitting') : t('login.submit')}
+                    </button>
+                </form>
+
+                <p className="mt-10 text-center text-sm/6 text-gray-500">
+                    {t('login.notMember')}
+                    {' '}
+                    <Link href="/register" className="font-semibold text-gray-600 hover:text-gray-500">
+                        {t('login.createAccount')}
+                    </Link>
+                </p>
+            </div>
+        </div>
     );
 };
+
+export const getStaticProps = async ({ locale }) => ({
+    props: {
+        ...(await serverSideTranslations(locale, ['common'], nextI18nextConfig)),
+    },
+});

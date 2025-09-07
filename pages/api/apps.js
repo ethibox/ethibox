@@ -1,63 +1,77 @@
-import 'dotenv/config';
-import Stripe from 'stripe';
-import fetch from 'node-fetch';
-import { User, App, Env, Op } from '@lib/orm';
+import { STATE, WEBHOOK_EVENTS, NEXT_PUBLIC_BASE_PATH } from '../../lib/constants';
+import { App, User, Env, Op } from '../../lib/orm';
 import {
-    getCustomerNameFromPaymentMethods,
-    getCustomerSubscriptions,
-    deleteSubscription,
-} from '@lib/stripe';
-import {
-    protectRoute,
-    sendWebhook,
-    generateReleaseName,
-    generatePassword,
-    checkDnsRecord,
-    checkDomain,
     getDomainIp,
-    decodeUnicode,
-} from '@lib/utils';
+    isValidDomain,
+    getCustomEnvs,
+    triggerWebhook,
+    fetchTemplates,
+    useTranslation,
+    generatePassword,
+    generateReleaseName,
+} from '../../lib/utils';
+import {
+    getStripeSubscriptions,
+    createStripeCheckoutUrl,
+    cancelStripeSubscription,
+} from '../../lib/stripe';
 
-/* eslint-disable complexity */
-/* eslint-disable max-lines-per-function */
-export const postQuery = async (req, res) => {
-    const { sessionId } = req;
+const getQuery = async (req, res, user) => {
+    const templates = await fetchTemplates(false);
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-    const stripeSession = await stripe.checkout.sessions.retrieve(sessionId).catch(() => false);
-    const user = await User.findOne({ where: { id: stripeSession.customer }, raw: false });
+    const apps = (await App.findAll({ where: { userId: user.id, state: { [Op.ne]: STATE.DELETED } }, include: Env, raw: false })).map((app) => {
+        const template = templates.find((t) => t.name.toLowerCase() === app.name);
+        const { name = 'Unknown', logo = `${NEXT_PUBLIC_BASE_PATH}/logo.svg`, category = 'Unknown' } = template || {};
 
-    if (!user) return res.status(401).send({ message: 'Unauthorized' });
+        const envs = template?.env?.filter((env) => !env.preset).map((env) => ({
+            ...env,
+            ...(env.select && { select: env.select.map((s) => ({ name: s.text, value: s.value || s.default })) }),
+        }));
 
-    if (!user.firstName || !user.lastName) {
-        const name = await getCustomerNameFromPaymentMethods(stripeSession.customer);
-        const [firstName, lastName] = name?.split(' ') || [];
-        user.update({ firstName, lastName });
-    }
+        app.envs.forEach((env) => {
+            const existingEnv = envs?.find((e) => e.name === env.name);
+            if (existingEnv) existingEnv.value = env.value;
+        });
 
-    const { name } = stripeSession.metadata;
-    const createdAt = new Date(stripeSession.created * 1000).toISOString();
+        const { id: _, userId: __, ...data } = app.dataValues;
+
+        return { ...data, name, logo, category, envs: envs || [] };
+    });
+
+    return res.status(200).json({ apps });
+};
+
+// eslint-disable-next-line complexity
+const postQuery = async (req, res, user) => {
+    const { name, returnUrl } = req.body || {};
+
     const releaseName = await generateReleaseName(name);
 
-    if (stripeSession.subscription) {
-        await stripe.subscriptions.update(stripeSession.subscription, { metadata: { releaseName } });
+    const rootDomain = process.env.ROOT_DOMAIN || 'localhost';
+    const domain = `${releaseName}.${rootDomain}`;
+
+    const templates = await fetchTemplates();
+    const template = templates.find((t) => t.name.toLowerCase() === name.toLowerCase());
+
+    const locale = req?.headers?.['accept-language'];
+    const t = useTranslation(locale);
+
+    if (!template) return res.status(400).send({ message: t('template_not_found') });
+
+    if (process.env.STRIPE_SECRET_KEY) {
+        const subscriptions = await getStripeSubscriptions(user);
+        const existingSubscription = subscriptions.find((s) => s.metadata.releaseName === releaseName);
+
+        if (!existingSubscription) {
+            const url = await createStripeCheckoutUrl({ name, releaseName }, user, returnUrl, locale);
+
+            return res.status(201).json({ ok: true, url });
+        }
     }
 
-    const { templates } = await fetch(process.env.TEMPLATES_URL).then((r) => r.json());
-    const domain = `${releaseName}.${process.env.ROOT_DOMAIN || 'localhost'}`;
-    const template = templates.find((t) => t.title.toLowerCase() === name.toLowerCase());
-
-    if (!template) return res.status(400).send({ message: 'Template not found' });
+    const app = await App.create({ releaseName, domain, userId: user.id });
 
     const envs = template?.env || [];
-    const { repository } = template;
-    const { stackfile: stackFile, url: repositoryUrl } = repository;
-
-    const alreadyExist = await App.findOne({ where: { [Op.or]: [{ releaseName }, { createdAt }] } });
-
-    if (alreadyExist) return res.status(400).send({ message: 'App already exist' });
-
-    const app = await App.create({ releaseName, domain, userId: user.id, createdAt });
 
     for await (const env of envs) {
         const { select } = env;
@@ -77,188 +91,123 @@ export const postQuery = async (req, res) => {
         await Env.create({ name: env.name, value: env.value, appId: app.id });
     }
 
-    Object.keys(process.env).forEach((key) => {
-        const customEnvStartName = `CUSTOM_ENV_${name.toUpperCase().replace(/-/g, '_')}_`;
-
-        if (key.startsWith('CUSTOM_ENV_ALL_') || key.startsWith(customEnvStartName)) {
-            const envName = key.replace('CUSTOM_ENV_ALL_', '').replace(customEnvStartName, '');
-            const envValue = decodeUnicode(process.env[key]);
-            const env = envs.find((e) => e.name === envName);
-
-            if (env) {
-                env.value = envValue;
-            } else {
-                envs.push({ name: envName, value: envValue });
-            }
-        }
-    });
-
-    await sendWebhook({
-        name,
-        stackFile,
-        repositoryUrl,
-        ...app.dataValues,
+    await triggerWebhook(WEBHOOK_EVENTS.APP_INSTALLED, {
+        name: template.name,
+        releaseName: app.releaseName,
+        domain: app.domain,
         email: user.email,
         manual: template.manual,
         envs: JSON.stringify(
             envs.concat([
                 { name: 'DOMAIN', value: domain },
                 { name: 'NUMBER', value: `${app.id}` },
+                ...getCustomEnvs(name),
             ]),
         ),
-        type: 'install-app',
+        ...template,
     });
 
-    return res.status(200).send({ success: true });
+    return res.status(201).json({ ok: true, url: '/apps?installed=true' });
 };
 
-const getQuery = async (req, res, user) => {
-    let apps = await user.getApps({ where: { [Op.not]: { state: 'deleted' } }, raw: false });
-    const { templates } = await fetch(process.env.TEMPLATES_URL).then((r) => r.json());
-
-    apps = await Promise.all(apps.map(async (app) => {
-        const template = templates.find((t) => t.title.toLowerCase() === app.name);
-
-        const envs = template?.env?.map((env) => ({
-            ...env,
-            select: (env.select || []).map((s) => ({ name: s.text, value: s.value || s.default })),
-        })).filter((env) => !env.preset) || [];
-
-        const appEnvs = await app.getEnvs({ raw: true });
-
-        appEnvs.forEach((env) => {
-            const templateEnv = envs.find((e) => e.name === env.name);
-            if (templateEnv) templateEnv.value = env.value;
-        });
-
-        return {
-            name: template.title,
-            releaseName: app.releaseName,
-            domain: app.domain,
-            category: template.categories[0],
-            logo: template?.logo,
-            updatedAt: app.updatedAt,
-            envs,
-        };
-    }));
-
-    return res.status(200).send({ apps });
-};
-
+// eslint-disable-next-line complexity
 const putQuery = async (req, res, user) => {
-    const { envs = [], domain, releaseName } = req;
+    const t = useTranslation(req?.headers?.['accept-language']);
+    const { releaseName, domain, envs } = req.body || {};
 
-    const apps = await user.getApps({ raw: false });
-    const app = apps.find((a) => a.releaseName === releaseName);
+    const app = await App.findOne({ where: { releaseName, userId: user.id }, raw: false });
 
-    if (!app) return res.status(400).send({ message: 'App not found' });
+    if (!app) return res.status(404).json({ message: t('app_not_found') });
 
-    if (apps.find((a) => a.domain === domain && a.releaseName !== releaseName)) {
-        return res.status(400).send({ message: 'Domain already exists' });
+    if (await App.findOne({ where: { domain, releaseName: { [Op.ne]: releaseName } } })) {
+        return res.status(400).send({ message: t('domain_already_exists') });
     }
 
-    const { templates } = await fetch(process.env.TEMPLATES_URL).then((r) => r.json());
-    const template = templates.find((t) => t.title.toLowerCase() === app.name);
-    const envNotFound = envs.some((env) => !((template?.env || []).find((e) => e.name === env.name)));
+    const ip = await getDomainIp(process.env.ROOT_DOMAIN || 'localhost');
 
-    if (envNotFound) {
-        return res.status(400).send({ message: 'Envs are not valid' });
-    }
-
-    if (domain && domain !== app.domain) {
-        const ip = await getDomainIp(process.env.ROOT_DOMAIN || 'localhost');
-        const isValidDomain = await checkDnsRecord(domain, ip).catch(() => false);
-        const isAuthorizedDomain = await checkDomain(domain);
-
-        if (!isAuthorizedDomain) {
-            return res.status(400).send({
-                message: 'You are not authorized to use this domain',
-            });
+    if (domain !== app.domain && domain !== `${releaseName}.${process.env.ROOT_DOMAIN || 'localhost'}`) {
+        try {
+            await isValidDomain(domain, ip);
+        } catch ({ message }) {
+            return res.status(400).json({ message: t(message, { domain, ip }) });
         }
-
-        if (!isValidDomain) {
-            return res.status(400).send({
-                message: `Please setup a correct DNS zone of type A for your domain ${domain} with the ip ${ip} on your registrar (ex: Gandi, OVH, Online, 1&1)`,
-            });
-        }
-
-        await app.update({ domain });
     }
 
-    app.update({ state: 'standby' });
-    app.changed('updatedAt', true);
-    app.save();
+    const templates = await fetchTemplates();
+    const template = templates.find(({ name }) => name.toLowerCase() === app.name.toLowerCase());
+    const allowedEnvs = (envs || []).filter(({ name }) => (template?.env || []).some((e) => e.name === name && !e.disabled));
 
-    for await (const { name, value } of envs) {
-        const [env] = await app.getEnvs({ where: { name }, raw: false });
-        await env.update({ value }, { where: { name } });
+    for await (const { name, value } of allowedEnvs) {
+        const existingEnv = await Env.findOne({ where: { name, appId: app.id }, raw: false });
+
+        if (existingEnv) {
+            await existingEnv.update({ value });
+        } else {
+            await Env.create({ name, value, appId: app.id });
+        }
     }
 
-    const allEnvs = await app.getEnvs({ raw: true });
+    await app.update({ domain });
 
-    const { repository } = template;
-    const { stackfile: stackFile, url: repositoryUrl } = repository;
+    const newEnvs = await app.getEnvs({ raw: true });
 
-    Object.keys(process.env).forEach((key) => {
-        const customEnvStartName = `CUSTOM_ENV_${app.name.toUpperCase().replace(/-/g, '_')}_`;
-
-        if (key.startsWith('CUSTOM_ENV_ALL_') || key.startsWith(customEnvStartName)) {
-            const envName = key.replace('CUSTOM_ENV_ALL_', '').replace(customEnvStartName, '');
-            const envValue = decodeUnicode(process.env[key]);
-            const env = allEnvs.find((e) => e.name === envName);
-
-            if (env) {
-                env.value = envValue;
-            } else {
-                allEnvs.push({ name: envName, value: envValue });
-            }
-        }
-    });
-
-    await sendWebhook({
-        stackFile,
-        repositoryUrl,
-        releaseName,
-        domain,
+    await triggerWebhook(WEBHOOK_EVENTS.APP_UPDATED, {
+        releaseName: app.releaseName,
+        domain: app.domain,
         email: user.email,
         envs: JSON.stringify(
-            allEnvs.concat([
+            newEnvs.concat([
                 { name: 'DOMAIN', value: domain },
                 { name: 'NUMBER', value: `${app.id}` },
+                ...getCustomEnvs(app.name),
             ]),
         ),
-        type: 'update-app',
     });
 
-    return res.status(200).send({ success: true });
+    return res.status(200).json({ ok: true });
 };
 
 const deleteQuery = async (req, res, user) => {
-    const { releaseName } = req;
+    const t = useTranslation(req?.headers?.['accept-language']);
+    const { releaseName } = req.body || {};
 
-    const [app] = await user.getApps({ where: { releaseName }, raw: false });
-    await app.update({ state: 'deleted' });
-    const subscriptions = await getCustomerSubscriptions(user.id);
+    const app = await App.findOne({ where: { releaseName, userId: user.id }, raw: false });
 
-    for await (const subscription of subscriptions.filter((s) => s.metadata.releaseName === releaseName)) {
-        await deleteSubscription(subscription.id);
+    if (!app) {
+        return res.status(404).json({ message: t('app_not_found') });
     }
 
-    await sendWebhook({
-        releaseName,
+    await app.update({ state: STATE.DELETED });
+
+    if (process.env.STRIPE_SECRET_KEY) {
+        await cancelStripeSubscription(user, { releaseName });
+    }
+
+    await triggerWebhook(WEBHOOK_EVENTS.APP_UNINSTALLED, {
         name: app.name,
+        domain: app.domain,
         email: user.email,
-        type: 'uninstall-app',
+        releaseName: app.releaseName,
     });
 
-    return res.status(200).send({ message: 'App deleted' });
+    return res.status(200).json({ ok: true });
 };
 
-export default protectRoute(async ({ body, method }, res, user) => {
-    if (method === 'GET') return getQuery(body, res, user);
-    if (method === 'POST') return postQuery(body, res, user);
-    if (method === 'PUT') return putQuery(body, res, user);
-    if (method === 'DELETE') return deleteQuery(body, res, user);
+export default async (req, res) => {
+    const t = useTranslation(req?.headers?.['accept-language']);
+    const email = req.headers['x-user-email'];
+    const user = await User.findOne({ where: { email }, raw: true }).catch(() => false);
 
-    return res.status(405).send({ message: 'Method not allowed' });
-});
+    if (!user) {
+        res.setHeader('Set-Cookie', 'token=; HttpOnly; Path=/; Max-Age=-1');
+        return res.status(401).json({ message: t('unauthorized') });
+    }
+
+    if (req.method === 'GET') return getQuery(req, res, user);
+    if (req.method === 'POST') return postQuery(req, res, user);
+    if (req.method === 'PUT') return putQuery(req, res, user);
+    if (req.method === 'DELETE') return deleteQuery(req, res, user);
+
+    res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
+    return res.status(405).json({ message: t('method_not_allowed') });
+};
