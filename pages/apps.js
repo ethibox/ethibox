@@ -37,6 +37,7 @@ const SettingsModal = ({ app, open, onClose, onSaved, onError, onUninstall }) =>
                     const { message } = await res.json();
                     throw new Error(message || 'Failed to save settings');
                 }
+                onClose();
                 onSaved(envs, domain);
             })
             .catch(({ message }) => {
@@ -285,13 +286,15 @@ export default ({ stripeEnabled = false }) => {
                     setTimeout(() => router.push('/apps', undefined, { shallow: true }), 200);
                 }}
                 onSaved={(envs, domain) => {
-                    setApps((prev) => prev.map((a) => (a.releaseName === currentApp.releaseName ? { ...a, envs, domain } : a)));
-                    setNotification({
-                        show: true,
-                        title: t('apps.notifications.updated.title'),
-                        description: t('apps.notifications.updated.description'),
-                        icon: Notification.CheckCircleIcon,
-                    });
+                    setApps((prev) => prev.map((a) => (a.releaseName === currentApp.releaseName ? { ...a, envs, domain, state: STATE.STANDBY, updatedAt: new Date() } : a)));
+                    setTimeout(() => {
+                        setNotification({
+                            show: true,
+                            title: t('apps.notifications.updated.title'),
+                            description: t('apps.notifications.updated.description'),
+                            icon: Notification.CheckCircleIcon,
+                        });
+                    }, 500);
                 }}
                 onUninstall={() => {
                     setModalOpen(false);

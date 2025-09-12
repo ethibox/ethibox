@@ -147,7 +147,7 @@ const putQuery = async (req, res, user) => {
         }
     }
 
-    await app.update({ domain });
+    await app.update({ domain, state: STATE.STANDBY });
 
     const newEnvs = await app.getEnvs({ raw: true });
 
