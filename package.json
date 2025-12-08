@@ -55,7 +55,7 @@
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7",
     "stripe": "^18.5.0",
-    "validator": "^13.15.23"
+    "validator": "^13.15.22"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",
