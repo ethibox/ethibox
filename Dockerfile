@@ -1,4 +1,4 @@
-FROM node:22 AS build
+FROM node:24 AS build
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -13,7 +13,7 @@ RUN yarn install \
     && rm -rf node_modules \
     && yarn install --prod --ignore-optional
 
-FROM gcr.io/distroless/nodejs22
+FROM gcr.io/distroless/nodejs24
 
 WORKDIR /app
 
@@ -24,5 +24,7 @@ ENV NODE_ENV=production
 VOLUME /app/data
 
 EXPOSE 3000
+
+HEALTHCHECK --interval=1m --start-period=20s CMD ["/nodejs/bin/node", "lib/healthcheck.js"]
 
 CMD ["node_modules/.bin/next", "start"]
