@@ -22,7 +22,7 @@ test('Should create a stripe customer', async () => {
     expect(customer.id).toBe(`${user.id}`);
     expect(customer.email).toBe(user.email);
     expect(customer.name).toBe('John Doe');
-});
+}, 20000);
 
 test('Should retrieve payment method of a stripe customer', async () => {
     const user = { id: 1, email: 'contact@ethibox.fr' };
@@ -40,14 +40,14 @@ test('Should create a stripe product', async () => {
     const product = await upsertStripeProduct('Nextcloud');
 
     expect(product.id).toMatch(/^prod_/);
-});
+}, 20000);
 
 test('Should create a stripe price', async () => {
     const product = await upsertStripeProduct('Nextcloud');
     const price = await upsertStripePrice(product);
 
     expect(price.id).toMatch(/^price_/);
-});
+}, 20000);
 
 test('Shoud create a stripe subscription', async () => {
     const user = { id: 1, email: 'contact@ethibox.fr' };
@@ -63,7 +63,7 @@ test('Should not create a stripe subscription if the customer does not have a pa
     const subscription = await upsertStripeSubscription({ id: user.id }, 'Nextcloud');
 
     expect(subscription).toBe(null);
-});
+}, 20000);
 
 test('Should cancel a stripe subscription', async () => {
     const user = { id: 1, email: 'contact@ethibox.fr' };
@@ -88,4 +88,4 @@ test('Should create a checkout url', async () => {
     const url = await createStripeCheckoutUrl(app, user);
 
     expect(url).toContain('https://checkout.stripe.com');
-});
+}, 20000);
