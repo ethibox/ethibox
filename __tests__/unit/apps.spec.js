@@ -1,6 +1,13 @@
 import { jest } from '@jest/globals';
-import handler from '../../pages/api/apps';
-import { Env, User, App, sequelize } from '../../lib/orm';
+
+jest.unstable_mockModule('../../lib/docker', () => ({
+    init: jest.fn().mockResolvedValue(true),
+    deploy: jest.fn().mockResolvedValue(true),
+    remove: jest.fn().mockResolvedValue(true),
+}));
+
+const { Env, User, App, sequelize } = await import('../../lib/orm');
+const { default: handler } = await import('../../pages/api/apps');
 
 beforeAll(async () => {
     delete process.env.STRIPE_SECRET_KEY;

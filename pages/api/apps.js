@@ -1,5 +1,6 @@
-import { STATE, WEBHOOK_EVENTS, NEXT_PUBLIC_BASE_PATH } from '../../lib/constants';
+import { STATE, WEBHOOK_EVENTS, NEXT_PUBLIC_BASE_PATH, TEMPLATES_URL } from '../../lib/constants';
 import { App, User, Env, Op } from '../../lib/orm';
+import { deploy, remove } from '../../lib/docker';
 import {
     getDomainIp,
     isValidDomain,
@@ -69,9 +70,15 @@ const postQuery = async (req, res, user) => {
         }
     }
 
-    const app = await App.create({ releaseName, domain, userId: user.id });
+    const app = await App.create({
+        domain,
+        releaseName,
+        userId: user.id,
+        commit: template.commit,
+        state: template.manual ? STATE.WAITING : STATE.STANDBY,
+    });
 
-    const envs = template?.env || [];
+    const envs = (template?.env || []).concat(getCustomEnvs(name));
 
     for await (const env of envs) {
         const { select } = env;
@@ -88,10 +95,12 @@ const postQuery = async (req, res, user) => {
             env.value = select[0].value;
         }
 
-        await Env.create({ name: env.name, value: env.value, appId: app.id });
+        if (env.value) {
+            await Env.create({ name: env.name, value: env.value, appId: app.id });
+        }
     }
 
-    await triggerWebhook(WEBHOOK_EVENTS.APP_INSTALLED, {
+    const payload = ({
         name: template.name,
         releaseName: app.releaseName,
         domain: app.domain,
@@ -101,11 +110,18 @@ const postQuery = async (req, res, user) => {
             envs.concat([
                 { name: 'DOMAIN', value: domain },
                 { name: 'NUMBER', value: `${app.id}` },
-                ...getCustomEnvs(name),
-            ]),
+            ]).map((e) => ({ name: e.name, value: e.value })),
         ),
         ...template,
     });
+
+    if (app.state === STATE.WAITING) {
+        payload.stackfile = TEMPLATES_URL.replace('templates.json', 'stacks/waiting.yml');
+    }
+
+    await deploy(payload.stackfile, payload.releaseName, JSON.parse(payload.envs));
+
+    await triggerWebhook(WEBHOOK_EVENTS.APP_INSTALLED, payload);
 
     return res.status(201).json({ ok: true, url: '/apps?installed=true' });
 };
@@ -137,7 +153,7 @@ const putQuery = async (req, res, user) => {
     const template = templates.find(({ name }) => name.toLowerCase() === app.name.toLowerCase());
     const allowedEnvs = (envs || []).filter(({ name }) => (template?.env || []).some((e) => e.name === name && !e.disabled));
 
-    for await (const { name, value } of allowedEnvs) {
+    for await (const { name, value } of allowedEnvs.concat(getCustomEnvs(app.name))) {
         const existingEnv = await Env.findOne({ where: { name, appId: app.id }, raw: false });
 
         if (existingEnv) {
@@ -147,11 +163,11 @@ const putQuery = async (req, res, user) => {
         }
     }
 
-    await app.update({ domain, state: STATE.STANDBY });
+    await app.update({ domain, state: app.state === STATE.WAITING ? app.state : STATE.STANDBY });
 
     const newEnvs = await app.getEnvs({ raw: true });
 
-    await triggerWebhook(WEBHOOK_EVENTS.APP_UPDATED, {
+    const payload = ({
         releaseName: app.releaseName,
         domain: app.domain,
         email: user.email,
@@ -159,10 +175,18 @@ const putQuery = async (req, res, user) => {
             newEnvs.concat([
                 { name: 'DOMAIN', value: domain },
                 { name: 'NUMBER', value: `${app.id}` },
-                ...getCustomEnvs(app.name),
-            ]),
+            ]).map(({ name, value }) => ({ name, value })),
         ),
+        ...template,
     });
+
+    if (app.state === STATE.WAITING) {
+        payload.stackfile = TEMPLATES_URL.replace('templates.json', 'stacks/waiting.yml');
+    }
+
+    await deploy(payload.stackfile, payload.releaseName, JSON.parse(payload.envs));
+
+    await triggerWebhook(WEBHOOK_EVENTS.APP_UPDATED, payload);
 
     return res.status(200).json({ ok: true });
 };
@@ -182,6 +206,8 @@ const deleteQuery = async (req, res, user) => {
     if (process.env.STRIPE_SECRET_KEY) {
         await cancelStripeSubscription(user, { releaseName });
     }
+
+    await remove(app.releaseName);
 
     await triggerWebhook(WEBHOOK_EVENTS.APP_UNINSTALLED, {
         name: app.name,

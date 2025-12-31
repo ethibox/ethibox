@@ -249,7 +249,7 @@ export default ({ stripeEnabled = false }) => {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
                     {apps.map(({ releaseName, name, category, logo, domain, state, updatedAt }) => (
                         <div key={releaseName} data-test="app" className="overflow-hidden rounded-lg bg-white shadow-sm relative">
-                            {state === STATE.STANDBY && <ProgressBar updatedAt={updatedAt} text={t('apps.progress')} />}
+                            {[STATE.STANDBY, STATE.WAITING].includes(state) && <ProgressBar updatedAt={updatedAt} text={t('apps.progress')} />}
                             <div className="px-4 py-5">
                                 <span className="text-sm text-gray-700 float-right">
                                     <img src={logo} className="w-14 h-14" alt={name} />
