@@ -17,7 +17,7 @@ import {
     cancelStripeSubscription,
 } from '../../lib/stripe';
 
-const getQuery = async (req, res, user) => {
+const getQuery = async (_, res, user) => {
     const templates = await fetchTemplates(false);
 
     const apps = (await App.findAll({ where: { userId: user.id, state: { [Op.ne]: STATE.DELETED } }, include: Env, raw: false })).map((app) => {
@@ -34,7 +34,10 @@ const getQuery = async (req, res, user) => {
             if (existingEnv) existingEnv.value = env.value;
         });
 
-        const { id: _, userId: __, ...data } = app.dataValues;
+        const data = { ...app.dataValues };
+
+        delete data.id;
+        delete data.userId;
 
         return { ...data, name, logo, category, envs: envs || [] };
     });

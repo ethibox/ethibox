@@ -1,5 +1,5 @@
-import fs from 'fs';
-import crypto from 'crypto';
+import fs from 'node:fs';
+import crypto from 'node:crypto';
 import { withSentryConfig } from '@sentry/nextjs';
 import { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_SERVER } from 'next/constants.js';
 import { NEXT_PUBLIC_BASE_PATH, SOCKET_PATH } from './lib/constants.js';
@@ -17,7 +17,7 @@ const config = (phase) => {
     if (phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_SERVER) {
         try {
             fs.accessSync(SOCKET_PATH, fs.constants.F_OK);
-        } catch (e) {
+        } catch {
             console.error(`${SOCKET_PATH} not found.`); // eslint-disable-line no-console
             process.exit(1);
         }

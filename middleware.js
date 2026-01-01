@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
+import { NextResponse } from 'next/server';
 import { DEFAULT_LOCALE, NEXT_PUBLIC_BASE_PATH } from './lib/constants';
 
 const isAuthenticated = async (token, secret) => {
@@ -18,7 +18,10 @@ const isAuthenticated = async (token, secret) => {
 export default async (req) => {
     const { pathname } = req.nextUrl;
 
-    if (pathname.startsWith(`${NEXT_PUBLIC_BASE_PATH}/_next`) || /\.(.*)$/.test(pathname)) {
+    const isStaticFile = /\.(ico|png|jpg|jpeg|svg|css|js|woff2?|ttf|map)$/.test(pathname);
+    const isApiRoute = pathname.startsWith(`${NEXT_PUBLIC_BASE_PATH}/api/`);
+
+    if (pathname.startsWith(`${NEXT_PUBLIC_BASE_PATH}/_next`) || (isStaticFile && !isApiRoute)) {
         return NextResponse.next();
     }
 
