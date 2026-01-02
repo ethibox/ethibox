@@ -15,9 +15,7 @@ const config = (phase) => {
     }
 
     if (phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_SERVER) {
-        try {
-            fs.accessSync(SOCKET_PATH, fs.constants.F_OK);
-        } catch {
+        if (!process.env.DOCKER_HOST && !fs.existsSync(SOCKET_PATH)) {
             console.error(`${SOCKET_PATH} not found.`); // eslint-disable-line no-console
             process.exit(1);
         }
