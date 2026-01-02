@@ -9,7 +9,7 @@ const isAuthenticated = async (token, secret) => {
         const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
 
         return payload;
-    } catch (_) {
+    } catch {
         return null;
     }
 };

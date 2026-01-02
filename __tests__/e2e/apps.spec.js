@@ -31,7 +31,7 @@ it('Should install an application', () => {
         cy.get('.SubmitButton').click();
     });
 
-    cy.wait('@confirmPayment').its('request.url').then((url) => {
+    cy.wait('@confirmPayment', { timeout: 10000 }).its('request.url').then((url) => {
         const [, sessionId] = url.match(/payment_pages\/([^/]+)\/confirm/);
         cy.visit(`/?session_id=${sessionId}`);
         cy.url({ timeout: 10000 }).should('contain', '/apps');

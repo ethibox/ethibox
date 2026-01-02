@@ -20,7 +20,7 @@ import {
 const getQuery = async (_, res, user) => {
     const templates = await fetchTemplates(false);
 
-    const apps = (await App.findAll({ where: { userId: user.id, state: { [Op.ne]: STATE.DELETED } }, include: Env, raw: false })).map((app) => {
+    const apps = (await App.findAll({ where: { userId: user.id, state: { [Op.ne]: STATE.DELETED } }, include: Env })).map((app) => {
         const template = templates.find((t) => t.name.toLowerCase() === app.name);
         const { name = 'Unknown', logo = `${NEXT_PUBLIC_BASE_PATH}/logo.svg`, category = 'Unknown' } = template || {};
 
@@ -134,7 +134,7 @@ const putQuery = async (req, res, user) => {
     const t = useTranslation(req?.headers?.['accept-language']);
     const { releaseName, domain, envs } = req.body || {};
 
-    const app = await App.findOne({ where: { releaseName, userId: user.id }, raw: false });
+    const app = await App.findOne({ where: { releaseName, userId: user.id } });
 
     if (!app) return res.status(404).json({ message: t('app_not_found') });
 
@@ -157,7 +157,7 @@ const putQuery = async (req, res, user) => {
     const allowedEnvs = (envs || []).filter(({ name }) => (template?.env || []).some((e) => e.name === name && !e.disabled));
 
     for await (const { name, value } of allowedEnvs.concat(getCustomEnvs(app.name))) {
-        const existingEnv = await Env.findOne({ where: { name, appId: app.id }, raw: false });
+        const existingEnv = await Env.findOne({ where: { name, appId: app.id } });
 
         if (existingEnv) {
             await existingEnv.update({ value });
@@ -168,7 +168,7 @@ const putQuery = async (req, res, user) => {
 
     await app.update({ domain, state: app.state === STATE.WAITING ? app.state : STATE.STANDBY });
 
-    const newEnvs = await app.getEnvs({ raw: true });
+    const newEnvs = await app.getEnvs();
 
     const payload = ({
         releaseName: app.releaseName,
@@ -198,7 +198,7 @@ const deleteQuery = async (req, res, user) => {
     const t = useTranslation(req?.headers?.['accept-language']);
     const { releaseName } = req.body || {};
 
-    const app = await App.findOne({ where: { releaseName, userId: user.id }, raw: false });
+    const app = await App.findOne({ where: { releaseName, userId: user.id } });
 
     if (!app) {
         return res.status(404).json({ message: t('app_not_found') });
