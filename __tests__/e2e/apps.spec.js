@@ -1,5 +1,7 @@
+import { TEST_EMAIL, TEST_PASSWORD } from '../../lib/constants';
+
 beforeEach(() => {
-    cy.login({ email: 'contact@ethibox.fr', password: 'myp@ssw0rd' });
+    cy.login({ email: TEST_EMAIL, password: TEST_PASSWORD });
     cy.visit('/apps');
     cy.wait(100).clock(new Date().getTime(), ['Date']).tick(500000);
 });
@@ -52,7 +54,7 @@ it('Should update SMTP settings of an application', () => {
     cy.get('[data-test="app-env-SMTP_HOST"]').clear().type('smtp.example.com');
     cy.get('[data-test="app-env-SMTP_PORT"]').clear().type('587');
     cy.get('[data-test="app-env-SMTP_USERNAME"]').clear().type('user@example.com');
-    cy.get('[data-test="app-env-SMTP_PASSWORD"]').clear().type('myp@ssw0rd');
+    cy.get('[data-test="app-env-SMTP_PASSWORD"]').clear().type(TEST_PASSWORD);
     cy.get('button[type="submit"]').click();
 
     cy.get('[data-test="notification"]').should('contain', 'Application updated');

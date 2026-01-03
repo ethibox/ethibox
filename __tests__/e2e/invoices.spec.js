@@ -1,5 +1,7 @@
+import { TEST_EMAIL, TEST_PASSWORD } from '../../lib/constants';
+
 beforeEach(() => {
-    cy.login({ email: 'contact@ethibox.fr', password: 'myp@ssw0rd' });
+    cy.login({ email: TEST_EMAIL, password: TEST_PASSWORD });
     cy.visit('/invoices');
 });
 

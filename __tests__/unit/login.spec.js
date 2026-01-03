@@ -2,10 +2,11 @@ import { jest } from '@jest/globals';
 import bcrypt from 'bcrypt';
 import handler from '../../pages/api/login';
 import { User } from '../../lib/orm';
+import { TEST_PASSWORD } from '../../lib/constants';
 
 test('should login with valid credentials', async () => {
     const email = `test+${Date.now()}@example.com`;
-    const password = 'myp@ssw0rd';
+    const password = TEST_PASSWORD;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await User.findOrCreate({

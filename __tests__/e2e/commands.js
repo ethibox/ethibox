@@ -1,3 +1,5 @@
+import { TEST_EMAIL, TEST_PASSWORD } from '../../lib/constants';
+
 Cypress.Commands.add('login', ({ email, password }) => {
     cy.session(email, () => {
         cy.visit('/login');
@@ -26,11 +28,11 @@ Cypress.Commands.add('resetPassword', () => {
         cy.request({
             method: 'POST',
             url: '/api/reset-password',
-            body: { token, password: 'myp@ssw0rd' },
+            body: { token, password: TEST_PASSWORD },
         });
     });
 });
 
 before(() => {
-    cy.register({ email: 'contact@ethibox.fr', password: 'myp@ssw0rd' });
+    cy.register({ email: TEST_EMAIL, password: TEST_PASSWORD });
 });

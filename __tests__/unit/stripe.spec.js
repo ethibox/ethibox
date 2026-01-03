@@ -8,13 +8,14 @@ import stripe, {
     upsertStripeSubscription,
 } from '../../lib/stripe';
 import { User, App, sequelize } from '../../lib/orm';
+import { TEST_EMAIL, TEST_PASSWORD } from '../../lib/constants';
 
 beforeAll(async () => {
     await sequelize.sync({ force: true });
 });
 
 test('Should create a stripe customer', async () => {
-    const user = { id: 1, firstName: 'John', lastName: 'Doe', email: 'contact@ethibox.fr' };
+    const user = { id: 1, firstName: 'John', lastName: 'Doe', email: TEST_EMAIL };
 
     await upsertStripeCustomer(user);
 
@@ -25,13 +26,13 @@ test('Should create a stripe customer', async () => {
 }, 20000);
 
 test('Should retrieve payment method of a stripe customer', async () => {
-    const user = { id: 1, email: 'contact@ethibox.fr' };
+    const user = { id: 1, email: TEST_EMAIL };
     await upsertStripeCustomer({ id: user.id, email: user.email });
     const pm = await stripe.paymentMethods.create({ type: 'card', card: { number: '4242424242424242', exp_month: 12, exp_year: 2030, cvc: '123' } });
     await stripe.paymentMethods.attach(pm.id, { customer: `${user.id}` });
     await stripe.customers.update(`${user.id}`, { invoice_settings: { default_payment_method: pm.id } });
 
-    const paymentMethod = await getStripePaymentMethod({ id: user.id, email: 'contact@ethibox.fr' });
+    const paymentMethod = await getStripePaymentMethod({ id: user.id, email: TEST_EMAIL });
 
     expect(paymentMethod.last4).toBe('4242');
 }, 20000);
@@ -50,7 +51,7 @@ test('Should create a stripe price', async () => {
 }, 20000);
 
 test('Shoud create a stripe subscription', async () => {
-    const user = { id: 1, email: 'contact@ethibox.fr' };
+    const user = { id: 1, email: TEST_EMAIL };
     const subscription = await upsertStripeSubscription({ id: user.id }, 'Nextcloud');
 
     expect(subscription.id).toMatch(/^sub_/);
@@ -66,7 +67,7 @@ test('Should not create a stripe subscription if the customer does not have a pa
 }, 20000);
 
 test('Should cancel a stripe subscription', async () => {
-    const user = { id: 1, email: 'contact@ethibox.fr' };
+    const user = { id: 1, email: TEST_EMAIL };
     const subscription = await upsertStripeSubscription({ id: user.id }, 'Nextcloud', { releaseName: 'nextcloud1' });
 
     await cancelStripeSubscription({ id: user.id }, { releaseName: 'nextcloud1' });
@@ -76,14 +77,14 @@ test('Should cancel a stripe subscription', async () => {
 }, 20000);
 
 test('Should create multiple stripe subscriptions with the same product name', async () => {
-    const user = { id: 1, email: 'contact@ethibox.fr' };
+    const user = { id: 1, email: TEST_EMAIL };
     await upsertStripeSubscription({ id: user.id }, 'Nextcloud');
     await upsertStripeSubscription({ id: user.id }, 'Nextcloud');
 }, 20000);
 
 test('Should create a checkout url', async () => {
-    const email = 'contact@ethibox.fr';
-    const [user] = await User.findOrCreate({ where: { email }, defaults: { password: 'myp@ssw0rd' } });
+    const email = TEST_EMAIL;
+    const [user] = await User.findOrCreate({ where: { email }, defaults: { password: TEST_PASSWORD } });
     const app = await App.create({ releaseName: 'nextcloud1', domain: 'nextcloud1.localhost', userId: user.id });
     const url = await createStripeCheckoutUrl(app, user);
 

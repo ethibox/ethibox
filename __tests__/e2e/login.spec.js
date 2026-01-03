@@ -1,8 +1,10 @@
+import { TEST_EMAIL, TEST_PASSWORD } from '../../lib/constants';
+
 it('Should login with valid credentials', () => {
     cy.visit('/login');
 
-    cy.get('input[name="email"]').type('contact@ethibox.fr');
-    cy.get('input[name="password"]').type('myp@ssw0rd');
+    cy.get('input[name="email"]').type(TEST_EMAIL);
+    cy.get('input[name="password"]').type(TEST_PASSWORD);
     cy.get('button[type="submit"]').click();
 
     cy.url().should('not.include', '/login');
@@ -11,7 +13,7 @@ it('Should login with valid credentials', () => {
 it('Should display error message if login fails', () => {
     cy.visit('/login');
 
-    cy.get('input[name="email"]').type('contact@ethibox.fr');
+    cy.get('input[name="email"]').type(TEST_EMAIL);
     cy.get('input[name="password"]').type('badpassword');
     cy.get('button[type="submit"]').click();
 

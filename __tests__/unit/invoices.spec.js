@@ -2,6 +2,7 @@ import { jest } from '@jest/globals';
 import handler from '../../pages/api/invoices';
 import { User } from '../../lib/orm';
 import stripe, { upsertStripeSubscription, upsertStripeCustomer } from '../../lib/stripe';
+import { TEST_PASSWORD } from '../../lib/constants';
 
 const setupCustomer = async (id, email) => {
     await upsertStripeCustomer({ id, email });
@@ -12,7 +13,7 @@ const setupCustomer = async (id, email) => {
 
 test('should retrieve stripe invoices', async () => {
     const email = `test+${Date.now()}@example.com`;
-    const [user] = await User.findOrCreate({ where: { email }, defaults: { password: 'password123' } });
+    const [user] = await User.findOrCreate({ where: { email }, defaults: { password: TEST_PASSWORD } });
 
     await setupCustomer(user.id, email);
     await upsertStripeSubscription({ id: user.id, email }, 'Wordpress');

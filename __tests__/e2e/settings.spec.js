@@ -1,9 +1,11 @@
+import { TEST_PASSWORD } from '../../lib/constants';
+
 before(() => {
-    cy.register({ email: 'contact+2@ethibox.fr', password: 'myp@ssw0rd' });
+    cy.register({ email: 'contact+2@ethibox.fr', password: TEST_PASSWORD });
 });
 
 beforeEach(() => {
-    cy.login({ email: 'contact+2@ethibox.fr', password: 'myp@ssw0rd' });
+    cy.login({ email: 'contact+2@ethibox.fr', password: TEST_PASSWORD });
     cy.visit('/settings');
 });
 

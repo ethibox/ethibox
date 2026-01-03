@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals';
-import { STATE } from '../../lib/constants';
-import { User, App, sequelize } from '../../lib/orm';
 import handler from '../../pages/api/settings';
+import { User, App, sequelize } from '../../lib/orm';
+import { STATE, TEST_EMAIL, TEST_PASSWORD } from '../../lib/constants';
 import stripe, { upsertStripeCustomer, upsertStripeSubscription } from '../../lib/stripe';
 
 await sequelize.sync({ force: true });
@@ -36,8 +36,8 @@ test('Should update user firstName and lastName', async () => {
 });
 
 test('Should delete user account', async () => {
-    const email = 'contact@ethibox.fr';
-    await User.findOrCreate({ where: { email }, defaults: { password: 'myp@ssw0rd' } });
+    const email = TEST_EMAIL;
+    await User.findOrCreate({ where: { email }, defaults: { password: TEST_PASSWORD } });
 
     const req = { method: 'DELETE', headers: { 'x-user-email': email } };
 
@@ -58,7 +58,7 @@ test('Should delete user account', async () => {
 
 test('Should delete user apps when deleting account', async () => {
     const email = 'contact+2@ethibox.fr';
-    const [user] = await User.findOrCreate({ where: { email }, defaults: { password: 'myp@ssw0rd' } });
+    const [user] = await User.findOrCreate({ where: { email }, defaults: { password: TEST_PASSWORD } });
 
     await App.create({ releaseName: 'nextcloud1', domain: 'nextcloud1.localhost', userId: user.id });
     await App.create({ releaseName: 'wordpress2', domain: 'wordpress1.localhost', userId: user.id });
@@ -85,7 +85,7 @@ test('Should delete user apps when deleting account', async () => {
 
 test('Should delete user stripe subscriptions when deleting account', async () => {
     const email = 'contact+3@ethibox.fr';
-    const [user] = await User.findOrCreate({ where: { email }, defaults: { password: 'myp@ssw0rd' } });
+    const [user] = await User.findOrCreate({ where: { email }, defaults: { password: TEST_PASSWORD } });
 
     await upsertStripeCustomer({ id: user.id, email });
 
