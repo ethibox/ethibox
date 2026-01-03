@@ -30,11 +30,11 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
             .then(async (res) => {
                 const { url, message } = await res.json();
 
-                if (!res.ok || !url.startsWith('https://billing.stripe.com')) {
+                if (url && new URL(url).hostname === 'billing.stripe.com') {
+                    window.location.href = url;
+                } else {
                     throw new Error(message || 'An error occurred while redirecting to Stripe.');
                 }
-
-                window.location.href = url;
             })
             .catch(({ message }) => {
                 setNotification({ show: true, title: 'Error', icon: Notification.XCircleIcon, description: message });
@@ -74,7 +74,7 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
                 if (res.ok) {
                     if (state.language !== router.locale) {
                         await router.push(router.pathname, router.pathname, { locale: state.language });
-                        document.cookie = `NEXT_LOCALE=${state.language}; path=/; max-age=31536000; samesite=lax`;
+                        document.cookie = `NEXT_LOCALE=${state.language}; path=/; max-age=31536000; samesite=lax${process.env.NODE_ENV === 'production' ? '; secure' : ''}`;
                     }
 
                     setNotification({
