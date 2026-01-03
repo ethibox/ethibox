@@ -4,7 +4,7 @@ import { triggerWebhook } from '../../lib/utils';
 import { WEBHOOK_EVENTS, NEXT_PUBLIC_BASE_PATH } from '../../lib/constants';
 
 export default async (req, res) => {
-    const { email, baseUrl } = req.body;
+    const { email } = req.body;
 
     const user = await User.findOne({ where: { email } }).catch(() => false);
 
@@ -12,7 +12,7 @@ export default async (req, res) => {
 
     const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    const resetUrl = `${baseUrl}${NEXT_PUBLIC_BASE_PATH}/reset-password?token=${token}`;
+    const resetUrl = `https://${process.env.ROOT_DOMAIN}${NEXT_PUBLIC_BASE_PATH}/reset-password?token=${token}`;
 
     console.log(`Password reset link for ${email}: ${resetUrl}`); // eslint-disable-line no-console
 

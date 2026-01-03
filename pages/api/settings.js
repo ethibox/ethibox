@@ -17,7 +17,7 @@ const putQuery = async (req, res, user) => {
 };
 
 const deleteQuery = async (req, res, user) => {
-    const apps = await App.findAll({ where: { userId: user.id, state: { [Op.ne]: STATE.DELETED } }, raw: false });
+    const apps = await App.findAll({ where: { userId: user.id, state: { [Op.ne]: STATE.DELETED } } });
 
     for await (const app of apps) {
         await app.update({ state: STATE.DELETED });
@@ -44,7 +44,7 @@ export default async (req, res) => {
     const t = useTranslation(req?.headers?.['accept-language']);
     const email = req.headers['x-user-email'];
 
-    const user = await User.findOne({ where: { email }, raw: false }).catch(() => false);
+    const user = await User.findOne({ where: { email } }).catch(() => false);
 
     if (!user) {
         res.setHeader('Set-Cookie', 'token=; HttpOnly; Path=/; Max-Age=-1');

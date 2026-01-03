@@ -1,5 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { defineConfig } from 'cypress';
+import { loadEnvConfig } from '@next/env';
+
+loadEnvConfig(process.cwd());
 
 export default defineConfig({
     chromeWebSecurity: false,
@@ -12,11 +15,7 @@ export default defineConfig({
         screenshotOnRunFailure: process.env.GITHUB_ACTIONS === 'true',
         setupNodeEvents(on) {
             on('task', {
-                'generate:jwt': () => {
-                    const secret = process.env.JWT_SECRET || 'mys3cr3t';
-                    const token = jwt.sign({ email: 'contact@ethibox.fr' }, secret, { expiresIn: '1d' });
-                    return token;
-                },
+                'generate:jwt': () => jwt.sign({ email: 'contact@ethibox.fr' }, process.env.JWT_SECRET, { expiresIn: '1d' }),
             });
         },
     },

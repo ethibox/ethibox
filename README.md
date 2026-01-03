@@ -11,8 +11,10 @@
 ## 📦 Installation
 
 ```bash
-docker run --name ethibox -p 3000:3000 ethibox/ethibox
+docker run -p 3000:3000 -v /var/run/docker.sock:/var/run/docker.sock ethibox/ethibox
 ```
+
+Go to [http://localhost:3000](http://localhost:3000) to access Ethibox.
 
 ## 🫱 Contributing
 

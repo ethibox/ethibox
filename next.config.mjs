@@ -1,9 +1,11 @@
-import crypto from 'crypto';
-import { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_SERVER } from 'next/constants.js';
+import fs from 'node:fs';
+import crypto from 'node:crypto';
 import { withSentryConfig } from '@sentry/nextjs';
-import { startCron } from './lib/cron.js';
-import { NEXT_PUBLIC_BASE_PATH } from './lib/constants.js';
+import { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_SERVER } from 'next/constants.js';
+import { NEXT_PUBLIC_BASE_PATH, SOCKET_PATH } from './lib/constants.js';
 import nextI18nextConfig from './next-i18next.config.mjs';
+import { startCron } from './lib/cron.js';
+import { init } from './lib/docker.js';
 
 const { i18n } = nextI18nextConfig;
 
@@ -13,6 +15,12 @@ const config = (phase) => {
     }
 
     if (phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_SERVER) {
+        if (!process.env.DOCKER_HOST && !fs.existsSync(SOCKET_PATH)) {
+            console.error(`${SOCKET_PATH} not found.`); // eslint-disable-line no-console
+            process.exit(1);
+        }
+
+        init();
         startCron();
     }
 

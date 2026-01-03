@@ -6,7 +6,7 @@ export default async (req, res) => {
     const t = useTranslation(req?.headers?.['accept-language']);
     const email = req.headers['x-user-email'];
 
-    const user = await User.findOne({ where: { email }, raw: false }).catch(() => false);
+    const user = await User.findOne({ where: { email } }).catch(() => false);
 
     if (!user) {
         res.setHeader('Set-Cookie', 'token=; HttpOnly; Path=/; Max-Age=-1');

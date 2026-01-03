@@ -1,5 +1,6 @@
-import { STATE, WEBHOOK_EVENTS, NEXT_PUBLIC_BASE_PATH } from '../../lib/constants';
+import { STATE, WEBHOOK_EVENTS, NEXT_PUBLIC_BASE_PATH, TEMPLATES_URL } from '../../lib/constants';
 import { App, User, Env, Op } from '../../lib/orm';
+import { deploy, remove } from '../../lib/docker';
 import {
     getDomainIp,
     isValidDomain,
@@ -16,10 +17,10 @@ import {
     cancelStripeSubscription,
 } from '../../lib/stripe';
 
-const getQuery = async (req, res, user) => {
+const getQuery = async (_, res, user) => {
     const templates = await fetchTemplates(false);
 
-    const apps = (await App.findAll({ where: { userId: user.id, state: { [Op.ne]: STATE.DELETED } }, include: Env, raw: false })).map((app) => {
+    const apps = (await App.findAll({ where: { userId: user.id, state: { [Op.ne]: STATE.DELETED } }, include: Env })).map((app) => {
         const template = templates.find((t) => t.name.toLowerCase() === app.name);
         const { name = 'Unknown', logo = `${NEXT_PUBLIC_BASE_PATH}/logo.svg`, category = 'Unknown' } = template || {};
 
@@ -33,7 +34,10 @@ const getQuery = async (req, res, user) => {
             if (existingEnv) existingEnv.value = env.value;
         });
 
-        const { id: _, userId: __, ...data } = app.dataValues;
+        const data = { ...app.dataValues };
+
+        delete data.id;
+        delete data.userId;
 
         return { ...data, name, logo, category, envs: envs || [] };
     });
@@ -69,9 +73,15 @@ const postQuery = async (req, res, user) => {
         }
     }
 
-    const app = await App.create({ releaseName, domain, userId: user.id });
+    const app = await App.create({
+        domain,
+        releaseName,
+        userId: user.id,
+        commit: template.commit,
+        state: template.manual ? STATE.WAITING : STATE.STANDBY,
+    });
 
-    const envs = template?.env || [];
+    const envs = (template?.env || []).concat(getCustomEnvs(name));
 
     for await (const env of envs) {
         const { select } = env;
@@ -88,10 +98,12 @@ const postQuery = async (req, res, user) => {
             env.value = select[0].value;
         }
 
-        await Env.create({ name: env.name, value: env.value, appId: app.id });
+        if (env.value) {
+            await Env.create({ name: env.name, value: env.value, appId: app.id });
+        }
     }
 
-    await triggerWebhook(WEBHOOK_EVENTS.APP_INSTALLED, {
+    const payload = ({
         name: template.name,
         releaseName: app.releaseName,
         domain: app.domain,
@@ -101,11 +113,18 @@ const postQuery = async (req, res, user) => {
             envs.concat([
                 { name: 'DOMAIN', value: domain },
                 { name: 'NUMBER', value: `${app.id}` },
-                ...getCustomEnvs(name),
-            ]),
+            ]).map((e) => ({ name: e.name, value: e.value })),
         ),
         ...template,
     });
+
+    if (app.state === STATE.WAITING) {
+        payload.stackfile = TEMPLATES_URL.replace('templates.json', 'stacks/waiting.yml');
+    }
+
+    await deploy(payload.stackfile, payload.releaseName, JSON.parse(payload.envs));
+
+    await triggerWebhook(WEBHOOK_EVENTS.APP_INSTALLED, payload);
 
     return res.status(201).json({ ok: true, url: '/apps?installed=true' });
 };
@@ -115,7 +134,7 @@ const putQuery = async (req, res, user) => {
     const t = useTranslation(req?.headers?.['accept-language']);
     const { releaseName, domain, envs } = req.body || {};
 
-    const app = await App.findOne({ where: { releaseName, userId: user.id }, raw: false });
+    const app = await App.findOne({ where: { releaseName, userId: user.id } });
 
     if (!app) return res.status(404).json({ message: t('app_not_found') });
 
@@ -137,8 +156,8 @@ const putQuery = async (req, res, user) => {
     const template = templates.find(({ name }) => name.toLowerCase() === app.name.toLowerCase());
     const allowedEnvs = (envs || []).filter(({ name }) => (template?.env || []).some((e) => e.name === name && !e.disabled));
 
-    for await (const { name, value } of allowedEnvs) {
-        const existingEnv = await Env.findOne({ where: { name, appId: app.id }, raw: false });
+    for await (const { name, value } of allowedEnvs.concat(getCustomEnvs(app.name))) {
+        const existingEnv = await Env.findOne({ where: { name, appId: app.id } });
 
         if (existingEnv) {
             await existingEnv.update({ value });
@@ -147,11 +166,11 @@ const putQuery = async (req, res, user) => {
         }
     }
 
-    await app.update({ domain, state: STATE.STANDBY });
+    await app.update({ domain, state: app.state === STATE.WAITING ? app.state : STATE.STANDBY });
 
-    const newEnvs = await app.getEnvs({ raw: true });
+    const newEnvs = await app.getEnvs();
 
-    await triggerWebhook(WEBHOOK_EVENTS.APP_UPDATED, {
+    const payload = ({
         releaseName: app.releaseName,
         domain: app.domain,
         email: user.email,
@@ -159,10 +178,18 @@ const putQuery = async (req, res, user) => {
             newEnvs.concat([
                 { name: 'DOMAIN', value: domain },
                 { name: 'NUMBER', value: `${app.id}` },
-                ...getCustomEnvs(app.name),
-            ]),
+            ]).map(({ name, value }) => ({ name, value })),
         ),
+        ...template,
     });
+
+    if (app.state === STATE.WAITING) {
+        payload.stackfile = TEMPLATES_URL.replace('templates.json', 'stacks/waiting.yml');
+    }
+
+    await deploy(payload.stackfile, payload.releaseName, JSON.parse(payload.envs));
+
+    await triggerWebhook(WEBHOOK_EVENTS.APP_UPDATED, payload);
 
     return res.status(200).json({ ok: true });
 };
@@ -171,7 +198,7 @@ const deleteQuery = async (req, res, user) => {
     const t = useTranslation(req?.headers?.['accept-language']);
     const { releaseName } = req.body || {};
 
-    const app = await App.findOne({ where: { releaseName, userId: user.id }, raw: false });
+    const app = await App.findOne({ where: { releaseName, userId: user.id } });
 
     if (!app) {
         return res.status(404).json({ message: t('app_not_found') });
@@ -182,6 +209,8 @@ const deleteQuery = async (req, res, user) => {
     if (process.env.STRIPE_SECRET_KEY) {
         await cancelStripeSubscription(user, { releaseName });
     }
+
+    await remove(app.releaseName);
 
     await triggerWebhook(WEBHOOK_EVENTS.APP_UNINSTALLED, {
         name: app.name,

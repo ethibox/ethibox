@@ -12,7 +12,7 @@ it('Should install an application', () => {
     cy.visit('/');
     cy.get('[data-test="app"]:has(img[alt="Kanboard"]) button[type="button"]').click();
 
-    cy.wait('@stripeSession');
+    cy.wait('@stripeSession', { timeout: 10000 });
 
     cy.origin('https://checkout.stripe.com', () => {
         cy.get('[data-testid="card-accordion-item"]').click();
@@ -31,10 +31,10 @@ it('Should install an application', () => {
         cy.get('.SubmitButton').click();
     });
 
-    cy.wait('@confirmPayment').its('request.url').then((url) => {
+    cy.wait('@confirmPayment', { timeout: 10000 }).its('request.url').then((url) => {
         const [, sessionId] = url.match(/payment_pages\/([^/]+)\/confirm/);
         cy.visit(`/?session_id=${sessionId}`);
-        cy.url().should('contain', '/apps');
+        cy.url({ timeout: 10000 }).should('contain', '/apps');
         cy.get('[data-test="app"]').should('exist');
     });
 });
