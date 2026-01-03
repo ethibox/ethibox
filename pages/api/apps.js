@@ -152,7 +152,7 @@ const putQuery = async (req, res, user) => {
         }
     }
 
-    const templates = await fetchTemplates();
+    const templates = await fetchTemplates(false);
     const template = templates.find(({ name }) => name.toLowerCase() === app.name.toLowerCase());
     const allowedEnvs = (envs || []).filter(({ name }) => (template?.env || []).some((e) => e.name === name && !e.disabled));
 
