@@ -252,14 +252,14 @@ export default ({ stripeEnabled = false }) => {
                             {[STATE.STANDBY, STATE.WAITING].includes(state) && <ProgressBar updatedAt={updatedAt} text={t('apps.progress')} />}
                             <div className="px-4 py-5">
                                 <span className="text-sm text-gray-700 float-right">
-                                    <img src={logo} className="w-14 h-14" alt={name} />
+                                    <img src={encodeURI(logo)} className="w-14 h-14" alt={name} />
                                 </span>
                                 <p className="text-sm font-semibold block">{name}</p>
                                 <p className="text-sm text-gray-500">{category}</p>
 
                                 <div className="flex mt-4">
                                     <ArrowTopRightOnSquareIcon className="w-4 h-4 text-gray-500 mr-1" />
-                                    <Link href={`https://${domain}`} target="_blank" className="text-xs underline" rel="noreferrer">{`https://${domain}`}</Link>
+                                    <Link href={`https://${encodeURI(domain)}`} target="_blank" className="text-xs underline" rel="noreferrer">{`https://${domain}`}</Link>
                                 </div>
                             </div>
 

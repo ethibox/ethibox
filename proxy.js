@@ -31,7 +31,7 @@ export default async (req) => {
 
     const locale = req.nextUrl.locale || DEFAULT_LOCALE;
     const base = NEXT_PUBLIC_BASE_PATH + (locale === DEFAULT_LOCALE ? '' : `/${locale}`);
-    const path = pathname.replace(new RegExp(`^${base}(?=/|$)`), '').replace(/\/$/, '') || '/';
+    const path = (pathname.startsWith(`${base}/`) || pathname === base ? pathname.slice(base.length) : pathname).replace(/\/$/, '') || '/';
 
     if (!isAuth && ['/', '/apps', '/settings', '/invoices'].includes(path)) {
         return NextResponse.redirect(new URL(`${base}/login`, req.nextUrl));

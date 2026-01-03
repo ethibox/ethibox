@@ -30,7 +30,7 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
             .then(async (res) => {
                 const { url, message } = await res.json();
 
-                if (!res.ok || !url) {
+                if (!res.ok || !url.startsWith('https://billing.stripe.com')) {
                     throw new Error(message || 'An error occurred while redirecting to Stripe.');
                 }
 
