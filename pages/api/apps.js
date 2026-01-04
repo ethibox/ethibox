@@ -55,7 +55,7 @@ const postQuery = async (req, res, user) => {
     const domain = `${releaseName}.${rootDomain}`;
 
     const templates = await fetchTemplates();
-    const template = templates.find((t) => t.name.toLowerCase() === name.toLowerCase());
+    const template = typeof name === 'string' && templates.find((t) => t.name.toLowerCase() === name.toLowerCase());
 
     const locale = req?.headers?.['accept-language'];
     const t = useTranslation(locale);
@@ -154,7 +154,7 @@ const putQuery = async (req, res, user) => {
 
     const templates = await fetchTemplates(false);
     const template = templates.find(({ name }) => name.toLowerCase() === app.name.toLowerCase());
-    const allowedEnvs = (envs || []).filter(({ name }) => (template?.env || []).some((e) => e.name === name && !e.disabled));
+    const allowedEnvs = (Array.isArray(envs) ? envs : []).filter(({ name }) => (template?.env || []).some((e) => e.name === name && !e.disabled));
 
     for await (const { name, value } of allowedEnvs.concat(getCustomEnvs(app.name))) {
         const existingEnv = await Env.findOne({ where: { name, appId: app.id } });
