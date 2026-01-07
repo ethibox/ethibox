@@ -27,7 +27,7 @@ const SettingsModal = ({ app, open, onClose, onSaved, onError, onUninstall }) =>
         const domain = formData.get('domain');
         const envs = app.envs.map(({ name, value, ...rest }) => ({ name, value: formData.get(name) || value, ...rest }));
 
-        fetch(`${router.basePath}/api/apps`, {
+        fetch('/api/apps', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
             body: JSON.stringify({ releaseName: app.releaseName, domain, envs }),
@@ -117,7 +117,7 @@ const ConfirmDeleteModal = ({ app, open, onClose, onConfirm, onError }) => {
 
     const onConfirmDelete = async () => {
         setLoading(true);
-        fetch(`${router.basePath}/api/apps`, {
+        fetch('/api/apps', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
             body: JSON.stringify({ releaseName: app.releaseName }),
@@ -168,7 +168,7 @@ export default ({ stripeEnabled = false }) => {
     const [showConfetti, setShowConfetti] = useState(false);
 
     useEffect(() => {
-        fetch(`${router.basePath}/api/apps`)
+        fetch('/api/apps')
             .then((res) => res.json())
             .then((data) => setApps(data?.apps || []))
             .catch(() => setApps([]));

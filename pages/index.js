@@ -19,9 +19,9 @@ export default ({ templates, appName = null, stripeEnabled = false }) => {
 
         setLoading(name);
 
-        const returnUrl = `${window.location.origin}${router.basePath}/${router.locale}`;
+        const returnUrl = `${window.location.origin}/${router.locale}`;
 
-        fetch(`${router.basePath}/api/apps`, {
+        fetch('/api/apps', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
             body: JSON.stringify({ name, returnUrl }),

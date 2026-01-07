@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../../lib/orm';
 import { triggerWebhook } from '../../lib/utils';
-import { WEBHOOK_EVENTS, NEXT_PUBLIC_BASE_PATH } from '../../lib/constants';
+import { WEBHOOK_EVENTS } from '../../lib/constants';
 
 export default async (req, res) => {
     const { email } = req.body;
@@ -12,7 +12,8 @@ export default async (req, res) => {
 
     const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    const resetUrl = `https://${process.env.ROOT_DOMAIN}${NEXT_PUBLIC_BASE_PATH}/reset-password?token=${token}`;
+    const protocol = req.headers?.['x-forwarded-proto'] || 'http';
+    const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL || `${protocol}://${req.headers?.host || 'localhost:3000'}`}/reset-password?token=${token}`;
 
     console.log(`Password reset link for ${email}: ${resetUrl}`); // eslint-disable-line no-console
 

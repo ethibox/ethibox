@@ -2,8 +2,8 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { withSentryConfig } from '@sentry/nextjs';
 import { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_SERVER } from 'next/constants.js';
-import { NEXT_PUBLIC_BASE_PATH, SOCKET_PATH } from './lib/constants.js';
 import nextI18nextConfig from './next-i18next.config.mjs';
+import { SOCKET_PATH } from './lib/constants.js';
 import { startCron } from './lib/cron.js';
 import { init } from './lib/docker.js';
 
@@ -27,8 +27,6 @@ const config = (phase) => {
     return {
         i18n,
         devIndicators: false,
-        basePath: NEXT_PUBLIC_BASE_PATH,
-        trailingSlash: !!NEXT_PUBLIC_BASE_PATH,
     };
 };
 

@@ -32,7 +32,7 @@ export default ({ token }) => {
             return;
         }
 
-        fetch(`${router.basePath}/api/reset-password`, {
+        fetch('/api/reset-password', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
             body: JSON.stringify({ token, password }),

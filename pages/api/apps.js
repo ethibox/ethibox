@@ -1,4 +1,4 @@
-import { STATE, WEBHOOK_EVENTS, NEXT_PUBLIC_BASE_PATH, TEMPLATES_URL } from '../../lib/constants';
+import { STATE, WEBHOOK_EVENTS, TEMPLATES_URL } from '../../lib/constants';
 import { App, User, Env, Op } from '../../lib/orm';
 import { deploy, remove } from '../../lib/docker';
 import {
@@ -22,7 +22,7 @@ const getQuery = async (_, res, user) => {
 
     const apps = (await App.findAll({ where: { userId: user.id, state: { [Op.ne]: STATE.DELETED } }, include: Env })).map((app) => {
         const template = templates.find((t) => t.name.toLowerCase() === app.name);
-        const { name = 'Unknown', logo = `${NEXT_PUBLIC_BASE_PATH}/logo.svg`, category = 'Unknown' } = template || {};
+        const { name = 'Unknown', logo = '/logo.svg', category = 'Unknown' } = template || {};
 
         const envs = template?.env?.filter((env) => !env.preset).map((env) => ({
             ...env,

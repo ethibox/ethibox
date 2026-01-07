@@ -11,7 +11,7 @@ export default () => {
 
     useEffect(() => {
         const doLogout = async () => {
-            fetch(`${router.basePath}/api/logout`, {
+            fetch('/api/logout', {
                 method: 'POST',
             }).then(() => {
                 setTimeout(() => {

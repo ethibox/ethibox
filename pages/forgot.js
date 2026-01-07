@@ -32,7 +32,7 @@ export default () => {
             return;
         }
 
-        fetch(`${router.basePath}/api/forgot`, {
+        fetch('/api/forgot', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
             body: JSON.stringify({ email }),

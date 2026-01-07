@@ -87,21 +87,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Login to registry
-        uses: docker/login-action@v3
-        with:
-          registry: registry.ethibox.fr
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build and push private Docker image
-        run: |
-          docker build \
-            --build-arg NEXT_PUBLIC_BASE_PATH=/app \
-            -t registry.ethibox.fr/ethibox:${{ steps.tag_version.outputs.new_tag }} \
-            -t registry.ethibox.fr/ethibox:latest .
-          docker push registry.ethibox.fr/ethibox --all-tags
-
       - name: Build and push public Docker image
         run: |
           docker build -t ethibox/ethibox:${{ steps.tag_version.outputs.new_tag }} -t ethibox/ethibox:latest .

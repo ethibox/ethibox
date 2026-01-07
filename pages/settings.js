@@ -20,9 +20,9 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
     const redirectToStripePortal = async () => {
         setIsRedirecting(true);
 
-        const returnUrl = `${window.location.origin}${router.basePath}/${router.locale}/settings`;
+        const returnUrl = `${window.location.origin}/${router.locale}/settings`;
 
-        fetch(`${router.basePath}/api/stripe`, {
+        fetch('/api/stripe', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
             body: JSON.stringify({ returnUrl, locale: router.locale }),
@@ -44,7 +44,7 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
 
     const onDelete = async () => {
         setIsDeleting(true);
-        fetch(`${router.basePath}/api/settings`, { method: 'DELETE' }).then(async (res) => {
+        fetch('/api/settings', { method: 'DELETE' }).then(async (res) => {
             if (res.ok) {
                 router.push('/logout');
             }
@@ -62,7 +62,7 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
         e.preventDefault();
         setLoading(true);
 
-        fetch(`${router.basePath}/api/settings`, {
+        fetch('/api/settings', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
             body: JSON.stringify({

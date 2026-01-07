@@ -14,7 +14,7 @@ export default ({ stripeEnabled = false }) => {
     const [notification, setNotification] = useState({ show: false, title: '', description: '', icon: null });
 
     useEffect(() => {
-        fetch(`${router.basePath}/api/invoices`)
+        fetch('/api/invoices')
             .then((res) => {
                 if (res.status === 401) router.push('/logout');
 

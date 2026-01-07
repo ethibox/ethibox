@@ -33,7 +33,7 @@ export default () => {
             return;
         }
 
-        fetch(`${router.basePath}/api/register`, {
+        fetch('/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
             body: JSON.stringify({ email, password }),
@@ -70,7 +70,7 @@ export default () => {
             />
 
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                <img alt="logo" src={`${router.basePath}/logo.svg`} className="mx-auto h-16 w-auto" />
+                <img alt="logo" src="/logo.svg" className="mx-auto h-16 w-auto" />
                 <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
                     {t('register.title')}
                 </h2>

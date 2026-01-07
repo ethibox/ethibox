@@ -1,6 +1,6 @@
 import { jwtVerify } from 'jose';
 import { NextResponse } from 'next/server';
-import { DEFAULT_LOCALE, NEXT_PUBLIC_BASE_PATH } from './lib/constants';
+import { DEFAULT_LOCALE } from './lib/constants';
 
 const isAuthenticated = async (token, secret) => {
     try {
@@ -19,9 +19,8 @@ export default async (req) => {
     const { pathname } = req.nextUrl;
 
     const isStaticFile = /\.(ico|png|jpg|jpeg|svg|css|js|woff2?|ttf|map)$/.test(pathname);
-    const isApiRoute = pathname.startsWith(`${NEXT_PUBLIC_BASE_PATH}/api/`);
 
-    if (pathname.startsWith(`${NEXT_PUBLIC_BASE_PATH}/_next`) || (isStaticFile && !isApiRoute)) {
+    if (pathname.startsWith('/_next') || (isStaticFile && !pathname.startsWith('/api/'))) {
         return NextResponse.next();
     }
 
@@ -30,7 +29,7 @@ export default async (req) => {
     const isAuth = Boolean(payload);
 
     const locale = req.nextUrl.locale || DEFAULT_LOCALE;
-    const base = NEXT_PUBLIC_BASE_PATH + (locale === DEFAULT_LOCALE ? '' : `/${locale}`);
+    const base = locale === DEFAULT_LOCALE ? '' : `/${locale}`;
     const path = (pathname.startsWith(`${base}/`) || pathname === base ? pathname.slice(base.length) : pathname).replace(/\/$/, '') || '/';
 
     if (!isAuth && ['/', '/apps', '/settings', '/invoices'].includes(path)) {
