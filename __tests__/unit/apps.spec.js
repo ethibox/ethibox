@@ -110,8 +110,8 @@ test('Should not return preset envs on GET request', async () => {
 
     const { envs } = res.json.mock.calls[0][0].apps[0];
 
-    expect(envs).toHaveLength(1);
-    expect(envs[0].name).toBe('FORCE_LANGUAGE');
+    expect(envs).toHaveLength(3);
+    expect(envs[2].name).toBe('FORCE_LANGUAGE');
     expect(envs.find((env) => env.name === 'OBJECTSTORE_S3_HOST')).toBeUndefined();
 });
 
@@ -133,7 +133,7 @@ test('Should only return envs defined in templates.json, no extra envs', async (
 
     const envs = res.json.mock.calls[0][0].apps.find((a) => a.releaseName === 'nextcloud5')?.envs || [];
 
-    expect(envs[0].name).toBe('FORCE_LANGUAGE');
+    expect(envs[2].name).toBe('FORCE_LANGUAGE');
     expect(envs.find((env) => env.name === 'CUSTOM_EXTRA_ENV')).toBeUndefined();
 });
 
@@ -152,12 +152,12 @@ test('Should return the correct env value and options for select type', async ()
     await handler(req, res);
 
     const envs = res.json.mock.calls[0][0].apps.find((a) => a.releaseName === 'nextcloud6')?.envs || [];
-    expect(envs).toHaveLength(1);
-    expect(envs[0].name).toBe('FORCE_LANGUAGE');
-    expect(envs[0].value).toBe('en');
-    expect(envs[0].type).toBe('select');
-    expect(envs[0].select[0]).toEqual({ name: 'Fr', value: 'fr' });
-    expect(envs[0].select[1]).toEqual({ name: 'En', value: 'en' });
+    expect(envs).toHaveLength(3);
+    expect(envs[2].name).toBe('FORCE_LANGUAGE');
+    expect(envs[2].value).toBe('en');
+    expect(envs[2].type).toBe('select');
+    expect(envs[2].select[0]).toEqual({ name: 'Fr', value: 'fr' });
+    expect(envs[2].select[1]).toEqual({ name: 'En', value: 'en' });
 });
 
 test('Should fill ADMIN_EMAIL with user email and ADMIN_PASSWORD with generated password', async () => {
