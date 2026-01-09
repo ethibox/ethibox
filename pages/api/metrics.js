@@ -37,7 +37,7 @@ export default async (req, res) => {
     const apps = await App.findAll({ where: { [Op.not]: { state: STATE.DELETED } } });
 
     for (const { domain, state, responseTime = 0 } of apps) {
-        gauge1.set({ domain }, state === STATE.ONLINE ? 1 : 0);
+        gauge1.set({ domain }, [STATE.ONLINE, STATE.WAITING].includes(state) ? 1 : 0);
         gauge2.set({ domain }, responseTime);
     }
 
