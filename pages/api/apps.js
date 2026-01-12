@@ -81,7 +81,7 @@ const postQuery = async (req, res, user) => {
         state: template.manual ? STATE.WAITING : STATE.STANDBY,
     });
 
-    const envs = (template?.env || []).concat(getCustomEnvs(name));
+    const envs = [...new Map([...(template?.env || []), ...getCustomEnvs(name)].map((item) => [item.name, item])).values()];
 
     for await (const env of envs) {
         const { select } = env;
@@ -155,8 +155,9 @@ const putQuery = async (req, res, user) => {
     const templates = await fetchTemplates(false);
     const template = templates.find(({ name }) => name.toLowerCase() === app.name.toLowerCase());
     const allowedEnvs = (Array.isArray(envs) ? envs : []).filter(({ name }) => (template?.env || []).some((e) => e.name === name && !e.disabled));
+    const uniqueEnvs = [...new Map([...allowedEnvs, ...getCustomEnvs(app.name)].map((item) => [item.name, item])).values()];
 
-    for await (const { name, value } of allowedEnvs.concat(getCustomEnvs(app.name))) {
+    for await (const { name, value } of uniqueEnvs) {
         const existingEnv = await Env.findOne({ where: { name, appId: app.id } });
 
         if (existingEnv) {
