@@ -157,7 +157,7 @@ const putQuery = async (req, res, user) => {
     const allowedEnvs = (Array.isArray(envs) ? envs : []).filter(({ name }) => (template?.env || []).some((e) => e.name === name && !e.disabled));
     const uniqueEnvs = [...new Map([...allowedEnvs, ...getCustomEnvs(app.name)].map((item) => [item.name, item])).values()];
 
-    for await (const { name, value } of uniqueEnvs) {
+    for await (const { name, value } of uniqueEnvs.filter((e) => e.value)) {
         const existingEnv = await Env.findOne({ where: { name, appId: app.id } });
 
         if (existingEnv) {
