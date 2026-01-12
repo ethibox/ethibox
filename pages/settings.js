@@ -202,8 +202,8 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
                                 <Button onClick={redirectToStripePortal} loading={isRedirecting} loadingText={t('apps.loadingStates.default')}>{t('settings.payment.manage')}</Button>
                             </div>
                         ) : (
-                            <div className="flex items-center justify-between">
-                                <p className="mt-1 text-sm text-gray-500">{t('settings.payment.noMethod')}</p>
+                            <div className="sm:flex items-center justify-between">
+                                <p className="my-2 text-sm text-gray-500">{t('settings.payment.noMethod')}</p>
                                 <Button onClick={redirectToStripePortal} loading={isRedirecting} loadingText={t('apps.loadingStates.default')}>{t('settings.payment.addMethod')}</Button>
                             </div>
                         )}
