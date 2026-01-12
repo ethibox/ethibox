@@ -122,9 +122,9 @@ const postQuery = async (req, res, user) => {
         payload.stackfile = TEMPLATES_URL.replace('templates.json', 'stacks/waiting.yml');
     }
 
-    await deploy(payload.stackfile, payload.releaseName, JSON.parse(payload.envs));
-
     await triggerWebhook(WEBHOOK_EVENTS.APP_INSTALLED, payload);
+
+    await deploy(payload.stackfile, payload.releaseName, JSON.parse(payload.envs));
 
     return res.status(201).json({ ok: true, url: '/apps?installed=true' });
 };
@@ -187,9 +187,9 @@ const putQuery = async (req, res, user) => {
         payload.stackfile = TEMPLATES_URL.replace('templates.json', 'stacks/waiting.yml');
     }
 
-    await deploy(payload.stackfile, payload.releaseName, JSON.parse(payload.envs));
-
     await triggerWebhook(WEBHOOK_EVENTS.APP_UPDATED, payload);
+
+    await deploy(payload.stackfile, payload.releaseName, JSON.parse(payload.envs));
 
     return res.status(200).json({ ok: true });
 };
