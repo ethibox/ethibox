@@ -205,13 +205,13 @@ const deleteQuery = async (req, res, user) => {
         return res.status(404).json({ message: t('app_not_found') });
     }
 
-    await app.update({ state: STATE.DELETED });
-
     if (process.env.STRIPE_SECRET_KEY) {
         await cancelStripeSubscription(user, { releaseName });
     }
 
     await remove(app.releaseName);
+
+    await app.update({ state: STATE.DELETED });
 
     await triggerWebhook(WEBHOOK_EVENTS.APP_UNINSTALLED, {
         name: app.name,

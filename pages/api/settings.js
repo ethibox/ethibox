@@ -1,6 +1,7 @@
 import { App, User, Op } from '../../lib/orm';
-import { triggerWebhook, useTranslation } from '../../lib/utils';
+import { remove } from '../../lib/docker';
 import { STATE, WEBHOOK_EVENTS } from '../../lib/constants';
+import { triggerWebhook, useTranslation } from '../../lib/utils';
 import { upsertStripeCustomer, cancelStripeSubscription } from '../../lib/stripe';
 
 const putQuery = async (req, res, user) => {
@@ -32,6 +33,8 @@ const deleteQuery = async (req, res, user) => {
             email: user.email,
             releaseName: app.releaseName,
         });
+
+        await remove(app.releaseName);
     }
 
     await user.destroy();

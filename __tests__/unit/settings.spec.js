@@ -1,8 +1,15 @@
 import { jest } from '@jest/globals';
-import handler from '../../pages/api/settings';
-import { User, App, sequelize } from '../../lib/orm';
 import { STATE, TEST_EMAIL, TEST_PASSWORD } from '../../lib/constants';
 import stripe, { upsertStripeCustomer, upsertStripeSubscription } from '../../lib/stripe';
+
+jest.unstable_mockModule('../../lib/docker', () => ({
+    init: jest.fn().mockResolvedValue(true),
+    deploy: jest.fn().mockResolvedValue(true),
+    remove: jest.fn().mockResolvedValue(true),
+}));
+
+const { User, App, sequelize } = await import('../../lib/orm');
+const { default: handler } = await import('../../pages/api/settings');
 
 await sequelize.sync({ force: true });
 
