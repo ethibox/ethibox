@@ -24,9 +24,13 @@ test('Should not trigger webhook without URL', async () => {
 test('Should trigger webhook successfully', async () => {
     process.env.WEBHOOK_URL = 'https://ethibox.fr';
 
+    const fetchMock = jest.spyOn(global, 'fetch').mockImplementation(() => Promise.resolve({ ok: true, status: 200 }));
+
     const res = await triggerWebhook('APP_INSTALLED', { name: 'nextcloud' });
 
     expect(res.ok).toBe(true);
+
+    fetchMock.mockRestore();
 });
 
 test('Should fail webhook on invalid URL', async () => {
