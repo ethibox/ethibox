@@ -41,7 +41,7 @@
     "index": {
         "title": "Application Store",
         "description": "A selection of the best open-source applications",
-        "moreInfos": "More infos",
+        "learnMore": "Learn more",
         "install": "Install application",
         "loading": "Loading...",
         "notifications": {

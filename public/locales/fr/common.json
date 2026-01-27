@@ -41,7 +41,7 @@
     "index": {
         "title": "Boutique d'applications",
         "description": "Une sélection des meilleures applications open-source",
-        "moreInfos": "Plus d'infos",
+        "learnMore": "En savoir plus",
         "install": "Installer l'application",
         "loading": "Chargement...",
         "notifications": {

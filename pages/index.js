@@ -79,7 +79,7 @@ export default ({ templates, appName = null, stripeEnabled = false }) => {
 
                                 <div className="flex mt-4">
                                     <ArrowTopRightOnSquareIcon className="w-4 h-4 text-gray-500 mr-1" />
-                                    <Link href={website} target="_blank" className="text-xs underline" rel="noreferrer">{t('index.moreInfos')}</Link>
+                                    <Link href={website} target="_blank" className="text-xs underline" rel="noreferrer">{t('index.learnMore')}</Link>
                                 </div>
                             </div>
 
