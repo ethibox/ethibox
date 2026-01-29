@@ -17,7 +17,11 @@ it('Should install an application', () => {
     cy.wait('@stripeSession', { timeout: 10000 });
 
     cy.origin('https://checkout.stripe.com', () => {
-        cy.get('[data-testid="card-accordion-item"]').click();
+        cy.get('body').then(($body) => {
+            if ($body.find('[data-testid="card-accordion-item"]').length) {
+                cy.get('[data-testid="card-accordion-item"]').click();
+            }
+        });
         cy.get('#cardNumber').type('4242424242424242');
         cy.get('#cardExpiry').type('1234');
         cy.get('#cardCvc').type('424');
