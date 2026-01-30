@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import { STATE, WEBHOOK_EVENTS, TEMPLATES_URL } from '../../lib/constants';
 import { App, User, Env, Op } from '../../lib/orm';
 import { deploy, remove } from '../../lib/docker';
@@ -45,7 +46,6 @@ const getQuery = async (_, res, user) => {
     return res.status(200).json({ apps });
 };
 
-// eslint-disable-next-line complexity
 const postQuery = async (req, res, user) => {
     const { name, returnUrl } = req.body || {};
 
@@ -129,7 +129,6 @@ const postQuery = async (req, res, user) => {
     return res.status(201).json({ ok: true, url: '/apps?installed=true' });
 };
 
-// eslint-disable-next-line complexity
 const putQuery = async (req, res, user) => {
     const t = useTranslation(req?.headers?.['accept-language']);
     const { releaseName, domain, envs } = req.body || {};

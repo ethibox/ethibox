@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { ExclamationCircleIcon } from '@heroicons/react/16/solid';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
-// eslint-disable-next-line complexity
 export default ({
     id,
     name,
@@ -22,6 +21,7 @@ export default ({
     type = 'text',
     className = '',
     ...rest
+// eslint-disable-next-line complexity
 }) => {
     const [inputValue, setInputValue] = useState(defaultValue || '');
     const [showPassword, setShowPassword] = useState(false);

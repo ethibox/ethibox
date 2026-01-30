@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';

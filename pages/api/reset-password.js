@@ -30,7 +30,7 @@ export default async (req, res) => {
         await User.update({ password: hashPassword }, { where: { email } });
 
         return res.status(200).json({ ok: true });
-    } catch (_) {
+    } catch {
         return res.status(401).send({ message: t('invalid_or_expired_token') });
     }
 };
