@@ -109,6 +109,7 @@
                 "description": "You can change your application settings here",
                 "domainLabel": "Domain Name",
                 "update": "Update",
+                "download": "Download data",
                 "back": "Back",
                 "uninstall": "Uninstall application"
             }
@@ -233,6 +234,7 @@
         "template_not_found": "Template not found",
         "no_payment_method": "No payment method found",
         "app_not_found": "App not found",
+        "download_failed": "Failed to download data, a download may already be in progress",
         "domain_already_exists": "Domain already exists",
         "unauthorized": "Unauthorized",
         "method_not_allowed": "Method Not Allowed",
