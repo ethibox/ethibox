@@ -44,6 +44,8 @@
         "learnMore": "Learn more",
         "install": "Install application",
         "loading": "Loading...",
+        "askingTitle": "Do you want a specific application?",
+        "askingButton": "Make a request",
         "notifications": {
             "payment": {
                 "title": "Payment method required",

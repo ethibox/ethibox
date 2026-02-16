@@ -44,6 +44,8 @@
         "learnMore": "En savoir plus",
         "install": "Installer l'application",
         "loading": "Chargement...",
+        "askingTitle": "Vous désirez une application en particulier ?",
+        "askingButton": "Faire une demande",
         "notifications": {
             "payment": {
                 "title": "Moyen de paiement requis",

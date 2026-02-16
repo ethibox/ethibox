@@ -88,6 +88,16 @@ export default ({ templates, appName = null, stripeEnabled = false }) => {
                             </div>
                         </div>
                     ))}
+                    <div className="flex flex-col overflow-hidden rounded-lg bg-white shadow-sm">
+                        <div className="flex-1 px-4 py-5 flex items-center justify-center">
+                            <p className="text-center font-semibold text-gray-900">{t('index.askingTitle')}</p>
+                        </div>
+                        <div className="p-4">
+                            <Link href="https://ethibox.fr/support?newapp=true" passHref>
+                                <Button className="w-full" secondary>{t('index.askingButton')}</Button>
+                            </Link>
+                        </div>
+                    </div>
                 </div>
             </div>
         </Layout>
