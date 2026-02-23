@@ -1,15 +1,12 @@
-import js from '@eslint/js';
 import globals from 'globals';
 import { FlatCompat } from '@eslint/eslintrc';
+import { fixupConfigRules } from '@eslint/compat';
 import pluginCypress from 'eslint-plugin-cypress';
 import pluginJest from 'eslint-plugin-jest';
 
-const compat = new FlatCompat({
-    baseDirectory: process.cwd(),
-    recommendedConfig: js.configs.recommended,
-});
+const compat = new FlatCompat({ baseDirectory: process.cwd() });
 
-export default [
+export default fixupConfigRules([
     ...compat.extends('airbnb'),
     { ignores: ['.next/'] },
     {
@@ -58,4 +55,4 @@ export default [
             'jest/expect-expect': 0,
         },
     },
-];
+]);
