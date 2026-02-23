@@ -38,6 +38,7 @@
     "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.2.0",
     "@sentry/nextjs": "^10.39.0",
+    "@vscode/sqlite3": "^5.1.12-vscode",
     "bcrypt": "^6.0.0",
     "i18next": "^25.8.13",
     "ip-range-check": "^0.2.0",
@@ -52,7 +53,6 @@
     "react-confetti": "^6.4.0",
     "react-i18next": "^15.7.4",
     "sequelize": "^6.37.7",
-    "sqlite3": "^5.1.7",
     "stripe": "^20.3.1",
     "validator": "^13.15.26"
   },
@@ -79,13 +79,7 @@
   "resolutions": {
     "jest/**/minimatch": "10.2.2",
     "@sentry/nextjs/**/minimatch": "10.2.2",
-    "eslint-plugin-jest/**/minimatch": "10.2.2",
-    "axios": "1.13.5",
-    "qs": "6.14.2",
-    "tar": "^7.5.7",
-    "node-gyp": "^12.1.0",
-    "lodash": "^4.17.23",
-    "@isaacs/brace-expansion": "^5.0.1"
+    "eslint-plugin-jest/**/minimatch": "10.2.2"
   },
   "jest": {
     "testPathIgnorePatterns": [
