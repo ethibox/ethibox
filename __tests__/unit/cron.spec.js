@@ -12,9 +12,19 @@ test('Should return standby if a domain has an error from less than 3 minutes ag
     fetchMock.mockRestore();
 });
 
-test('Should return offline if a domain has an error from more than 3 minutes ago', async () => {
+test('Should return standby if DNS does not match root domain', async () => {
     const fetchMock = jest.spyOn(global, 'fetch').mockImplementation(() => Promise.resolve({ status: 500 }));
     const app = { domain: 'error.ethibox.fr', state: STATE.STANDBY, updatedAt: new Date(Date.now() - 4 * 60 * 1000).toISOString() };
+
+    const state = await getAppState(app);
+
+    expect(state).toBe(STATE.STANDBY);
+    fetchMock.mockRestore();
+});
+
+test('Should return offline if a domain is down', async () => {
+    const fetchMock = jest.spyOn(global, 'fetch').mockImplementation(() => Promise.resolve({ status: 500 }));
+    const app = { domain: 'localhost', state: STATE.STANDBY, updatedAt: new Date(Date.now() - 4 * 60 * 1000).toISOString() };
 
     const state = await getAppState(app);
 
