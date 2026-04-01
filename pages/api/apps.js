@@ -103,7 +103,7 @@ const postQuery = async (req, res, user) => {
         }
     }
 
-    const payload = ({
+    const payload = {
         name: template.name,
         releaseName: app.releaseName,
         domain: app.domain,
@@ -116,7 +116,7 @@ const postQuery = async (req, res, user) => {
             ]).map((e) => ({ name: e.name, value: e.value })),
         ),
         ...template,
-    });
+    };
 
     if (app.state === STATE.WAITING) {
         payload.stackfile = TEMPLATES_URL.replace('templates.json', 'stacks/waiting.yml');
@@ -170,7 +170,7 @@ const putQuery = async (req, res, user) => {
 
     const newEnvs = await app.getEnvs();
 
-    const payload = ({
+    const payload = {
         releaseName: app.releaseName,
         domain: app.domain,
         email: user.email,
@@ -181,7 +181,7 @@ const putQuery = async (req, res, user) => {
             ]).map(({ name, value }) => ({ name, value })),
         ),
         ...template,
-    });
+    };
 
     if (app.state === STATE.WAITING) {
         payload.stackfile = TEMPLATES_URL.replace('templates.json', 'stacks/waiting.yml');

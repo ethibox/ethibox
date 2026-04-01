@@ -4,8 +4,6 @@ import { Op, App } from '../../lib/orm';
 import { STATE } from '../../lib/constants';
 
 register.clear();
-const gauge = new Gauge({ name: 'metric_name', help: 'metric_help' });
-
 const gauge1 = new Gauge({
     name: 'ethibox_success',
     help: 'Displays whether or not domain was a success',
@@ -31,8 +29,6 @@ export default async (req, res) => {
     if (!isAuthorized(ip)) {
         return res.status(401).send({ success: false, message: 'You are not authorized' });
     }
-
-    gauge.set(10);
 
     const apps = await App.findAll({ where: { [Op.not]: { state: STATE.DELETED } } });
 
