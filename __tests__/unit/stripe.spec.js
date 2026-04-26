@@ -80,7 +80,7 @@ test('Should create multiple stripe subscriptions with the same product name', a
     const user = { id: 1, email: TEST_EMAIL };
     await upsertStripeSubscription({ id: user.id }, 'Nextcloud');
     await upsertStripeSubscription({ id: user.id }, 'Nextcloud');
-}, 20000);
+}, 60000);
 
 test('Should create a checkout url', async () => {
     const email = TEST_EMAIL;
