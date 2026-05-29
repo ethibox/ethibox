@@ -37,7 +37,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.10",
     "@heroicons/react": "^2.2.0",
-    "@sentry/nextjs": "^10.54.0",
+    "@sentry/nextjs": "^10.55.0",
     "@vscode/sqlite3": "^5.1.12-vscode",
     "bcrypt": "^6.0.0",
     "i18next": "^25.10.10",
