@@ -37,7 +37,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.10",
     "@heroicons/react": "^2.2.0",
-    "@sentry/nextjs": "^10.55.0",
+    "@sentry/nextjs": "^10.56.0",
     "@vscode/sqlite3": "^5.1.12-vscode",
     "bcrypt": "^6.0.0",
     "i18next": "^25.10.10",
@@ -45,7 +45,7 @@
     "jose": "^6.2.3",
     "jsonwebtoken": "^9.0.3",
     "mariadb": "^3.5.2",
-    "next": "^16.2.6",
+    "next": "^16.2.7",
     "next-i18next": "^15.4.3",
     "node-cron": "^4.2.1",
     "node-fetch": "^3.3.2",
@@ -71,13 +71,14 @@
     "globals": "^17.6.0",
     "jest": "^30.4.2",
     "postcss": "^8.5.15",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
-    "start-server-and-test": "^3.0.5",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "start-server-and-test": "^3.0.6",
     "tailwindcss": "^4.3.0"
   },
   "resolutions": {
-    "postcss": "^8.5.12"
+    "postcss": "^8.5.12",
+    "uuid": "^11.1.1"
   },
   "jest": {
     "testPathIgnorePatterns": [
