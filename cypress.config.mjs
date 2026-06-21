@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { defineConfig } from 'cypress';
-import { loadEnvConfig } from '@next/env';
+import nextEnv from '@next/env';
+
+const { loadEnvConfig } = nextEnv;
 
 loadEnvConfig(process.cwd());
 
