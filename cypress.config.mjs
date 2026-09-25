@@ -7,6 +7,7 @@ const { loadEnvConfig } = nextEnv;
 loadEnvConfig(process.cwd());
 
 export default defineConfig({
+    allowCypressEnv: false,
     chromeWebSecurity: false,
     experimentalModifyObstructiveThirdPartyCode: true,
     e2e: {
