@@ -10,7 +10,7 @@ export default async (req, res) => {
 
     const user = await User.findOne({ where: { email } }).catch(() => false);
 
-    const passwordMatch = await bcrypt.compare(password, user?.password || '');
+    const passwordMatch = await bcrypt.compare(password || '', user?.password || '');
 
     if (!user || !passwordMatch) return res.status(401).send({ message: t('invalid_credentials') });
 

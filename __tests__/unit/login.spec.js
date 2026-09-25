@@ -49,3 +49,18 @@ test('should reject invalid credentials', async () => {
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.send).toHaveBeenCalledWith({ message: 'Invalid credentials' });
 });
+
+test('should reject missing password', async () => {
+    const req = { body: { email: 'nonexistent@example.com' } };
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis(),
+        setHeader: jest.fn().mockReturnThis(),
+    };
+
+    await handler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.send).toHaveBeenCalledWith({ message: 'Invalid credentials' });
+});
