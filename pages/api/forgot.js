@@ -10,7 +10,7 @@ export default async (req, res) => {
 
     if (!user) return res.status(200).json({ ok: true });
 
-    const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     const protocol = req.headers?.['x-forwarded-proto'] || 'http';
     const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL || `${protocol}://${req.headers?.host || 'localhost:3000'}`}/reset-password?token=${token}`;

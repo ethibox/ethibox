@@ -16,7 +16,7 @@ export default async (req, res) => {
 
     const { firstName, lastName } = user;
 
-    const token = jwt.sign({ firstName, lastName, email }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_TOKEN_TTL || '30d' });
+    const token = jwt.sign({ firstName, lastName, email: user.email }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_TOKEN_TTL || '30d' });
 
     res.setHeader('Set-Cookie', `token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`);
 

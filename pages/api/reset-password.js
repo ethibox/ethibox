@@ -27,7 +27,7 @@ export default async (req, res) => {
 
         const hashPassword = await bcrypt.hash(password, 10);
 
-        await User.update({ password: hashPassword }, { where: { email } });
+        await user.update({ password: hashPassword });
 
         return res.status(200).json({ ok: true });
     } catch {
