@@ -14,6 +14,7 @@ import {
 } from '../../lib/utils';
 import {
     getStripeSubscriptions,
+    rewardStripeReferrer,
     createStripeCheckoutUrl,
     cancelStripeSubscription,
 } from '../../lib/stripe';
@@ -71,6 +72,8 @@ const postQuery = async (req, res, user) => {
 
             return res.status(201).json({ ok: true, url });
         }
+
+        await rewardStripeReferrer(user);
     }
 
     const app = await App.create({

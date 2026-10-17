@@ -7,7 +7,7 @@ import { User } from '../lib/orm';
 import nextI18nextConfig from '../next-i18next.config.mjs';
 
 // eslint-disable-next-line complexity
-export default ({ email, firstName = '', lastName = '', paymentMethod = null, stripeEnabled = false }) => {
+export default ({ email, firstName = '', lastName = '', referralUrl = '', paymentMethod = null, stripeEnabled = false }) => {
     const { t } = useTranslation();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -210,6 +210,25 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
                     </div>
                 </div>
             )}
+
+            {stripeEnabled && (
+                <div className="container my-10 bg-white text-gray-700 overflow-hidden shadow rounded-lg divide-y divide-gray-200 my-4">
+                    <div className="px-4 py-5 sm:p-6">
+                        <div className="mb-6">
+                            <h3 className="font-semibold text-gray-700 my-4 text-xl !my-0">{t('settings.referral.title')}</h3>
+                            <p className="mt-1 text-sm text-gray-500">{t('settings.referral.description')}</p>
+                        </div>
+                        <Input
+                            id="referral"
+                            name="referral"
+                            readOnly
+                            label={t('settings.referral.link')}
+                            defaultValue={referralUrl}
+                            onFocus={(e) => e.target.select()}
+                        />
+                    </div>
+                </div>
+            )}
         </Layout>
     );
 };
@@ -227,6 +246,7 @@ export const getServerSideProps = async ({ req, locale }) => {
             email: user.email,
             lastName: user.lastName,
             firstName: user.firstName,
+            referralUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/register?ref=${user.id}`,
             stripeEnabled: !!process.env.STRIPE_SECRET_KEY,
             paymentMethod: process.env.STRIPE_SECRET_KEY ? await getStripePaymentMethod(user) : null,
             ...(await serverSideTranslations(locale, ['common'], nextI18nextConfig)),

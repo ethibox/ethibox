@@ -36,6 +36,11 @@
             "manage": "Gérer",
             "noMethod": "Vous n'avez pas de moyen de paiement enregistré.",
             "addMethod": "Ajouter un moyen de paiement"
+        },
+        "referral": {
+            "title": "Parrainage",
+            "description": "Invitez un ami : vous recevez un mois offert lorsqu’il souscrit à sa première application.",
+            "link": "Votre lien de parrainage"
         }
     },
     "index": {
