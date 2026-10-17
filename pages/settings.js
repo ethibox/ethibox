@@ -62,7 +62,7 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
         e.preventDefault();
         setLoading(true);
 
-        fetch('/api/settings', {
+        await fetch('/api/settings', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
             body: JSON.stringify({

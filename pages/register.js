@@ -33,7 +33,7 @@ export default () => {
             return;
         }
 
-        fetch('/api/register', {
+        await fetch('/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
             body: JSON.stringify({ email, password }),

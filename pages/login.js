@@ -21,7 +21,7 @@ export default () => {
         const email = String(formData.get('email') || '');
         const password = String(formData.get('password') || '');
 
-        fetch('/api/login', {
+        await fetch('/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
             body: JSON.stringify({ email, password }),

@@ -11,7 +11,7 @@ export default () => {
 
     useEffect(() => {
         const doLogout = async () => {
-            fetch('/api/logout', {
+            await fetch('/api/logout', {
                 method: 'POST',
             }).then(() => {
                 setTimeout(() => {
