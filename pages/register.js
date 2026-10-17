@@ -41,7 +41,7 @@ export default () => {
             .then((res) => res.json())
             .then(({ ok, message }) => {
                 if (ok) {
-                    router.push('/');
+                    router.push({ pathname: '/', query: router.query });
                 } else {
                     setNotification({
                         show: true,
@@ -109,7 +109,7 @@ export default () => {
                 <p className="mt-10 text-center text-sm/6 text-gray-500">
                     {t('register.alreadyMember')}
                     {' '}
-                    <Link href="/login" className="font-semibold text-gray-600 hover:text-gray-500">
+                    <Link href={{ pathname: '/login', query: router.query }} className="font-semibold text-gray-600 hover:text-gray-500">
                         {t('register.signIn')}
                     </Link>
                 </p>

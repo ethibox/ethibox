@@ -105,8 +105,11 @@ export default ({ templates, appName = null, stripeEnabled = false }) => {
 };
 
 export const getServerSideProps = async ({ query, locale }) => {
+    const templates = await fetchTemplates();
+
     const props = {
-        templates: await fetchTemplates(),
+        templates,
+        appName: templates.find(({ name }) => name.toLowerCase() === query.app)?.name || null,
         stripeEnabled: !!process.env.STRIPE_SECRET_KEY,
         ...(await serverSideTranslations(locale, ['common'], nextI18nextConfig)),
     };
@@ -121,5 +124,5 @@ export const getServerSideProps = async ({ query, locale }) => {
 
     if (!session) return { props };
 
-    return { props: { ...props, appName: session?.metadata?.appName } };
+    return { props: { ...props, appName: session.metadata.appName } };
 };

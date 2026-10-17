@@ -33,10 +33,10 @@ export default async (req) => {
     const path = (pathname.startsWith(`${base}/`) || pathname === base ? pathname.slice(base.length) : pathname).replace(/\/$/, '') || '/';
 
     if (!isAuth && ['/', '/apps', '/settings', '/invoices'].includes(path)) {
-        return NextResponse.redirect(new URL(`${base}/login`, req.nextUrl));
+        return NextResponse.redirect(new URL(`${base}/login${req.nextUrl.search}`, req.nextUrl));
     }
     if (isAuth && ['/login', '/register', '/forgot', '/reset-password'].includes(path)) {
-        return NextResponse.redirect(new URL(`${base}/`, req.nextUrl));
+        return NextResponse.redirect(new URL(`${base}/${req.nextUrl.search}`, req.nextUrl));
     }
 
     const headers = new Headers(req.headers);
