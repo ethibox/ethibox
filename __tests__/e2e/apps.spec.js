@@ -1,5 +1,9 @@
 import { TEST_EMAIL, TEST_PASSWORD } from '../../lib/constants';
 
+before(() => {
+    cy.task('stripe:cancel-subscriptions');
+});
+
 beforeEach(() => {
     cy.login({ email: TEST_EMAIL, password: TEST_PASSWORD });
     cy.visit('/apps');
