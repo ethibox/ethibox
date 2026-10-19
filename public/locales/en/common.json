@@ -235,6 +235,7 @@
         "no_payment_method": "No payment method found",
         "app_not_found": "App not found",
         "download_failed": "Failed to download data, a download may already be in progress",
+        "download_disabled": "Data download is not available for this application",
         "domain_already_exists": "Domain already exists",
         "unauthorized": "Unauthorized",
         "method_not_allowed": "Method Not Allowed",

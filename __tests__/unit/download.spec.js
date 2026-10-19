@@ -47,6 +47,17 @@ test('Should return 404 when app belongs to another user', async () => {
     expect(status).toBe(404);
 });
 
+test('Should return 403 when app has sensitive envs', async () => {
+    process.env.CUSTOM_ENV_WORDPRESS_SECRET_KEY = 'secret';
+
+    const { status } = await requestDownload(TEST_EMAIL);
+
+    delete process.env.CUSTOM_ENV_WORDPRESS_SECRET_KEY;
+
+    expect(status).toBe(403);
+    expect(download).not.toHaveBeenCalled();
+});
+
 test('Should return 500 when backup is empty', async () => {
     download.mockResolvedValue(fakeBackup(''));
 

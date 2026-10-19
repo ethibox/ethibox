@@ -1,7 +1,7 @@
 import { pipeline } from 'node:stream';
 import { App, User } from '../../lib/orm';
 import { download, cancelDownload } from '../../lib/docker';
-import { useTranslation } from '../../lib/utils';
+import { useTranslation, hasSensitiveEnvs } from '../../lib/utils';
 
 export const config = { api: { responseLimit: false } };
 
@@ -16,6 +16,8 @@ export default async (req, res) => {
     const app = await App.findOne({ where: { releaseName, userId: user.id } });
 
     if (!app) return res.status(404).json({ message: t('app_not_found') });
+
+    if (hasSensitiveEnvs(app.name)) return res.status(403).json({ message: t('download_disabled') });
 
     const backup = await download(app.releaseName);
 
