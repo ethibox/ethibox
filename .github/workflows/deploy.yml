@@ -19,7 +19,6 @@ jobs:
       - run: yarn lint
 
   test:
-    needs: lint
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -42,7 +41,6 @@ jobs:
           path: cypress/screenshots
 
   build:
-    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -57,37 +55,32 @@ jobs:
       - run: yarn build
 
   deploy:
-    needs: build
+    needs: [lint, test, build]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     permissions:
+      issues: write
       contents: write
+      pull-requests: write
     steps:
+      - name: Create release PR or GitHub release
+        id: release
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          release-type: node
+
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      - name: Bump version and push tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v7
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag_prefix: ''
-
-      - name: Create a GitHub release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ steps.tag_version.outputs.new_tag }}
-          name: ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
+        if: ${{ steps.release.outputs.release_created }}
 
       - name: Login to Docker Hub
+        if: ${{ steps.release.outputs.release_created }}
         uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push public Docker image
+        if: ${{ steps.release.outputs.release_created }}
         run: |
-          docker build -t ethibox/ethibox:${{ steps.tag_version.outputs.new_tag }} -t ethibox/ethibox:latest .
+          docker build -t ethibox/ethibox:${{ steps.release.outputs.version }} -t ethibox/ethibox:latest .
           docker push ethibox/ethibox --all-tags
