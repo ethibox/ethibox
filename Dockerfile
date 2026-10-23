@@ -15,7 +15,7 @@ RUN yarn install \
 
 RUN curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz | tar -xz -C /tmp
 
-FROM gcr.io/distroless/nodejs24@sha256:cdf42f994cee425970f30a0d0e37112dcc800737dde7bba50415612702b399af
+FROM gcr.io/distroless/nodejs24@sha256:c23cc7262662efd642cd9c9d61783d10f600321f7bafdd37c8a82365ffaa2aa6
 
 WORKDIR /app
 
