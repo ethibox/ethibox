@@ -2,7 +2,7 @@
   "name": "Ethibox",
   "homepage": "https://github.com/ethibox/ethibox/",
   "description": "Open-source web apps hoster",
-  "version": "0.0.0-development",
+  "version": "2.20.0",
   "author": "@johackim",
   "license": "GPL-3.0",
   "repository": {
