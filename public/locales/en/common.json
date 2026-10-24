@@ -36,6 +36,11 @@
             "manage": "Manage",
             "noMethod": "You don't have a payment method on file.",
             "addMethod": "Add payment method"
+        },
+        "referral": {
+            "title": "Referral",
+            "description": "Invite a friend: you get one free month when they subscribe to their first application.",
+            "link": "Your referral link"
         }
     },
     "index": {

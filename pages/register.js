@@ -36,7 +36,7 @@ export default () => {
         await fetch('/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ email, password, referrerId: router.query.ref }),
         })
             .then((res) => res.json())
             .then(({ ok, message }) => {

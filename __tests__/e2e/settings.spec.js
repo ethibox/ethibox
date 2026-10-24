@@ -25,6 +25,10 @@ it('Should change language', () => {
     cy.url().should('include', '/fr/');
 });
 
+it('Should show referral link', () => {
+    cy.get('input[name="referral"]').invoke('val').should('match', /\/register\?ref=\d+$/);
+});
+
 it('Should delete account', () => {
     cy.contains('button', 'Delete my account').click();
 

@@ -6,9 +6,11 @@ import stripe, {
     createStripeCheckoutUrl,
     cancelStripeSubscription,
     upsertStripeSubscription,
+    saveStripeReferrer,
+    rewardStripeReferrer,
 } from '../../lib/stripe';
 import { User, App, sequelize } from '../../lib/orm';
-import { TEST_EMAIL, TEST_PASSWORD } from '../../lib/constants';
+import { TEST_EMAIL, TEST_PASSWORD, DEFAULT_PRICE } from '../../lib/constants';
 
 beforeAll(async () => {
     await sequelize.sync({ force: true });
@@ -89,4 +91,29 @@ test('Should create a checkout url', async () => {
     const url = await createStripeCheckoutUrl(app, user);
 
     expect(url).toContain('https://checkout.stripe.com');
+}, 20000);
+
+test('Should save the referrer in the stripe customer metadata', async () => {
+    const referred = { id: 3, email: 'contact+3@ethibox.fr' };
+    const referrer = { id: 1, email: TEST_EMAIL };
+
+    await saveStripeReferrer(referred, referrer);
+
+    const { metadata } = await stripe.customers.retrieve(`${referred.id}`);
+    expect(metadata.referrerId).toBe(`${referrer.id}`);
+}, 20000);
+
+test('Should reward the referrer only once', async () => {
+    const referred = { id: 3, email: 'contact+3@ethibox.fr' };
+    const referrer = { id: 1, email: TEST_EMAIL };
+
+    await saveStripeReferrer(referred, referrer);
+    await stripe.customers.update(`${referred.id}`, { metadata: { referralRewarded: '' } });
+    const { balance } = await stripe.customers.retrieve(`${referrer.id}`);
+
+    await rewardStripeReferrer(referred);
+    await rewardStripeReferrer(referred);
+
+    const customer = await stripe.customers.retrieve(`${referrer.id}`);
+    expect(customer.balance).toBe(balance - DEFAULT_PRICE);
 }, 20000);
