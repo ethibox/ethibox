@@ -27,7 +27,11 @@ export default async (req, res) => {
 
     res.setHeader('Set-Cookie', `token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`);
 
-    await triggerWebhook(WEBHOOK_EVENTS.USER_REGISTERED, { email });
+    await triggerWebhook(WEBHOOK_EVENTS.USER_REGISTERED, {
+        email,
+        ip: req.headers['x-real-ip'],
+        userAgent: req.headers['user-agent'],
+    });
 
     return res.status(200).json({ ok: true });
 };

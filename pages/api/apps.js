@@ -108,6 +108,8 @@ const postQuery = async (req, res, user) => {
         releaseName: app.releaseName,
         domain: app.domain,
         email: user.email,
+        ip: req.headers['x-real-ip'],
+        userAgent: req.headers['user-agent'],
         manual: template.manual,
         envs: JSON.stringify(
             envs.concat([

@@ -6,7 +6,7 @@ import { TEST_PASSWORD } from '../../lib/constants';
 test('should register with valid credentials', async () => {
     const email = `test+${Date.now()}@example.com`;
 
-    const req = { body: { email, password: TEST_PASSWORD } };
+    const req = { body: { email, password: TEST_PASSWORD }, headers: {} };
     const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn().mockReturnThis(),
