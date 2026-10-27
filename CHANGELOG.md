@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.21.0](https://github.com/ethibox/ethibox/compare/v2.20.0...v2.21.0) (2026-10-27)
+
+
+### Features
+
+* update webhooks ([6b30907](https://github.com/ethibox/ethibox/commit/6b309077de6ad73347c232c57476281b119c6ccd))
+
 ## [2.20.0](https://github.com/ethibox/ethibox/compare/2.19.23...v2.20.0) (2026-10-23)
 
 
