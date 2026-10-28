@@ -3,12 +3,11 @@ import stripe, {
     upsertStripeProduct,
     upsertStripeCustomer,
     getStripePaymentMethod,
-    createStripeCheckoutUrl,
     cancelStripeSubscription,
     upsertStripeSubscription,
 } from '../../lib/stripe';
-import { User, App, sequelize } from '../../lib/orm';
-import { TEST_EMAIL, TEST_PASSWORD } from '../../lib/constants';
+import { sequelize } from '../../lib/orm';
+import { TEST_EMAIL } from '../../lib/constants';
 
 beforeAll(async () => {
     await sequelize.sync({ force: true });
@@ -57,13 +56,13 @@ test('Shoud create a stripe subscription', async () => {
     expect(subscription.id).toMatch(/^sub_/);
 }, 20000);
 
-test('Should not create a stripe subscription if the customer does not have a payment method', async () => {
+test('Should create a trial stripe subscription if the customer does not have a payment method', async () => {
     const user = { id: 2, email: 'contact+2@ethibox.fr' };
     await upsertStripeCustomer({ id: user.id, email: user.email });
 
     const subscription = await upsertStripeSubscription({ id: user.id }, 'Nextcloud');
 
-    expect(subscription).toBe(null);
+    expect(subscription.status).toBe('trialing');
 }, 20000);
 
 test('Should cancel a stripe subscription', async () => {
@@ -81,12 +80,3 @@ test('Should create multiple stripe subscriptions with the same product name', a
     await upsertStripeSubscription({ id: user.id }, 'Nextcloud');
     await upsertStripeSubscription({ id: user.id }, 'Nextcloud');
 }, 60000);
-
-test('Should create a checkout url', async () => {
-    const email = TEST_EMAIL;
-    const [user] = await User.findOrCreate({ where: { email }, defaults: { password: TEST_PASSWORD } });
-    const app = await App.create({ releaseName: 'nextcloud1', domain: 'nextcloud1.localhost', userId: user.id });
-    const url = await createStripeCheckoutUrl(app, user);
-
-    expect(url).toContain('https://checkout.stripe.com');
-}, 20000);

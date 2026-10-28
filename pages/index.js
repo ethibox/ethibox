@@ -19,12 +19,10 @@ export default ({ templates, appName = null, stripeEnabled = false }) => {
 
         setLoading(name);
 
-        const returnUrl = `${window.location.origin}/${router.locale}`;
-
         fetch('/api/apps', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
-            body: JSON.stringify({ name, returnUrl }),
+            body: JSON.stringify({ name }),
         })
             .then(async (res) => {
                 const { url, message } = await res.json();
@@ -107,22 +105,12 @@ export default ({ templates, appName = null, stripeEnabled = false }) => {
 export const getServerSideProps = async ({ query, locale }) => {
     const templates = await fetchTemplates();
 
-    const props = {
-        templates,
-        appName: templates.find(({ name }) => name.toLowerCase() === query.app)?.name || null,
-        stripeEnabled: !!process.env.STRIPE_SECRET_KEY,
-        ...(await serverSideTranslations(locale, ['common'], nextI18nextConfig)),
+    return {
+        props: {
+            templates,
+            appName: templates.find(({ name }) => name.toLowerCase() === query.app)?.name || null,
+            stripeEnabled: !!process.env.STRIPE_SECRET_KEY,
+            ...(await serverSideTranslations(locale, ['common'], nextI18nextConfig)),
+        },
     };
-
-    const sessionId = query.session_id || null;
-
-    if (!process.env.STRIPE_SECRET_KEY || !sessionId) return { props };
-
-    const { getStripeCheckoutSession } = await import('../lib/stripe');
-
-    const session = await getStripeCheckoutSession(sessionId);
-
-    if (!session) return { props };
-
-    return { props: { ...props, appName: session.metadata.appName } };
 };

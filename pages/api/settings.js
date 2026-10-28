@@ -1,7 +1,6 @@
+import { STATE } from '../../lib/constants';
 import { App, User, Op } from '../../lib/orm';
-import { remove } from '../../lib/docker';
-import { STATE, WEBHOOK_EVENTS } from '../../lib/constants';
-import { triggerWebhook, useTranslation } from '../../lib/utils';
+import { uninstallApp, useTranslation } from '../../lib/utils';
 import { upsertStripeCustomer, cancelStripeSubscription } from '../../lib/stripe';
 
 const putQuery = async (req, res, user) => {
@@ -21,20 +20,11 @@ const deleteQuery = async (req, res, user) => {
     const apps = await App.findAll({ where: { userId: user.id, state: { [Op.ne]: STATE.DELETED } } });
 
     for await (const app of apps) {
-        await app.update({ state: STATE.DELETED });
-
         if (process.env.STRIPE_SECRET_KEY) {
             await cancelStripeSubscription(user, { releaseName: app.releaseName });
         }
 
-        await triggerWebhook(WEBHOOK_EVENTS.APP_UNINSTALLED, {
-            name: app.name,
-            domain: app.domain,
-            email: user.email,
-            releaseName: app.releaseName,
-        });
-
-        await remove(app.releaseName);
+        await uninstallApp(app);
     }
 
     await user.destroy();

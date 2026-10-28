@@ -11,42 +11,11 @@ beforeEach(() => {
 });
 
 it('Should install an application', () => {
-    cy.on('uncaught:exception', () => false);
-    cy.intercept('POST', 'https://api.stripe.com/v1/payment_pages/*/confirm').as('confirmPayment');
-    cy.intercept('GET', 'https://api.stripe.com/v1/elements/sessions*').as('stripeSession');
-
     cy.visit('/');
     cy.get('[data-test="app"]:has(img[alt="Kanboard"]) button[type="button"]').click();
 
-    cy.wait('@stripeSession', { timeout: 30000 });
-
-    cy.origin('https://checkout.stripe.com', () => {
-        cy.get('body').then(($body) => {
-            if ($body.find('[data-testid="card-accordion-item"]').length) {
-                cy.get('[data-testid="card-accordion-item"]').click();
-            }
-        });
-        cy.get('#cardNumber').type('4242424242424242');
-        cy.get('#cardExpiry').type('1234');
-        cy.get('#cardCvc').type('424');
-        cy.get('#billingName').type('John Doe');
-        cy.get('body').then(($body) => {
-            if ($body.find('#billingPostalCode').length) {
-                cy.get('#billingPostalCode').type('12345');
-            }
-            if ($body.find('#phoneNumber').length) {
-                cy.get('#enableStripePass').click();
-            }
-        });
-        cy.get('.SubmitButton').click();
-    });
-
-    cy.wait('@confirmPayment', { timeout: 30000 }).its('request.url').then((url) => {
-        const [, sessionId] = url.match(/payment_pages\/([^/]+)\/confirm/);
-        cy.visit(`/?session_id=${sessionId}`);
-        cy.url({ timeout: 30000 }).should('contain', '/apps');
-        cy.get('[data-test="app"]').should('exist');
-    });
+    cy.url({ timeout: 30000 }).should('contain', '/apps');
+    cy.get('[data-test="app"]').should('exist');
 });
 
 it('Should update domain of an application', () => {

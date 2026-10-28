@@ -231,6 +231,7 @@
     },
     "api": {
         "template_not_found": "Template not found",
+        "trial_already_in_progress": "Your free trial includes 1 app at a time. Uninstall it to try another one.",
         "no_payment_method": "No payment method found",
         "app_not_found": "App not found",
         "domain_already_exists": "Domain already exists",
