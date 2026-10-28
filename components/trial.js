@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import { PaymentElement } from '@stripe/react-stripe-js';
 import { CheckIcon, CreditCardIcon } from '@heroicons/react/20/solid';
 import Modal from './modal';
 import Button from './button';
@@ -7,12 +8,16 @@ import { DEFAULT_PRICE, DEFAULT_CURRENCY, DEFAULT_TRIAL_DAYS } from '../lib/cons
 
 const formatPrice = (cents, locale) => new Intl.NumberFormat(locale, { style: 'currency', currency: DEFAULT_CURRENCY }).format(cents / 100);
 
-export default ({ app, paymentMethod, open, loading, onClose, onConfirm }) => {
+const formatTrialEnd = (locale) => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long' }).format(Date.now() + DEFAULT_TRIAL_DAYS * 24 * 60 * 60 * 1000);
+
+// eslint-disable-next-line complexity
+export default ({ app, paymentMethod, paymentRequired, open, loading, onClose, onConfirm }) => {
     const { t } = useTranslation('common');
     const { locale } = useRouter();
 
     const defaultBenefits = t('index.trial.benefits', { returnObjects: true });
-    const benefits = paymentMethod ? defaultBenefits : [t('index.trial.noCharge'), ...defaultBenefits];
+    const benefits = paymentMethod || paymentRequired ? defaultBenefits : [t('index.trial.noCharge'), ...defaultBenefits];
+    const charge = t('index.trial.charge', { price: formatPrice(DEFAULT_PRICE, locale), date: formatTrialEnd(locale) });
 
     return (
         <Modal open={open} onClose={onClose}>
@@ -39,8 +44,16 @@ export default ({ app, paymentMethod, open, loading, onClose, onConfirm }) => {
                         <CreditCardIcon className="size-5 text-gray-400" />
                         <div>
                             <p className="font-medium text-gray-900">{paymentMethod.label}</p>
-                            <p className="text-gray-500">{t('index.trial.charge')}</p>
+                            <p className="text-gray-500">{charge}</p>
                         </div>
+                    </div>
+                )}
+
+                {paymentRequired && (
+                    <div className="mt-6">
+                        <p className="mb-4 text-sm text-gray-700">{t('index.trial.paymentRequired')}</p>
+                        <PaymentElement />
+                        <p className="mt-2 text-sm text-gray-500">{charge}</p>
                     </div>
                 )}
 

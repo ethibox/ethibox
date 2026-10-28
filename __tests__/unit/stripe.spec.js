@@ -17,6 +17,12 @@ beforeAll(async () => {
     await sequelize.sync({ force: true });
 });
 
+afterAll(async () => {
+    const subscriptions = [...await getStripeSubscriptions({ id: 1 }), ...await getStripeSubscriptions({ id: 2 })];
+
+    await Promise.all(subscriptions.map((s) => stripe.subscriptions.cancel(s.id)));
+}, 60000);
+
 test('Should create a stripe customer', async () => {
     const user = { id: 1, firstName: 'John', lastName: 'Doe', email: TEST_EMAIL };
 

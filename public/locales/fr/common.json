@@ -58,7 +58,8 @@
             "title": "Essayez {{name}} gratuitement",
             "price": "{{days}} jours gratuits, puis {{price}} par mois",
             "noCharge": "Sans carte bancaire, aucun prélèvement automatique",
-            "charge": "Prélevé après l'essai, annulable avant",
+            "charge": "{{price}} le {{date}}, sauf si vous désinstallez avant",
+            "paymentRequired": "Vous avez déjà un essai en cours. Ajoutez un moyen de paiement pour essayer plusieurs applications en même temps.",
             "benefits": [
                 "Hébergée en France, sauvegardée chaque jour",
                 "Mises à jour, sécurité et surveillance 24/7 incluses",
@@ -242,7 +243,7 @@
     },
     "api": {
         "template_not_found": "Modèle non trouvé",
-        "trial_already_in_progress": "Votre essai gratuit inclut 1 application à la fois. Désinstallez-la pour en essayer une autre.",
+        "trial_already_in_progress": "Votre essai gratuit inclut 1 application à la fois. Ajoutez un moyen de paiement pour en essayer plusieurs en même temps.",
         "no_payment_method": "Aucun moyen de paiement trouvé",
         "app_not_found": "Application non trouvée",
         "domain_already_exists": "Le domaine existe déjà",

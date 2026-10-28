@@ -13,7 +13,13 @@ import {
     generatePassword,
     generateReleaseName,
 } from '../../lib/utils';
-import { getStripeSubscriptions, upsertStripeSubscription, cancelStripeSubscription } from '../../lib/stripe';
+import {
+    getStripePaymentMethod,
+    hasStripeTrialInProgress,
+    updateStripePaymentMethod,
+    upsertStripeSubscription,
+    cancelStripeSubscription,
+} from '../../lib/stripe';
 
 const getQuery = async (_, res, user) => {
     const templates = await fetchTemplates(false);
@@ -44,7 +50,7 @@ const getQuery = async (_, res, user) => {
 };
 
 const postQuery = async (req, res, user) => {
-    const { name } = req.body || {};
+    const { name, setupIntentId } = req.body || {};
 
     const releaseName = await generateReleaseName(name);
 
@@ -60,10 +66,9 @@ const postQuery = async (req, res, user) => {
     if (!template) return res.status(400).send({ message: t('template_not_found') });
 
     if (process.env.STRIPE_SECRET_KEY) {
-        const subscriptions = await getStripeSubscriptions(user);
-        const hasTrialInProgress = subscriptions.some((s) => s.status === 'trialing');
+        if (setupIntentId) await updateStripePaymentMethod(user, setupIntentId);
 
-        if (hasTrialInProgress) {
+        if (!(await getStripePaymentMethod(user)) && await hasStripeTrialInProgress(user)) {
             return res.status(403).json({ message: t('trial_already_in_progress') });
         }
 
