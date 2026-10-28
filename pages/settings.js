@@ -38,7 +38,7 @@ const Settings = ({ email, firstName = '', lastName = '', paymentMethod = null, 
 
     const onDeletePaymentMethod = async () => {
         setIsDeletingPayment(true);
-        fetch('/api/stripe', { method: 'DELETE', headers: { 'Accept-Language': router.locale } })
+        await fetch('/api/stripe', { method: 'DELETE', headers: { 'Accept-Language': router.locale } })
             .then(() => router.replace(router.asPath))
             .finally(() => setIsDeletingPayment(false));
     };
