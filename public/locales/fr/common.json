@@ -56,6 +56,20 @@
                 "title": "L'installation a échoué",
                 "description": "Une erreur inconnue est survenue."
             }
+        },
+        "trial": {
+            "title": "Essayez {{name}} gratuitement",
+            "price": "{{days}} jours gratuits, puis {{price}} par mois",
+            "noCharge": "Sans carte bancaire, aucun prélèvement automatique",
+            "charge": "Prélevé après l'essai, annulable avant",
+            "benefits": [
+                "Hébergée en France, sauvegardée chaque jour",
+                "Mises à jour, sécurité et surveillance 24/7 incluses",
+                "Sans engagement, export de vos données à tout moment"
+            ],
+            "dueToday": "À payer aujourd'hui",
+            "confirm": "Démarrer mon essai gratuit",
+            "cancel": "Annuler"
         }
     },
     "invoices": {

@@ -4,15 +4,20 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid';
-import { Notification, Button, Layout } from '../components';
+import { Notification, Button, Layout, Trial } from '../components';
+import { User } from '../lib/orm';
 import { fetchTemplates } from '../lib/utils';
+import { getStripePaymentMethod } from '../lib/stripe';
 import nextI18nextConfig from '../next-i18next.config.mjs';
 
-export default ({ templates, appName = null, stripeEnabled = false }) => {
+export default ({ templates, appName = null, stripeEnabled = false, paymentMethod = null }) => {
     const { t } = useTranslation('common');
     const router = useRouter();
-    const [isLoading, setLoading] = useState(appName);
+    const [isLoading, setLoading] = useState(false);
+    const [trial, setTrial] = useState({ open: false, name: null });
     const [notification, setNotification] = useState({ show: false, title: '', description: '', icon: null });
+
+    const closeTrial = () => setTrial((s) => ({ ...s, open: false }));
 
     const handleInstall = async (name) => {
         if (isLoading && isLoading !== name) return;
@@ -41,13 +46,16 @@ export default ({ templates, appName = null, stripeEnabled = false }) => {
                     icon: Notification.XCircleIcon,
                 });
                 setLoading(false);
+                closeTrial();
             });
     };
+
+    const requestInstall = (name) => (stripeEnabled ? setTrial({ open: true, name }) : handleInstall(name));
 
     useEffect(() => {
         if (!appName) return;
         router.replace('/', undefined, { shallow: true });
-        handleInstall(appName);
+        requestInstall(appName);
     }, [appName]);
 
     return (
@@ -59,6 +67,15 @@ export default ({ templates, appName = null, stripeEnabled = false }) => {
                 button={notification.button}
                 description={notification.description}
                 onClose={() => setNotification((s) => ({ ...s, show: false }))}
+            />
+
+            <Trial
+                app={templates.find(({ name }) => name === trial.name)}
+                paymentMethod={paymentMethod}
+                open={trial.open}
+                loading={isLoading === trial.name}
+                onClose={closeTrial}
+                onConfirm={() => handleInstall(trial.name)}
             />
 
             <h1 className="text-2xl font-semibold text-gray-900">{t('index.title')}</h1>
@@ -82,7 +99,7 @@ export default ({ templates, appName = null, stripeEnabled = false }) => {
                             </div>
 
                             <div className="p-4">
-                                <Button className="w-full" onClick={() => handleInstall(name)} loading={isLoading === name} loadingText={t('index.loading')} secondary>{t('index.install')}</Button>
+                                <Button className="w-full" onClick={() => requestInstall(name)} loading={isLoading === name} loadingText={t('index.loading')} secondary>{t('index.install')}</Button>
                             </div>
                         </div>
                     ))}
@@ -102,14 +119,21 @@ export default ({ templates, appName = null, stripeEnabled = false }) => {
     );
 };
 
-export const getServerSideProps = async ({ query, locale }) => {
+export const getServerSideProps = async ({ req, query, locale }) => {
+    const email = req.headers['x-user-email'];
+    const user = await User.findOne({ where: { email }, raw: true }).catch(() => false);
+
+    if (!user) return { redirect: { destination: '/logout', permanent: false } };
+
     const templates = await fetchTemplates();
+    const stripeEnabled = !!process.env.STRIPE_SECRET_KEY;
 
     return {
         props: {
             templates,
             appName: templates.find(({ name }) => name.toLowerCase() === query.app)?.name || null,
-            stripeEnabled: !!process.env.STRIPE_SECRET_KEY,
+            stripeEnabled,
+            paymentMethod: stripeEnabled ? await getStripePaymentMethod(user) : null,
             ...(await serverSideTranslations(locale, ['common'], nextI18nextConfig)),
         },
     };

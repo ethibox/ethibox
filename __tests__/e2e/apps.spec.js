@@ -13,6 +13,7 @@ beforeEach(() => {
 it('Should install an application', () => {
     cy.visit('/');
     cy.get('[data-test="app"]:has(img[alt="Kanboard"]) button[type="button"]').click();
+    cy.get('[data-test="start-trial"]').click();
 
     cy.url({ timeout: 30000 }).should('contain', '/apps');
     cy.get('[data-test="app"]').should('exist');

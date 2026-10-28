@@ -56,6 +56,20 @@
                 "title": "Installation failed",
                 "description": "An unknown error occured."
             }
+        },
+        "trial": {
+            "title": "Try {{name}} for free",
+            "price": "{{days}} days free, then {{price}} per month",
+            "noCharge": "No credit card required, no automatic charge",
+            "charge": "Charged after the trial, cancel before",
+            "benefits": [
+                "Hosted in France, backed up every day",
+                "Updates, security and 24/7 monitoring included",
+                "No commitment, export your data anytime"
+            ],
+            "dueToday": "Due today",
+            "confirm": "Start my free trial",
+            "cancel": "Cancel"
         }
     },
     "invoices": {
