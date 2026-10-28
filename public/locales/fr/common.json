@@ -28,13 +28,10 @@
         },
         "payment": {
             "title": "Moyen de paiement",
-            "description": "Gérez votre moyen de paiement via Stripe.",
-            "currentMethod": {
-                "text1": "Votre moyen de paiement actuel est une carte",
-                "text2": "se terminant par"
-            },
-            "manage": "Gérer",
-            "noMethod": "Vous n'avez pas de moyen de paiement enregistré.",
+            "description": "Gérez le moyen de paiement utilisé pour vos abonnements",
+            "edit": "Modifier",
+            "delete": "Supprimer",
+            "expires": "Expire fin {{date}}",
             "addMethod": "Ajouter un moyen de paiement"
         }
     },

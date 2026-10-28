@@ -38,6 +38,8 @@
     "@headlessui/react": "^2.2.10",
     "@heroicons/react": "^2.2.0",
     "@sentry/nextjs": "^10.76.2",
+    "@stripe/react-stripe-js": "^7.0.1",
+    "@stripe/stripe-js": "^10.2.0",
     "@vscode/sqlite3": "^5.1.14-vscode",
     "bcrypt": "^6.0.0",
     "i18next": "^25.10.10",

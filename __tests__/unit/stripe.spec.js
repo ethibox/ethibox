@@ -3,6 +3,10 @@ import stripe, {
     upsertStripeProduct,
     upsertStripeCustomer,
     getStripePaymentMethod,
+    createStripeSetupIntent,
+    updateStripePaymentMethod,
+    deleteStripePaymentMethod,
+    getStripeSubscriptions,
     cancelStripeSubscription,
     upsertStripeSubscription,
 } from '../../lib/stripe';
@@ -34,6 +38,32 @@ test('Should retrieve payment method of a stripe customer', async () => {
     const paymentMethod = await getStripePaymentMethod({ id: user.id, email: TEST_EMAIL });
 
     expect(paymentMethod.last4).toBe('4242');
+}, 20000);
+
+test('Should update payment method of a stripe customer', async () => {
+    const user = { id: Date.now(), email: TEST_EMAIL };
+    const setupIntent = await createStripeSetupIntent(user);
+    await stripe.setupIntents.confirm(setupIntent.id, { payment_method: 'pm_card_mastercard', return_url: 'https://example.com' });
+
+    await updateStripePaymentMethod(user, setupIntent.id);
+
+    const paymentMethod = await getStripePaymentMethod(user);
+
+    expect(paymentMethod.brand).toBe('mastercard');
+}, 20000);
+
+test('Should delete payment method of a stripe customer', async () => {
+    const user = { id: Date.now(), email: TEST_EMAIL };
+    await upsertStripeSubscription(user, 'Nextcloud');
+    const setupIntent = await createStripeSetupIntent(user);
+    await stripe.setupIntents.confirm(setupIntent.id, { payment_method: 'pm_card_visa', return_url: 'https://example.com' });
+    await updateStripePaymentMethod(user, setupIntent.id);
+
+    await deleteStripePaymentMethod(user);
+
+    const subscriptions = await getStripeSubscriptions(user);
+    expect(await getStripePaymentMethod(user)).toBeNull();
+    expect(subscriptions.every((s) => !s.default_payment_method)).toBe(true);
 }, 20000);
 
 test('Should create a stripe product', async () => {

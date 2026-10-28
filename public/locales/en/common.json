@@ -27,14 +27,11 @@
             }
         },
         "payment": {
-            "title": "Payment Method",
-            "description": "Manage your payment method via Stripe.",
-            "currentMethod": {
-                "text1": "Your current payment method is a",
-                "text2": "card ending in"
-            },
-            "manage": "Manage",
-            "noMethod": "You don't have a payment method on file.",
+            "title": "Payment method",
+            "description": "Manage the payment method used for your subscriptions",
+            "edit": "Edit",
+            "delete": "Delete",
+            "expires": "Expires {{date}}",
             "addMethod": "Add payment method"
         }
     },
