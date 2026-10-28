@@ -3,16 +3,25 @@ import stripe, {
     upsertStripeProduct,
     upsertStripeCustomer,
     getStripePaymentMethod,
-    createStripeCheckoutUrl,
+    createStripeSetupIntent,
+    updateStripePaymentMethod,
+    deleteStripePaymentMethod,
+    getStripeSubscriptions,
     cancelStripeSubscription,
     upsertStripeSubscription,
 } from '../../lib/stripe';
-import { User, App, sequelize } from '../../lib/orm';
-import { TEST_EMAIL, TEST_PASSWORD } from '../../lib/constants';
+import { sequelize } from '../../lib/orm';
+import { TEST_EMAIL } from '../../lib/constants';
 
 beforeAll(async () => {
     await sequelize.sync({ force: true });
 });
+
+afterAll(async () => {
+    const subscriptions = [...await getStripeSubscriptions({ id: 1 }), ...await getStripeSubscriptions({ id: 2 })];
+
+    await Promise.all(subscriptions.map((s) => stripe.subscriptions.cancel(s.id)));
+}, 60000);
 
 test('Should create a stripe customer', async () => {
     const user = { id: 1, firstName: 'John', lastName: 'Doe', email: TEST_EMAIL };
@@ -37,6 +46,32 @@ test('Should retrieve payment method of a stripe customer', async () => {
     expect(paymentMethod.last4).toBe('4242');
 }, 20000);
 
+test('Should update payment method of a stripe customer', async () => {
+    const user = { id: Date.now(), email: TEST_EMAIL };
+    const setupIntent = await createStripeSetupIntent(user);
+    await stripe.setupIntents.confirm(setupIntent.id, { payment_method: 'pm_card_mastercard', return_url: 'https://example.com' });
+
+    await updateStripePaymentMethod(user, setupIntent.id);
+
+    const paymentMethod = await getStripePaymentMethod(user);
+
+    expect(paymentMethod.brand).toBe('mastercard');
+}, 20000);
+
+test('Should delete payment method of a stripe customer', async () => {
+    const user = { id: Date.now(), email: TEST_EMAIL };
+    await upsertStripeSubscription(user, 'Nextcloud');
+    const setupIntent = await createStripeSetupIntent(user);
+    await stripe.setupIntents.confirm(setupIntent.id, { payment_method: 'pm_card_visa', return_url: 'https://example.com' });
+    await updateStripePaymentMethod(user, setupIntent.id);
+
+    await deleteStripePaymentMethod(user);
+
+    const subscriptions = await getStripeSubscriptions(user);
+    expect(await getStripePaymentMethod(user)).toBeNull();
+    expect(subscriptions.every((s) => !s.default_payment_method)).toBe(true);
+}, 20000);
+
 test('Should create a stripe product', async () => {
     const product = await upsertStripeProduct('Nextcloud');
 
@@ -57,13 +92,13 @@ test('Shoud create a stripe subscription', async () => {
     expect(subscription.id).toMatch(/^sub_/);
 }, 20000);
 
-test('Should not create a stripe subscription if the customer does not have a payment method', async () => {
+test('Should create a trial stripe subscription if the customer does not have a payment method', async () => {
     const user = { id: 2, email: 'contact+2@ethibox.fr' };
     await upsertStripeCustomer({ id: user.id, email: user.email });
 
     const subscription = await upsertStripeSubscription({ id: user.id }, 'Nextcloud');
 
-    expect(subscription).toBe(null);
+    expect(subscription.status).toBe('trialing');
 }, 20000);
 
 test('Should cancel a stripe subscription', async () => {
@@ -81,12 +116,3 @@ test('Should create multiple stripe subscriptions with the same product name', a
     await upsertStripeSubscription({ id: user.id }, 'Nextcloud');
     await upsertStripeSubscription({ id: user.id }, 'Nextcloud');
 }, 60000);
-
-test('Should create a checkout url', async () => {
-    const email = TEST_EMAIL;
-    const [user] = await User.findOrCreate({ where: { email }, defaults: { password: TEST_PASSWORD } });
-    const app = await App.create({ releaseName: 'nextcloud1', domain: 'nextcloud1.localhost', userId: user.id });
-    const url = await createStripeCheckoutUrl(app, user);
-
-    expect(url).toContain('https://checkout.stripe.com');
-}, 20000);

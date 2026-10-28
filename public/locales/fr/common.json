@@ -28,13 +28,10 @@
         },
         "payment": {
             "title": "Moyen de paiement",
-            "description": "Gérez votre moyen de paiement via Stripe.",
-            "currentMethod": {
-                "text1": "Votre moyen de paiement actuel est une carte",
-                "text2": "se terminant par"
-            },
-            "manage": "Gérer",
-            "noMethod": "Vous n'avez pas de moyen de paiement enregistré.",
+            "description": "Gérez le moyen de paiement utilisé pour vos abonnements",
+            "edit": "Modifier",
+            "delete": "Supprimer",
+            "expires": "Expire fin {{date}}",
             "addMethod": "Ajouter un moyen de paiement"
         }
     },
@@ -56,6 +53,21 @@
                 "title": "L'installation a échoué",
                 "description": "Une erreur inconnue est survenue."
             }
+        },
+        "trial": {
+            "title": "Essayez {{name}} gratuitement",
+            "price": "{{days}} jours gratuits, puis {{price}} par mois",
+            "noCharge": "Sans carte bancaire, aucun prélèvement automatique",
+            "charge": "{{price}} le {{date}}, sauf si vous désinstallez avant",
+            "paymentRequired": "Vous avez déjà un essai en cours. Ajoutez un moyen de paiement pour essayer plusieurs applications en même temps.",
+            "benefits": [
+                "Hébergée en France, sauvegardée chaque jour",
+                "Mises à jour, sécurité et surveillance 24/7 incluses",
+                "Sans engagement, export de vos données à tout moment"
+            ],
+            "dueToday": "À payer aujourd'hui",
+            "confirm": "Démarrer mon essai gratuit",
+            "cancel": "Annuler"
         }
     },
     "invoices": {
@@ -231,6 +243,7 @@
     },
     "api": {
         "template_not_found": "Modèle non trouvé",
+        "trial_already_in_progress": "Votre essai gratuit inclut 1 application à la fois. Ajoutez un moyen de paiement pour en essayer plusieurs en même temps.",
         "no_payment_method": "Aucun moyen de paiement trouvé",
         "app_not_found": "Application non trouvée",
         "domain_already_exists": "Le domaine existe déjà",

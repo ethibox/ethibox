@@ -2,44 +2,45 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import { Input, Button, Layout, Modal, Notification, Select } from '../components';
+import { CreditCardIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { Input, Button, Layout, Loading, Modal, Notification, Select } from '../components';
 import { User } from '../lib/orm';
+import { DEFAULT_CURRENCY } from '../lib/constants';
 import nextI18nextConfig from '../next-i18next.config.mjs';
 
 // eslint-disable-next-line complexity
-export default ({ email, firstName = '', lastName = '', paymentMethod = null, stripeEnabled = false }) => {
+const Settings = ({ email, firstName = '', lastName = '', paymentMethod = null, stripeEnabled = false }) => {
     const { t } = useTranslation();
     const router = useRouter();
+    const stripe = useStripe();
+    const elements = useElements();
     const [loading, setLoading] = useState(false);
-    const [isRedirecting, setIsRedirecting] = useState(false);
+    const [isEditingPayment, setIsEditingPayment] = useState(false);
+    const [isDeletingPayment, setIsDeletingPayment] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [state, setState] = useState({ firstName: firstName || '', lastName: lastName || '', language: router.locale });
     const [notification, setNotification] = useState({ show: false, title: '', description: '' });
 
-    const redirectToStripePortal = async () => {
-        setIsRedirecting(true);
+    const savePaymentMethod = async () => {
+        const { error: submitError } = await elements.submit();
 
-        const returnUrl = `${window.location.origin}/${router.locale}/settings`;
+        if (submitError) throw submitError;
 
-        fetch('/api/stripe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
-            body: JSON.stringify({ returnUrl, locale: router.locale }),
-        })
-            .then(async (res) => {
-                const { url, message } = await res.json();
+        const { clientSecret } = await fetch('/api/stripe', { method: 'POST', headers: { 'Accept-Language': router.locale } }).then((res) => res.json());
 
-                if (url && new URL(url).hostname === 'billing.stripe.com') {
-                    window.location.href = url;
-                } else {
-                    throw new Error(message || 'An error occurred while redirecting to Stripe.');
-                }
-            })
-            .catch(({ message }) => {
-                setNotification({ show: true, title: 'Error', icon: Notification.XCircleIcon, description: message });
-                setIsRedirecting(false);
-            });
+        const { error } = await stripe.confirmSetup({ elements, clientSecret, confirmParams: { return_url: window.location.href } });
+
+        if (error) throw error;
+    };
+
+    const onDeletePaymentMethod = async () => {
+        setIsDeletingPayment(true);
+        await fetch('/api/stripe', { method: 'DELETE', headers: { 'Accept-Language': router.locale } })
+            .then(() => router.replace(router.asPath))
+            .finally(() => setIsDeletingPayment(false));
     };
 
     const onDelete = async () => {
@@ -77,12 +78,17 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
                         document.cookie = `NEXT_LOCALE=${state.language}; path=/; max-age=31536000; samesite=lax${process.env.NODE_ENV === 'production' ? '; secure' : ''}`;
                     }
 
+                    if (isEditingPayment) await savePaymentMethod();
+
                     setNotification({
                         show: true,
                         title: t('settings.account.success.title'),
                         description: t('settings.account.success.description'),
                     });
                 }
+            })
+            .catch(({ message }) => {
+                setNotification({ show: true, title: 'Error', icon: Notification.XCircleIcon, description: message });
             })
             .finally(() => {
                 setLoading(false);
@@ -122,52 +128,86 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
                             <p className="mt-1 text-sm text-gray-500">{t('settings.account.description')}</p>
                         </div>
 
-                        <Input
-                            id="email"
-                            name="email"
-                            type="email"
-                            disabled
-                            label={t('settings.account.email')}
-                            className="mb-4"
-                            defaultValue={email}
-                        />
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <Input
+                                id="email"
+                                name="email"
+                                type="email"
+                                disabled
+                                label={t('settings.account.email')}
+                                className="sm:col-span-2"
+                                defaultValue={email}
+                            />
 
-                        <Input
-                            id="firstname"
-                            name="firstName"
-                            type="text"
-                            placeholder="John"
-                            label={t('settings.account.firstName')}
-                            className="mb-4"
-                            value={state.firstName}
-                            onChange={onChange}
-                        />
+                            <Input
+                                id="firstname"
+                                name="firstName"
+                                type="text"
+                                placeholder="John"
+                                label={t('settings.account.firstName')}
+                                value={state.firstName}
+                                onChange={onChange}
+                            />
 
-                        <Input
-                            id="lastname"
-                            name="lastName"
-                            type="text"
-                            placeholder="Doe"
-                            label={t('settings.account.lastName')}
-                            className="mb-4"
-                            value={state.lastName}
-                            onChange={onChange}
-                        />
+                            <Input
+                                id="lastname"
+                                name="lastName"
+                                type="text"
+                                placeholder="Doe"
+                                label={t('settings.account.lastName')}
+                                value={state.lastName}
+                                onChange={onChange}
+                            />
 
-                        <Select
-                            id="language"
-                            name="language"
-                            label={t('settings.language.label')}
-                            value={state.language}
-                            onChange={onChange}
-                        >
-                            <option value="en">English</option>
-                            <option value="fr">Français</option>
-                        </Select>
+                            <Select
+                                id="language"
+                                name="language"
+                                label={t('settings.language.label')}
+                                className="sm:col-span-2"
+                                value={state.language}
+                                onChange={onChange}
+                            >
+                                <option value="en">English</option>
+                                <option value="fr">Français</option>
+                            </Select>
+                        </div>
+
+                        {stripe && (
+                            <div className="mt-8 pt-6 border-t border-gray-200">
+                                <h4 className="text-base font-semibold text-gray-900">{t('settings.payment.title')}</h4>
+                                <p className="mt-1 text-sm text-gray-500">{t('settings.payment.description')}</p>
+                                <div className="mt-4">
+                                    {isEditingPayment && <PaymentElement />}
+
+                                    {!isEditingPayment && paymentMethod && (
+                                        <div className="flex flex-col gap-4 rounded-md px-4 py-4 outline-1 -outline-offset-1 outline-gray-300 sm:flex-row sm:items-center sm:justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <CreditCardIcon className="size-8 shrink-0 text-gray-400" />
+                                                <p className="text-sm text-gray-900">
+                                                    <span className="font-medium">{paymentMethod.label}</span>
+                                                    {paymentMethod.expires && <span className="block text-gray-500 sm:inline sm:ml-2">{t('settings.payment.expires', { date: paymentMethod.expires })}</span>}
+                                                </p>
+                                            </div>
+                                            <div className="flex shrink-0 gap-4 text-sm font-medium">
+                                                <button type="button" onClick={onDeletePaymentMethod} disabled={isDeletingPayment} className="cursor-pointer text-gray-700 hover:text-gray-900 disabled:cursor-not-allowed">{isDeletingPayment ? <Loading text={t('apps.loadingStates.deleting')} size="sm" /> : t('settings.payment.delete')}</button>
+                                                <button type="button" onClick={() => setIsEditingPayment(true)} className="cursor-pointer text-gray-700 hover:text-gray-900">{t('settings.payment.edit')}</button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {!isEditingPayment && !paymentMethod && (
+                                        <button type="button" onClick={() => setIsEditingPayment(true)} className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-300 px-3 py-4 text-sm font-medium text-gray-600 hover:border-gray-400 hover:text-gray-900">
+                                            <PlusIcon className="size-5" />
+                                            {t('settings.payment.addMethod')}
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="px-4 py-4 sm:px-6">
-                        <div className="justify-end grid grid-flow-col auto-cols-max gap-2 my-2">
+                        <div className="flex flex-col-reverse gap-2 my-2 sm:flex-row sm:justify-between">
                             <Button onClick={() => setIsModalOpen(true)} secondary>{t('settings.account.deleteAccount')}</Button>
                             <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
                                 <Modal.Header icon={Modal.ExclamationTriangleIcon}>
@@ -184,43 +224,32 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
                     </div>
                 </div>
             </form>
-
-            {stripeEnabled && (
-                <div className="container my-10 bg-white text-gray-700 overflow-hidden shadow rounded-lg divide-y divide-gray-200 my-4">
-                    <div className="px-4 py-5 sm:p-6">
-                        <div className="mb-6">
-                            <h3 className="font-semibold text-gray-700 my-4 text-xl !my-0">{t('settings.payment.title')}</h3>
-                            <p className="mt-1 text-sm text-gray-500">{t('settings.payment.description')}</p>
-                        </div>
-                        {paymentMethod ? (
-                            <div className="flex items-center justify-between">
-                                <p className="text-sm">
-                                    {paymentMethod.type === 'card'
-                                        ? `${t('settings.payment.currentMethod.text1')} ${paymentMethod.brand} ${t('settings.payment.currentMethod.text2')} ${paymentMethod.last4}.`
-                                        : `${t('settings.payment.currentMethod.text1')} ${paymentMethod.label || paymentMethod.brand}.`}
-                                </p>
-                                <Button onClick={redirectToStripePortal} loading={isRedirecting} loadingText={t('apps.loadingStates.default')}>{t('settings.payment.manage')}</Button>
-                            </div>
-                        ) : (
-                            <div className="sm:flex items-center justify-between">
-                                <p className="my-2 text-sm text-gray-500">{t('settings.payment.noMethod')}</p>
-                                <Button onClick={redirectToStripePortal} loading={isRedirecting} loadingText={t('apps.loadingStates.default')}>{t('settings.payment.addMethod')}</Button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
         </Layout>
     );
 };
 
-export const getServerSideProps = async ({ req, locale }) => {
+export default ({ stripePublishableKey, ...props }) => {
+    const [stripePromise] = useState(() => (stripePublishableKey ? loadStripe(stripePublishableKey) : null));
+
+    return (
+        <Elements stripe={stripePromise} options={{ mode: 'setup', currency: DEFAULT_CURRENCY }}>
+            <Settings {...props} />
+        </Elements>
+    );
+};
+
+export const getServerSideProps = async ({ req, query, locale }) => {
     const email = req.headers['x-user-email'];
     const user = await User.findOne({ where: { email }, raw: true }).catch(() => false);
 
     if (!user) return { redirect: { destination: '/logout', permanent: false } };
 
-    const { getStripePaymentMethod } = await import('../lib/stripe');
+    const { getStripePaymentMethod, updateStripePaymentMethod } = await import('../lib/stripe');
+
+    if (query.setup_intent) {
+        await updateStripePaymentMethod(user, query.setup_intent);
+        return { redirect: { destination: `/${locale}/settings`, permanent: false } };
+    }
 
     return {
         props: {
@@ -228,6 +257,7 @@ export const getServerSideProps = async ({ req, locale }) => {
             lastName: user.lastName,
             firstName: user.firstName,
             stripeEnabled: !!process.env.STRIPE_SECRET_KEY,
+            stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY || null,
             paymentMethod: process.env.STRIPE_SECRET_KEY ? await getStripePaymentMethod(user) : null,
             ...(await serverSideTranslations(locale, ['common'], nextI18nextConfig)),
         },

@@ -1,20 +1,23 @@
 /* eslint-disable complexity */
 import { STATE, WEBHOOK_EVENTS, TEMPLATES_URL } from '../../lib/constants';
 import { App, User, Env, Op } from '../../lib/orm';
-import { deploy, remove } from '../../lib/docker';
+import { deploy } from '../../lib/docker';
 import {
     getDomainIp,
     isValidDomain,
     getCustomEnvs,
     triggerWebhook,
+    uninstallApp,
     fetchTemplates,
     useTranslation,
     generatePassword,
     generateReleaseName,
 } from '../../lib/utils';
 import {
-    getStripeSubscriptions,
-    createStripeCheckoutUrl,
+    getStripePaymentMethod,
+    hasStripeTrialInProgress,
+    updateStripePaymentMethod,
+    upsertStripeSubscription,
     cancelStripeSubscription,
 } from '../../lib/stripe';
 
@@ -47,7 +50,7 @@ const getQuery = async (_, res, user) => {
 };
 
 const postQuery = async (req, res, user) => {
-    const { name, returnUrl } = req.body || {};
+    const { name, setupIntentId } = req.body || {};
 
     const releaseName = await generateReleaseName(name);
 
@@ -63,14 +66,13 @@ const postQuery = async (req, res, user) => {
     if (!template) return res.status(400).send({ message: t('template_not_found') });
 
     if (process.env.STRIPE_SECRET_KEY) {
-        const subscriptions = await getStripeSubscriptions(user);
-        const existingSubscription = subscriptions.find((s) => s.metadata.releaseName === releaseName);
+        if (setupIntentId) await updateStripePaymentMethod(user, setupIntentId);
 
-        if (!existingSubscription) {
-            const url = await createStripeCheckoutUrl({ name, releaseName }, user, returnUrl, locale);
-
-            return res.status(201).json({ ok: true, url });
+        if (!(await getStripePaymentMethod(user)) && await hasStripeTrialInProgress(user)) {
+            return res.status(403).json({ message: t('trial_already_in_progress') });
         }
+
+        await upsertStripeSubscription({ ...user, locale }, name, { releaseName });
     }
 
     const app = await App.create({
@@ -210,16 +212,7 @@ const deleteQuery = async (req, res, user) => {
         await cancelStripeSubscription(user, { releaseName });
     }
 
-    await remove(app.releaseName);
-
-    await app.update({ state: STATE.DELETED });
-
-    await triggerWebhook(WEBHOOK_EVENTS.APP_UNINSTALLED, {
-        name: app.name,
-        domain: app.domain,
-        email: user.email,
-        releaseName: app.releaseName,
-    });
+    await uninstallApp(app);
 
     return res.status(200).json({ ok: true });
 };
