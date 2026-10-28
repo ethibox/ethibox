@@ -109,6 +109,7 @@
                 "description": "Vous pouvez modifier les paramètres de votre application ici",
                 "domainLabel": "Nom de domaine",
                 "update": "Mettre à jour",
+                "download": "Télécharger les données",
                 "back": "Retour",
                 "uninstall": "Désinstaller l'application"
             }
@@ -233,6 +234,8 @@
         "template_not_found": "Modèle non trouvé",
         "no_payment_method": "Aucun moyen de paiement trouvé",
         "app_not_found": "Application non trouvée",
+        "download_failed": "Échec du téléchargement des données, un téléchargement est peut-être déjà en cours",
+        "download_disabled": "Le téléchargement des données n'est pas disponible pour cette application",
         "domain_already_exists": "Le domaine existe déjà",
         "unauthorized": "Non autorisé",
         "method_not_allowed": "Méthode non autorisée",
