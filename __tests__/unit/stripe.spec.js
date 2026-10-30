@@ -58,7 +58,7 @@ test('Shoud create a stripe subscription', async () => {
 }, 20000);
 
 test('Should not create a stripe subscription if the customer does not have a payment method', async () => {
-    const user = { id: 2, email: 'contact+2@ethibox.fr' };
+    const user = { id: Date.now(), email: 'contact+2@ethibox.fr' };
     await upsertStripeCustomer({ id: user.id, email: user.email });
 
     const subscription = await upsertStripeSubscription({ id: user.id }, 'Nextcloud');
