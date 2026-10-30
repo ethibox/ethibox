@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.21.1](https://github.com/ethibox/ethibox/compare/v2.21.0...v2.21.1) (2026-10-30)
+
+
+### Bug Fixes
+
+* abort deploy on missing stackfile ([432abb5](https://github.com/ethibox/ethibox/commit/432abb57257934e3266fc6b3fa5fcb3e6bf2abab))
+* ignore draft invoices ([6c6d95b](https://github.com/ethibox/ethibox/commit/6c6d95b2f31ce03077b79c299f4183e62f908d7f))
+
 ## [2.21.0](https://github.com/ethibox/ethibox/compare/v2.20.0...v2.21.0) (2026-10-27)
 
 
