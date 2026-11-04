@@ -70,10 +70,12 @@ test('Should cancel a stripe subscription', async () => {
     const user = { id: 1, email: TEST_EMAIL };
     const subscription = await upsertStripeSubscription({ id: user.id }, 'Nextcloud', { releaseName: 'nextcloud1' });
 
-    await cancelStripeSubscription({ id: user.id }, { releaseName: 'nextcloud1' });
+    await cancelStripeSubscription({ id: user.id }, { releaseName: 'nextcloud1' }, { feedback: 'other', comment: 'Too slow' });
 
     const updatedSubscription = await stripe.subscriptions.retrieve(subscription.id);
     expect(updatedSubscription.status).toBe('canceled');
+    expect(updatedSubscription.cancellation_details.feedback).toBe('other');
+    expect(updatedSubscription.cancellation_details.comment).toBe('Too slow');
 }, 20000);
 
 test('Should create multiple stripe subscriptions with the same product name', async () => {

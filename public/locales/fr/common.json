@@ -117,7 +117,19 @@
             "modal": {
                 "title": "Confirmer la suppression de l'application",
                 "description": "En supprimant votre application, vous supprimerez également toutes les données de votre application et annulerez votre facturation associée.",
-                "question": "Êtes-vous sûr de vouloir désinstaller votre application ?",
+                "feedback": {
+                    "label": "Pouvez-vous nous dire pourquoi vous partez ?",
+                    "placeholder": "Sélectionner une option",
+                    "too_expensive": "Le tarif est trop élevé",
+                    "missing_features": "J'ai besoin de plus de fonctionnalités",
+                    "switched_service": "J'ai trouvé une autre solution",
+                    "unused": "Je n'ai plus besoin de cette fonctionnalité",
+                    "customer_service": "Le service client faisait défaut",
+                    "too_complex": "C'était trop complexe à utiliser",
+                    "low_quality": "La qualité faisait défaut",
+                    "other": "Autre motif",
+                    "comment": "Précisez votre motif"
+                },
                 "uninstall": "Désinstaller",
                 "cancel": "Annuler"
             }

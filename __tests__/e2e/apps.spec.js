@@ -72,6 +72,11 @@ it('Should uninstall an application', () => {
     cy.get('[data-test="app-settings"]:first').click();
     cy.get('[data-test="modal-dropdown').click();
     cy.get('[data-test="modal-dropdown-item"]').contains('Uninstall application').click();
+    cy.get('[role="dialog"]').should('have.length', 1);
+    cy.get('[data-test="uninstall"]').should('be.disabled');
+    cy.get('[data-test="uninstall-feedback"]').select('other');
+    cy.get('[data-test="uninstall"]').should('be.disabled');
+    cy.get('[data-test="uninstall-comment"]').type('Too slow');
     cy.get('[data-test="uninstall"]').click();
 
     cy.get('[data-test="notification"]').should('contain', 'Application uninstalled');

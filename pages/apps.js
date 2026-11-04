@@ -7,7 +7,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Squares2X2Icon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { Button, Empty, Layout, Modal, Input, Loading, Select, ProgressBar, Notification, Confetti } from '../components';
 import nextI18nextConfig from '../next-i18next.config.mjs';
-import { STATE } from '../lib/constants';
+import { STATE, CANCELLATION_FEEDBACKS } from '../lib/constants';
 
 const SettingsModal = ({ app, open, onClose, onSaved, onError, onUninstall }) => {
     const router = useRouter();
@@ -111,17 +111,20 @@ const SettingsModal = ({ app, open, onClose, onSaved, onError, onUninstall }) =>
     );
 };
 
-const ConfirmDeleteModal = ({ app, open, onClose, onConfirm, onError }) => {
+const ConfirmDeleteModal = ({ app, open, onClose, onConfirm, onError, stripeEnabled }) => {
     const router = useRouter();
     const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
+    const [feedback, setFeedback] = useState('');
+    const [comment, setComment] = useState('');
+    const isFeedbackMissing = stripeEnabled && (!feedback || (feedback === 'other' && !comment.trim()));
 
     const onConfirmDelete = async () => {
         setLoading(true);
         fetch('/api/apps', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
-            body: JSON.stringify({ releaseName: app.releaseName }),
+            body: JSON.stringify({ releaseName: app.releaseName, feedback, comment: feedback === 'other' ? comment : '' }),
         })
             .then(async (res) => {
                 if (!res.ok) {
@@ -141,17 +144,41 @@ const ConfirmDeleteModal = ({ app, open, onClose, onConfirm, onError }) => {
 
     return (
         <Modal open={open} onClose={onClose}>
-            <Modal.Header icon={Modal.ExclamationTriangleIcon}>
+            <Modal.Header>
                 <Modal.Title>{t('apps.delete.modal.title')}</Modal.Title>
                 <Modal.Description>
                     {t('apps.delete.modal.description')}
-                    <br />
-                    <br />
-                    <b>{t('apps.delete.modal.question')}</b>
                 </Modal.Description>
+                {stripeEnabled && (
+                    <>
+                        <Select
+                            id="feedback"
+                            className="mt-4"
+                            label={t('apps.delete.modal.feedback.label')}
+                            value={feedback}
+                            onChange={(e) => setFeedback(e.target.value)}
+                            data-test="uninstall-feedback"
+                        >
+                            <option value="">{t('apps.delete.modal.feedback.placeholder')}</option>
+                            {CANCELLATION_FEEDBACKS.map((value) => (
+                                <option key={value} value={value}>{t(`apps.delete.modal.feedback.${value}`)}</option>
+                            ))}
+                        </Select>
+                        {feedback === 'other' && (
+                            <Input
+                                id="comment"
+                                className="mt-4"
+                                label={t('apps.delete.modal.feedback.comment')}
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                                data-test="uninstall-comment"
+                            />
+                        )}
+                    </>
+                )}
             </Modal.Header>
             <Modal.Footer>
-                <Button onClick={onConfirmDelete} loading={loading} loadingText={t('apps.loadingStates.deleting')} className="!bg-red-500 hover:!bg-red-600 disabled:hover:!bg-red-500" data-test="uninstall">{t('apps.delete.modal.uninstall')}</Button>
+                <Button onClick={onConfirmDelete} disabled={isFeedbackMissing} loading={loading} loadingText={t('apps.loadingStates.deleting')} className="!bg-red-500 hover:!bg-red-600 disabled:hover:!bg-red-500" data-test="uninstall">{t('apps.delete.modal.uninstall')}</Button>
                 <Button onClick={onClose} className="bg-white" secondary>{t('apps.delete.modal.cancel')}</Button>
             </Modal.Footer>
         </Modal>
@@ -312,7 +339,9 @@ export default ({ stripeEnabled = false }) => {
             />
 
             <ConfirmDeleteModal
+                key={currentApp?.releaseName}
                 app={currentApp}
+                stripeEnabled={stripeEnabled}
                 open={isConfirmOpen}
                 onClose={() => {
                     setConfirmOpen(false);

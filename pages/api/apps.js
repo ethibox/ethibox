@@ -198,7 +198,7 @@ const putQuery = async (req, res, user) => {
 
 const deleteQuery = async (req, res, user) => {
     const t = useTranslation(req?.headers?.['accept-language']);
-    const { releaseName } = req.body || {};
+    const { releaseName, feedback, comment } = req.body || {};
 
     const app = await App.findOne({ where: { releaseName, userId: user.id } });
 
@@ -207,7 +207,7 @@ const deleteQuery = async (req, res, user) => {
     }
 
     if (process.env.STRIPE_SECRET_KEY) {
-        await cancelStripeSubscription(user, { releaseName });
+        await cancelStripeSubscription(user, { releaseName }, { feedback, comment });
     }
 
     await remove(app.releaseName);

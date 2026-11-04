@@ -117,7 +117,19 @@
             "modal": {
                 "title": "Confirm Application Deletion",
                 "description": "By deleting your application, you will also delete all your application's data and cancel your billing associated.",
-                "question": "Are you sure you want to uninstall your application?",
+                "feedback": {
+                    "label": "Can you tell us why you're leaving?",
+                    "placeholder": "Select an option",
+                    "too_expensive": "It's too expensive",
+                    "missing_features": "I need more features",
+                    "switched_service": "I found an alternative",
+                    "unused": "I no longer need it",
+                    "customer_service": "Customer service was less than expected",
+                    "too_complex": "Ease of use was less than expected",
+                    "low_quality": "Quality was less than expected",
+                    "other": "Other reason",
+                    "comment": "Please tell us more"
+                },
                 "uninstall": "Uninstall",
                 "cancel": "Cancel"
             }
