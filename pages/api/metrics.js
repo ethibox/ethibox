@@ -24,7 +24,7 @@ const isAuthorized = (ip) => {
 export default async (req, res) => {
     register.resetMetrics();
 
-    const ip = req.connection.remoteAddress.replace('::ffff:', '');
+    const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress).split(',').at(-1).trim().replace('::ffff:', '');
 
     if (!isAuthorized(ip)) {
         return res.status(401).send({ success: false, message: 'You are not authorized' });
