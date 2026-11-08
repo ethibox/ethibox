@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.22.0](https://github.com/ethibox/ethibox/compare/v2.21.0...v2.22.0) (2026-11-08)
+
+
+### Features
+
+* add cancellation reason ([c58534a](https://github.com/ethibox/ethibox/commit/c58534a0d9385f82f2c845b3bded606dcc2026c4))
+
+
+### Bug Fixes
+
+* abort deploy on missing stackfile ([432abb5](https://github.com/ethibox/ethibox/commit/432abb57257934e3266fc6b3fa5fcb3e6bf2abab))
+* check client ip on metrics endpoint ([f52c21c](https://github.com/ethibox/ethibox/commit/f52c21cfc2d5bfd5c33e1889c859774dd8095953))
+* ignore draft invoices ([6c6d95b](https://github.com/ethibox/ethibox/commit/6c6d95b2f31ce03077b79c299f4183e62f908d7f))
+
 ## [2.21.0](https://github.com/ethibox/ethibox/compare/v2.20.0...v2.21.0) (2026-10-27)
 
 
