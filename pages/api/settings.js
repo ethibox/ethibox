@@ -21,11 +21,11 @@ const deleteQuery = async (req, res, user) => {
     const apps = await App.findAll({ where: { userId: user.id, state: { [Op.ne]: STATE.DELETED } } });
 
     for await (const app of apps) {
-        await app.update({ state: STATE.DELETED });
-
         if (process.env.STRIPE_SECRET_KEY) {
             await cancelStripeSubscription(user, { releaseName: app.releaseName });
         }
+
+        await app.update({ state: STATE.DELETED });
 
         await triggerWebhook(WEBHOOK_EVENTS.APP_UNINSTALLED, {
             name: app.name,
