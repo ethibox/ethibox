@@ -29,6 +29,20 @@ export default defineConfig({
 
                     return null;
                 },
+                'stripe:complete-checkout': async (sessionId) => {
+                    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+                    const session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ['line_items'] });
+                    const paymentMethod = await stripe.paymentMethods.attach('pm_card_visa', { customer: session.customer });
+
+                    await stripe.subscriptions.create({
+                        customer: session.customer,
+                        default_payment_method: paymentMethod.id,
+                        items: [{ price: session.line_items.data[0].price.id }],
+                        metadata: { releaseName: session.metadata.releaseName },
+                    });
+
+                    return null;
+                },
             });
         },
     },
