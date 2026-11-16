@@ -179,7 +179,7 @@ test('Should fill ADMIN_EMAIL with user email and ADMIN_PASSWORD with generated 
     const adminPasswordEnv = await Env.findOne({ where: { name: 'ADMIN_PASSWORD', appId: app.id } });
 
     expect(adminEmailEnv.value).toBe(TEST_EMAIL);
-    expect(adminPasswordEnv.value).toBeTruthy();
+    expect(adminPasswordEnv.value.length).toBeGreaterThanOrEqual(15);
 }, 20000);
 
 test('Should reject domain update when IP does not match root domain IP', async () => {
