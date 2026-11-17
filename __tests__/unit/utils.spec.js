@@ -1,3 +1,4 @@
+import fs from 'fs';
 import dns from 'dns';
 import { jest } from '@jest/globals';
 import { isDisposableDomain, triggerWebhook, getDomainIp, isValidDomain, getCustomEnvs } from '../../lib/utils';
@@ -75,10 +76,14 @@ test('Should allow custom domain names with app name and numbers from other root
 });
 
 test('Should get custom envs only for corresponding apps', () => {
-    process.env.CUSTOM_ENV_WEKAN_SMTP_HOST = 'smtp.example.com';
-    process.env.CUSTOM_ENV_NEXTCLOUD_OBJECTSTORE_S3_HOST = 's3.example.com';
+    fs.writeFileSync('data/envs.test.json', JSON.stringify({
+        wekan: { SMTP_HOST: 'smtp.example.com' },
+        nextcloud: { OBJECTSTORE_S3_HOST: 's3.example.com' },
+    }));
 
     const envs = getCustomEnvs('nextcloud');
+
+    fs.rmSync('data/envs.test.json');
 
     expect(envs).toEqual([{ name: 'OBJECTSTORE_S3_HOST', value: 's3.example.com' }]);
 });

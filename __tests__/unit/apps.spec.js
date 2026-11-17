@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { jest } from '@jest/globals';
 import { TEST_EMAIL, TEST_PASSWORD } from '../../lib/constants';
 
@@ -15,8 +16,10 @@ beforeAll(async () => {
     await sequelize.sync({ force: true });
 });
 
-test('Should send webhook with CUSTOM_ENV_ALL env when installing a new app', async () => {
-    process.env.CUSTOM_ENV_ALL_VOLUME_PATH = '/mnt/data/';
+afterAll(() => fs.rmSync('data/envs.test.json', { force: true }));
+
+test('Should send webhook with global custom envs when installing a new app', async () => {
+    fs.writeFileSync('data/envs.test.json', JSON.stringify({ all: { VOLUME_PATH: '/mnt/data/' } }));
     global.fetch = jest.fn().mockResolvedValue({ status: 200 });
 
     await User.findOrCreate({ where: { email: TEST_EMAIL }, defaults: { password: TEST_PASSWORD } });
@@ -37,8 +40,8 @@ test('Should send webhook with CUSTOM_ENV_ALL env when installing a new app', as
     expect(envs).toEqual(expect.arrayContaining([{ name: 'VOLUME_PATH', value: '/mnt/data/' }]));
 }, 20000);
 
-test('Should send webhook with CUSTOM_ENV_MYAPP_ env when updating a new app', async () => {
-    process.env.CUSTOM_ENV_NEXTCLOUD_OBJECTSTORE_S3_HOST = 's3.example.com';
+test('Should send webhook with app custom envs when updating a new app', async () => {
+    fs.writeFileSync('data/envs.test.json', JSON.stringify({ nextcloud: { OBJECTSTORE_S3_HOST: 's3.example.com' } }));
     global.fetch = jest.fn().mockResolvedValue({ status: 200 });
 
     const [user] = await User.findOrCreate({ where: { email: TEST_EMAIL }, defaults: { password: TEST_PASSWORD } });
