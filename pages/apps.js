@@ -67,7 +67,12 @@ const SettingsModal = ({ app, open, onClose, onSaved, onError, onUninstall }) =>
     return (
         <Modal open={open} onClose={onClose}>
             <Modal.Header>
-                <Modal.Dropdown items={[{ text: t('apps.settings.modal.uninstall'), icon: Modal.TrashIcon, onClick: onUninstall }]} />
+                <Modal.Dropdown
+                    items={[
+                        ...(app?.downloadable ? [{ text: t('apps.settings.modal.download'), icon: Modal.ArrowDownTrayIcon, onClick: () => window.location.assign(`/api/download?releaseName=${app.releaseName}`) }] : []),
+                        { text: t('apps.settings.modal.uninstall'), icon: Modal.TrashIcon, onClick: onUninstall },
+                    ]}
+                />
                 <Modal.Title>{t('apps.settings.modal.title', { name: app?.name })}</Modal.Title>
                 <Modal.Description>{t('apps.settings.modal.description')}</Modal.Description>
             </Modal.Header>

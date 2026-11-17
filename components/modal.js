@@ -1,5 +1,5 @@
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, DialogDescription, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { ExclamationTriangleIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { ArrowDownTrayIcon, ExclamationTriangleIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 
 const Modal = ({ open, onClose, children }) => (
@@ -82,5 +82,7 @@ Modal.Description = ({ className = '', ...props }) => (
 Modal.ExclamationTriangleIcon = <ExclamationTriangleIcon className="size-6 text-red-600" />;
 
 Modal.TrashIcon = <TrashIcon className="mr-3 size-5 text-gray-400" />;
+
+Modal.ArrowDownTrayIcon = <ArrowDownTrayIcon className="mr-3 size-5 text-gray-400" />;
 
 export default Modal;
