@@ -193,6 +193,10 @@ const putQuery = async (req, res, user) => {
 
     await deploy(payload.stackfile, payload.releaseName, JSON.parse(payload.envs));
 
+    if (app.state !== STATE.WAITING && template?.commit) {
+        await app.update({ commit: template.commit }, { silent: true });
+    }
+
     return res.status(200).json({ ok: true });
 };
 
