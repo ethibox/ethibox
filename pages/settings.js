@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import { Input, Button, Layout, Modal, Notification, Select } from '../components';
+import { Input, Button, Layout, Modal, Notification, Select, Feedback, isFeedbackMissing } from '../components';
 import { User } from '../lib/orm';
 import nextI18nextConfig from '../next-i18next.config.mjs';
 
@@ -14,6 +14,7 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
     const [isRedirecting, setIsRedirecting] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [feedback, setFeedback] = useState({ feedback: '', comment: '' });
     const [state, setState] = useState({ firstName: firstName || '', lastName: lastName || '', language: router.locale });
     const [notification, setNotification] = useState({ show: false, title: '', description: '' });
 
@@ -44,7 +45,11 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
 
     const onDelete = async () => {
         setIsDeleting(true);
-        fetch('/api/settings', { method: 'DELETE' }).then(async (res) => {
+        fetch('/api/settings', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(feedback),
+        }).then(async (res) => {
             if (res.ok) {
                 router.push('/logout');
             }
@@ -173,9 +178,10 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
                                 <Modal.Header icon={Modal.ExclamationTriangleIcon}>
                                     <Modal.Title>{t('settings.account.modal.title')}</Modal.Title>
                                     <Modal.Description>{t('settings.account.modal.description')}</Modal.Description>
+                                    {stripeEnabled && <Feedback value={feedback} onChange={setFeedback} />}
                                 </Modal.Header>
                                 <Modal.Footer>
-                                    <Button onClick={onDelete} loading={isDeleting} loadingText={t('apps.loadingStates.deleting')} className="!bg-red-500 hover:!bg-red-600 disabled:hover:!bg-red-500">{t('settings.account.modal.confirm')}</Button>
+                                    <Button onClick={onDelete} disabled={stripeEnabled && isFeedbackMissing(feedback)} loading={isDeleting} loadingText={t('apps.loadingStates.deleting')} className="!bg-red-500 hover:!bg-red-600 disabled:hover:!bg-red-500">{t('settings.account.modal.confirm')}</Button>
                                     <Button onClick={() => setIsModalOpen(false)} className="bg-white" secondary>{t('settings.account.modal.cancel')}</Button>
                                 </Modal.Footer>
                             </Modal>

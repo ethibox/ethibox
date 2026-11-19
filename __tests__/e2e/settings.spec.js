@@ -30,6 +30,8 @@ it('Should delete account', () => {
 
     cy.get('[role="dialog"]').should('be.visible');
     cy.get('[role="dialog"]').within(() => {
+        cy.contains('button', 'Delete my account').should('be.disabled');
+        cy.get('[data-test="uninstall-feedback"]').select('unused');
         cy.contains('button', 'Delete my account').click();
     });
 

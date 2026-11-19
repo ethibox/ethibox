@@ -5,9 +5,9 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Squares2X2Icon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
-import { Button, Empty, Layout, Modal, Input, Loading, Select, ProgressBar, Notification, Confetti } from '../components';
+import { Button, Empty, Layout, Modal, Input, Loading, Select, ProgressBar, Notification, Confetti, Feedback, isFeedbackMissing } from '../components';
 import nextI18nextConfig from '../next-i18next.config.mjs';
-import { STATE, CANCELLATION_FEEDBACKS } from '../lib/constants';
+import { STATE } from '../lib/constants';
 
 const SettingsModal = ({ app, open, onClose, onSaved, onError, onUninstall }) => {
     const router = useRouter();
@@ -115,16 +115,14 @@ const ConfirmDeleteModal = ({ app, open, onClose, onConfirm, onError, stripeEnab
     const router = useRouter();
     const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
-    const [feedback, setFeedback] = useState('');
-    const [comment, setComment] = useState('');
-    const isFeedbackMissing = stripeEnabled && (!feedback || (feedback === 'other' && !comment.trim()));
+    const [feedback, setFeedback] = useState({ feedback: '', comment: '' });
 
     const onConfirmDelete = async () => {
         setLoading(true);
         fetch('/api/apps', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json', 'Accept-Language': router.locale },
-            body: JSON.stringify({ releaseName: app.releaseName, feedback, comment: feedback === 'other' ? comment : '' }),
+            body: JSON.stringify({ releaseName: app.releaseName, ...feedback }),
         })
             .then(async (res) => {
                 if (!res.ok) {
@@ -149,36 +147,10 @@ const ConfirmDeleteModal = ({ app, open, onClose, onConfirm, onError, stripeEnab
                 <Modal.Description>
                     {t('apps.delete.modal.description')}
                 </Modal.Description>
-                {stripeEnabled && (
-                    <>
-                        <Select
-                            id="feedback"
-                            className="mt-4"
-                            label={t('apps.delete.modal.feedback.label')}
-                            value={feedback}
-                            onChange={(e) => setFeedback(e.target.value)}
-                            data-test="uninstall-feedback"
-                        >
-                            <option value="">{t('apps.delete.modal.feedback.placeholder')}</option>
-                            {CANCELLATION_FEEDBACKS.map((value) => (
-                                <option key={value} value={value}>{t(`apps.delete.modal.feedback.${value}`)}</option>
-                            ))}
-                        </Select>
-                        {feedback === 'other' && (
-                            <Input
-                                id="comment"
-                                className="mt-4"
-                                label={t('apps.delete.modal.feedback.comment')}
-                                value={comment}
-                                onChange={(e) => setComment(e.target.value)}
-                                data-test="uninstall-comment"
-                            />
-                        )}
-                    </>
-                )}
+                {stripeEnabled && <Feedback value={feedback} onChange={setFeedback} />}
             </Modal.Header>
             <Modal.Footer>
-                <Button onClick={onConfirmDelete} disabled={isFeedbackMissing} loading={loading} loadingText={t('apps.loadingStates.deleting')} className="!bg-red-500 hover:!bg-red-600 disabled:hover:!bg-red-500" data-test="uninstall">{t('apps.delete.modal.uninstall')}</Button>
+                <Button onClick={onConfirmDelete} disabled={stripeEnabled && isFeedbackMissing(feedback)} loading={loading} loadingText={t('apps.loadingStates.deleting')} className="!bg-red-500 hover:!bg-red-600 disabled:hover:!bg-red-500" data-test="uninstall">{t('apps.delete.modal.uninstall')}</Button>
                 <Button onClick={onClose} className="bg-white" secondary>{t('apps.delete.modal.cancel')}</Button>
             </Modal.Footer>
         </Modal>
