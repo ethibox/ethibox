@@ -6,6 +6,7 @@ import {
     getDomainIp,
     isValidDomain,
     getCustomEnvs,
+    hasSensitiveEnvs,
     triggerWebhook,
     fetchTemplates,
     useTranslation,
@@ -40,7 +41,7 @@ const getQuery = async (_, res, user) => {
         delete data.id;
         delete data.userId;
 
-        return { ...data, name, logo, category, envs: envs || [] };
+        return { ...data, name, logo, category, envs: envs || [], downloadable: !hasSensitiveEnvs(app.name) };
     });
 
     return res.status(200).json({ apps });

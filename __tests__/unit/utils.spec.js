@@ -1,7 +1,7 @@
 import fs from 'fs';
 import dns from 'dns';
 import { jest } from '@jest/globals';
-import { isDisposableDomain, triggerWebhook, getDomainIp, isValidDomain, getCustomEnvs } from '../../lib/utils';
+import { isDisposableDomain, triggerWebhook, getDomainIp, isValidDomain, getCustomEnvs, hasSensitiveEnvs } from '../../lib/utils';
 
 test('Should get domain IP', async () => {
     const ip = await getDomainIp('localhost');
@@ -86,4 +86,12 @@ test('Should get custom envs only for corresponding apps', () => {
     fs.rmSync('data/envs.test.json');
 
     expect(envs).toEqual([{ name: 'OBJECTSTORE_S3_HOST', value: 's3.example.com' }]);
+});
+
+test('Should detect sensitive envs only for apps with custom envs', () => {
+    process.env.CUSTOM_ENV_ALL_VOLUME_PATH = '/mnt/data/';
+    process.env.CUSTOM_ENV_NEXTCLOUD_OBJECTSTORE_S3_SECRET = 'secret';
+
+    expect(hasSensitiveEnvs('nextcloud')).toBe(true);
+    expect(hasSensitiveEnvs('wordpress')).toBe(false);
 });
