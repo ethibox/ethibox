@@ -59,3 +59,20 @@ test('should reject invalid email', async () => {
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.send).toHaveBeenCalledWith({ message: 'Invalid email address' });
 });
+
+test('should register with an unknown referrer', async () => {
+    const email = `unknown-referrer+${Date.now()}@example.com`;
+
+    const req = { body: { email, password: TEST_PASSWORD, referrerId: 999999 } };
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis(),
+        setHeader: jest.fn().mockReturnThis(),
+    };
+
+    await handler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ ok: true });
+});
