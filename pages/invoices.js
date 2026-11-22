@@ -78,7 +78,7 @@ export default ({ stripeEnabled = false }) => {
                     t('invoices.table.description'),
                     t('invoices.table.total'),
                     t('invoices.table.status'),
-                    <span className="sr-only">{t('invoices.table.view')}</span>,
+                    <span key="view" className="sr-only">{t('invoices.table.view')}</span>,
                 ]}
                 rows={invoices.map((invoice) => ({
                     number: `#${invoice.number}`,
