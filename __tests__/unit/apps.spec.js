@@ -94,6 +94,33 @@ test('Should update envs when updating an application', async () => {
     expect(env?.value).toBe('en');
 });
 
+test('Should not update preset envs when updating an application', async () => {
+    const [user] = await User.findOrCreate({ where: { email: TEST_EMAIL }, defaults: { password: TEST_PASSWORD } });
+    const app = await App.create({ releaseName: 'nextcloud7', domain: 'nextcloud7.localhost', userId: user.id });
+    await Env.create({ name: 'OBJECTSTORE_S3_HOST', value: 's3.example.com', appId: app.id });
+
+    const req = {
+        method: 'PUT',
+        headers: { 'x-user-email': TEST_EMAIL },
+        body: {
+            releaseName: 'nextcloud7',
+            domain: 'nextcloud7.localhost',
+            envs: [{ name: 'OBJECTSTORE_S3_HOST', value: 'evil.example.com' }],
+        },
+    };
+
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+    };
+
+    await handler(req, res);
+
+    const env = await Env.findOne({ where: { name: 'OBJECTSTORE_S3_HOST', appId: app.id } });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(env?.value).toBe('s3.example.com');
+});
+
 test('Should not return preset envs on GET request', async () => {
     const [user] = await User.findOrCreate({ where: { email: TEST_EMAIL }, defaults: { password: TEST_PASSWORD } });
     const app = await App.create({ releaseName: 'nextcloud4', domain: 'nextcloud4.localhost', userId: user.id });

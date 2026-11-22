@@ -155,7 +155,7 @@ const putQuery = async (req, res, user) => {
 
     const templates = await fetchTemplates(false);
     const template = templates.find(({ name }) => name.toLowerCase() === app.name.toLowerCase());
-    const allowedEnvs = (Array.isArray(envs) ? envs : []).filter(({ name }) => (template?.env || []).some((e) => e.name === name && !e.disabled));
+    const allowedEnvs = (Array.isArray(envs) ? envs : []).filter(({ name }) => (template?.env || []).some((e) => e.name === name && !e.disabled && !e.preset));
     const uniqueEnvs = [...new Map([...allowedEnvs, ...getCustomEnvs(app.name)].map((item) => [item.name, item])).values()];
 
     for await (const { name, value } of uniqueEnvs.filter((e) => e.value)) {
