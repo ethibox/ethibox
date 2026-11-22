@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.23.0](https://github.com/ethibox/ethibox/compare/v2.22.0...v2.23.0) (2026-11-22)
+
+
+### Features
+
+* add automatic discounts ([02542e6](https://github.com/ethibox/ethibox/commit/02542e6c37c2cbbc91e9b7a57c03da7f44a58573))
+* add cancellation reason ([42683af](https://github.com/ethibox/ethibox/commit/42683af3758ab6477f2db9ff2af30d4f5a50e53b))
+* move custom envs to json file ([c08ceb9](https://github.com/ethibox/ethibox/commit/c08ceb9ed9ea0f9d271ff0fab0ed44b58587b734))
+
+
+### Bug Fixes
+
+* increase password length ([86f7efa](https://github.com/ethibox/ethibox/commit/86f7efaff7bdc913ce24a3d04135425ba7089533))
+* remove stripe warning ([e18068c](https://github.com/ethibox/ethibox/commit/e18068c7bb42e281ff352b964339c0bda201dd9a))
+* stop billing deleted apps ([b047b26](https://github.com/ethibox/ethibox/commit/b047b26e1c2d45faee7c9f3a6b0d89752db2e476))
+* upgrade disabled templates ([beed21e](https://github.com/ethibox/ethibox/commit/beed21ea00e2ceb17cde682375c5fff50fead784))
+
 ## [2.22.0](https://github.com/ethibox/ethibox/compare/v2.21.0...v2.22.0) (2026-11-08)
 
 
