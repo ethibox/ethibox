@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.23.1](https://github.com/ethibox/ethibox/compare/v2.23.0...v2.23.1) (2026-11-22)
+
+
+### Bug Fixes
+
+* prevent preset envs override ([8dfde78](https://github.com/ethibox/ethibox/commit/8dfde78d5d002017f7c128aa7d13e6932859c8e3))
+* whitelist docker env vars ([cbbd65d](https://github.com/ethibox/ethibox/commit/cbbd65d91515e9cf2da20d7ea63aa6e87756d968))
+
 ## [2.23.0](https://github.com/ethibox/ethibox/compare/v2.22.0...v2.23.0) (2026-11-22)
 
 
