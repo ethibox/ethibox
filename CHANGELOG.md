@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.23.2](https://github.com/ethibox/ethibox/compare/v2.23.1...v2.23.2) (2026-11-24)
+
+
+### Bug Fixes
+
+* invoice table keys ([99835e9](https://github.com/ethibox/ethibox/commit/99835e9684d50a1e85c808da0047263301cfdf1b))
+
 ## [2.23.1](https://github.com/ethibox/ethibox/compare/v2.23.0...v2.23.1) (2026-11-22)
 
 
