@@ -240,7 +240,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.29.7"
 
-"@babel/runtime@^7.23.2", "@babel/runtime@^7.27.6":
+"@babel/runtime@^7.23.2":
   version "7.29.15"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.29.15.tgz#fd047349f32c2e89c28527e023af277e3dc747b6"
   integrity sha512-304gsbbGVmQc+cNGHzwHBlqepYdWLKj3VXCQBGt/EGcV7PUPfKI7kAUNW1FZEOCwlQiLvQjg1JEaAlRQ616h+Q==
@@ -1841,7 +1841,7 @@
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.16.tgz#8ebe53d69efada7044454e3305c19017d97ced2a"
   integrity sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==
 
-"@types/hoist-non-react-statics@^3.3.6":
+"@types/hoist-non-react-statics@^3.3.7":
   version "3.3.7"
   resolved "https://registry.yarnpkg.com/@types/hoist-non-react-statics/-/hoist-non-react-statics-3.3.7.tgz#306e3a3a73828522efa1341159da4846e7573a6c"
   integrity sha512-PQTyIulDkIDro8P+IHbKCsw7U2xxBYflVzW/FgWdCAePD9xGSidgA76/GeJ6lBKoblyhf9pBY763gbrN+1dI8g==
@@ -2747,11 +2747,6 @@ convert-source-map@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/convert-source-map/-/convert-source-map-2.0.0.tgz#4b560f649fc4e918dd0ab75cf4961e8bc882d82a"
   integrity sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==
-
-core-js@^3:
-  version "3.51.0"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.51.0.tgz#9a7b197159ab83173b50efbe0c4846bec94b3abb"
-  integrity sha512-7bDKx/5jm5MxzsXxc93g6Z2+4ZsuT/MddrfRmTDJNAkWsYWHU8EVNEsBiIEWnMAMCHMmRfUEjkuo3jeNBOIHRw==
 
 core-util-is@1.0.2:
   version "1.0.2"
@@ -3845,12 +3840,10 @@ html-escaper@^2.0.0:
   resolved "https://registry.yarnpkg.com/html-escaper/-/html-escaper-2.0.2.tgz#dfd60027da36a36dfcbe236262c00a5822681453"
   integrity sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==
 
-html-parse-stringify@^3.0.1:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/html-parse-stringify/-/html-parse-stringify-3.1.0.tgz#507e6ac96596629d7d7797cf7292549942c13d97"
-  integrity sha512-E0oAXcELOtsXe+BmpJ2EZyedbldPpriV5vICzEuo6xjC/D1lDukOI7KrpfQGF2Qc4wWEy0nk3bFORS2K5ZAhFQ==
-  dependencies:
-    void-elements "3.1.0"
+html-parse-stringify@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/html-parse-stringify/-/html-parse-stringify-4.0.1.tgz#7264be901df0fef8829eb04632191be0aa94f55e"
+  integrity sha512-0zHsZJrK7S3K2aucXWL6ycoYJ/iNtIcFHC/nYQgFklPtrv5LpJctIiSCroWZWeuoXvuyFdzp6KzjJQ+OT5MfFw==
 
 http-signature@~1.4.0:
   version "1.4.0"
@@ -3879,15 +3872,17 @@ human-signals@^2.1.0:
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-2.1.0.tgz#dc91fcba42e4d06e4abaed33b3e7a3c02f514ea0"
   integrity sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==
 
-i18next-fs-backend@^2.6.0:
-  version "2.7.3"
-  resolved "https://registry.yarnpkg.com/i18next-fs-backend/-/i18next-fs-backend-2.7.3.tgz#0547b84301456e1dd0a847bd77c9f761539e8de7"
-  integrity sha512-VEiKwfe4CYKh2LCOtdEWAIS63Z2Gyus22HDHzuiRzeTqArewBXNOJrX5G8WOZxm9qE1BNj0ejiqPirQoST8DtQ==
+i18next-resources-to-backend@^1.2.3:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/i18next-resources-to-backend/-/i18next-resources-to-backend-1.3.0.tgz#0c05094ae2c12be0a455e615e590453431ba587f"
+  integrity sha512-tpSsuGjgK146b9XkCZuaZCDHRc2UMudpNpFFD8grJLUq7vIz1AkXrSlZhaWCtjvgMnGmAXNBuzcUFm0i71O/pA==
+  dependencies:
+    "@babel/runtime" "^7.23.2"
 
-i18next@^26.7.2:
-  version "26.7.2"
-  resolved "https://registry.yarnpkg.com/i18next/-/i18next-26.7.2.tgz#56e7550d479f05d0150479fbb345e6c29b78bbd1"
-  integrity sha512-RsOY3BeaCDdkk52NeJSFAXELQ2rQXBO/tOub6L8ue2ICPfR/FRDWDOfEDg4xMPd1SqO5goVYQ6i72qWEUB/PPw==
+i18next@^27.2.7:
+  version "27.2.7"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-27.2.7.tgz#d95aa4a8b5ad2fc62312479ed74c7f25e8c7de83"
+  integrity sha512-q3XlM8YSo6Nmomd+MQ4JPGJGvhgHwfCRXNeFrM8l0F4TuIuoJBqhCxQrdGDHNMjObRuw5O0ReuU968ZeMVlfnw==
 
 iconv-lite@^0.7.2:
   version "0.7.3"
@@ -5127,16 +5122,14 @@ natural-compare@^1.4.0:
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==
 
-next-i18next@^15.4.3:
-  version "15.4.3"
-  resolved "https://registry.yarnpkg.com/next-i18next/-/next-i18next-15.4.3.tgz#2d9aae8fddf2de1cab5336f95dc69569506bcd9c"
-  integrity sha512-ZRmiz72o1Jvh2ZghCUQX1Ua5F/f2W1/Ila/L1ZeKVuSWiH7J4zfUedfDxNBEhj9lajREC7aoJuPXMFtKi2bdIg==
+next-i18next@^16.5.2:
+  version "16.5.2"
+  resolved "https://registry.yarnpkg.com/next-i18next/-/next-i18next-16.5.2.tgz#ffe392ca3dbaa7ddcfef140da343f35db5ce51a6"
+  integrity sha512-EP1XHfcuP7UUZvPmhVgQmeLzZlOk5F/j989YYHPlhHZNCCTrsvwWTNV2BstHGhUAz3LJ9KKtQblF8pZGQweGLg==
   dependencies:
-    "@babel/runtime" "^7.23.2"
-    "@types/hoist-non-react-statics" "^3.3.6"
-    core-js "^3"
+    "@types/hoist-non-react-statics" "^3.3.7"
     hoist-non-react-statics "^3.3.2"
-    i18next-fs-backend "^2.6.0"
+    i18next-resources-to-backend "^1.2.3"
 
 next@^16.4.6:
   version "16.4.6"
@@ -5605,13 +5598,12 @@ react-dom@^19.3.1:
   dependencies:
     scheduler "^0.28.0"
 
-react-i18next@^15.7.4:
-  version "15.7.4"
-  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-15.7.4.tgz#146e50f220d204b842e22c75d1a3d23c6c589a30"
-  integrity sha512-nyU8iKNrI5uDJch0z9+Y5XEr34b0wkyYj3Rp+tfbahxtlswxSCjcUL9H0nqXo9IR3/t5Y5PKIA3fx3MfUyR9Xw==
+react-i18next@^18.0.3:
+  version "18.0.3"
+  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-18.0.3.tgz#1d85c7a09454f2163acad1bc830d14801f9c500a"
+  integrity sha512-S84rtVuaKuiRtoCOspbGEaDlFjka+KvK/A5YCOr4LQ41XF3iJOrJ5rqQTD/jJHFVUf6X1i4ZMN5PGGgpz8NN6g==
   dependencies:
-    "@babel/runtime" "^7.27.6"
-    html-parse-stringify "^3.0.1"
+    html-parse-stringify "^4.0.1"
 
 react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"
@@ -6537,11 +6529,6 @@ verror@1.10.0:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
-
-void-elements@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/void-elements/-/void-elements-3.1.0.tgz#614f7fbf8d801f0bb5f0661f5b2f5785750e4f09"
-  integrity sha512-Dhxzh5HZuiHQhbvTW9AMetFfBHDMYpo23Uo9btPXgdYP+3T5S+p+jgNy7spra+veYhBP2dCSgxR/i2Y02h5/6w==
 
 wait-on@9.5.1:
   version "9.5.1"

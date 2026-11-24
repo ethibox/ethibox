@@ -1,7 +1,7 @@
 import '../styles/globals.css';
 import Head from 'next/head';
 import { Roboto } from 'next/font/google';
-import { appWithTranslation } from 'next-i18next';
+import { appWithTranslation } from 'next-i18next/pages';
 
 const roboto = Roboto({
     weight: ['300', '400', '500', '700'],

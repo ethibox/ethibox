@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { useTranslation } from 'next-i18next';
+import { useTranslation } from 'next-i18next/pages';
 import { Dialog, DialogBackdrop, DialogPanel, TransitionChild } from '@headlessui/react';
 import { Bars3Icon, Squares2X2Icon, Cog8ToothIcon, DocumentTextIcon, HomeIcon, XMarkIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 

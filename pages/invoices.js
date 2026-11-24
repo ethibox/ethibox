@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'next-i18next';
+import { useTranslation } from 'next-i18next/pages';
 import { DocumentTextIcon } from '@heroicons/react/24/outline';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslations';
 import nextI18nextConfig from '../next-i18next.config.mjs';
 import { Button, Empty, Layout, Loading, Table, Notification } from '../components';
 

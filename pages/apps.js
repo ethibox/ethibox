@@ -2,8 +2,8 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next/pages';
+import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslations';
 import { Squares2X2Icon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { Button, Empty, Layout, Modal, Input, Loading, Select, ProgressBar, Notification, Confetti, Feedback, isFeedbackMissing } from '../components';
 import nextI18nextConfig from '../next-i18next.config.mjs';

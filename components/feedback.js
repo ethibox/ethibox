@@ -1,4 +1,4 @@
-import { useTranslation } from 'next-i18next';
+import { useTranslation } from 'next-i18next/pages';
 import Input from './input';
 import Select from './select';
 import { CANCELLATION_FEEDBACKS } from '../lib/constants';

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next/pages';
+import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { Input, Button, Layout, Modal, Notification, Select, Feedback, isFeedbackMissing } from '../components';
 import { User } from '../lib/orm';
@@ -84,8 +84,8 @@ export default ({ email, firstName = '', lastName = '', paymentMethod = null, st
 
                     setNotification({
                         show: true,
-                        title: t('settings.account.success.title'),
-                        description: t('settings.account.success.description'),
+                        title: t('settings.account.success.title', { lng: state.language }),
+                        description: t('settings.account.success.description', { lng: state.language }),
                     });
                 }
             })

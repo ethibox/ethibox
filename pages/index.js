@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next/pages';
+import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslations';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid';
 import { Notification, Button, Layout } from '../components';
 import { fetchTemplates } from '../lib/utils';
