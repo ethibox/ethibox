@@ -2762,10 +2762,10 @@ cross-spawn@^7.0.0, cross-spawn@^7.0.3, cross-spawn@^7.0.6:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
-cypress@^15.21.2:
-  version "15.21.2"
-  resolved "https://registry.yarnpkg.com/cypress/-/cypress-15.21.2.tgz#83674deec636145f348e3edf95e2a1d5322dff71"
-  integrity sha512-LcO9+YBGT0zlLd9+mD6/O30S1GcvJqBFTOCQ+uTd3nwFi+fTvogSskE3W/BWgDd/iHFkJzuIun5fcDl1aVLKRQ==
+cypress@^16.3.0:
+  version "16.3.0"
+  resolved "https://registry.yarnpkg.com/cypress/-/cypress-16.3.0.tgz#c1335704442ea67effe0643bf1ee098e1f690eda"
+  integrity sha512-h5qq6G9wgNEMWEUFejeBwj7fzwJljrO54n3wAa7yW2Q/8ORnkq4tQBqUhY4g9UM5uOazKmr4ay8YcKi+SJJ1ng==
   dependencies:
     "@cypress/request" "^4.0.0"
     "@cypress/xvfb" "^1.2.4"
@@ -2783,7 +2783,7 @@ cypress@^15.21.2:
     cli-table3 "0.6.1"
     commander "^6.2.1"
     common-tags "^1.8.0"
-    dayjs "^1.10.4"
+    dayjs "^1.11.23"
     debug "^4.3.4"
     eventemitter2 "6.4.7"
     execa "4.1.0"
@@ -2801,7 +2801,7 @@ cypress@^15.21.2:
     proxy-from-env "1.0.0"
     request-progress "^3.0.0"
     supports-color "^8.1.1"
-    systeminformation "^5.31.1"
+    systeminformation "^5.33.16"
     tmp "~0.2.4"
     tree-kill "1.2.2"
     untildify "^4.0.0"
@@ -2851,7 +2851,7 @@ data-view-byte-offset@^1.0.1:
     es-errors "^1.3.0"
     is-data-view "^1.0.1"
 
-dayjs@^1.10.4:
+dayjs@^1.11.23:
   version "1.11.23"
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.23.tgz#b0a363506dde5f36cf5075e42ebe8115165a8c79"
   integrity sha512-QDTCU0M0MxR3hQfnlDJfwekQiaanm1ubOD231u73WBckQ/fsamwRLiE2GBz6D3a/xF1NgfiDLJjXBa1hYOYTtQ==
@@ -6221,7 +6221,7 @@ synckit@^0.11.8:
   dependencies:
     "@pkgr/core" "^0.3.6"
 
-systeminformation@^5.31.1:
+systeminformation@^5.33.16:
   version "5.33.25"
   resolved "https://registry.yarnpkg.com/systeminformation/-/systeminformation-5.33.25.tgz#3615d6ea81492cfa73f70ee31b8930cee8e70f97"
   integrity sha512-kSdv4FbVh87DT89E3WapR8K7M93XXtaOvuSZahA4MpCaXflsS9KOO40d7GsZkoIkvAJLmS67WanUORcoruvYtg==
